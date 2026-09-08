@@ -1,0 +1,277 @@
+import React, { useState, useEffect } from 'react';
+import Header from './components/Header';
+import HeroSection from './components/HeroSection';
+import Highlights from './components/Highlights';
+import RoomsSection from './components/RoomsSection';
+import MenuSection from './components/MenuSection';
+import GallerySection from './components/GallerySection';
+import ReviewsSection from './components/ReviewsSection';
+import ContactSection from './components/ContactSection';
+import Footer from './components/Footer';
+import BookingModal from './components/BookingModal';
+
+import AdminLogin from './admin/AdminLogin';
+import AdminDashboard from './admin/AdminDashboard';
+
+import { initialRooms } from './data/roomsData';
+import { initialMenuItems } from './data/menuData';
+import { initialGallery } from './data/galleryData';
+import { initialReviews } from './data/reviewsData';
+
+export default function App() {
+  // Trilingual Language State (remembers choice)
+  const [lang, setLang] = useState(() => {
+    return localStorage.getItem('bisrat_lang') || 'en';
+  });
+
+  useEffect(() => {
+    localStorage.setItem('bisrat_lang', lang);
+  }, [lang]);
+
+  // Persistent 3-Tab Main Navigation ('home' | 'menu' | 'admin')
+  const [activeTab, setActiveTab] = useState('home');
+
+  // Rooms Data State
+  const [rooms, setRooms] = useState(() => {
+    const saved = localStorage.getItem('bisrat_rooms');
+    return saved ? JSON.parse(saved) : initialRooms;
+  });
+  useEffect(() => {
+    localStorage.setItem('bisrat_rooms', JSON.stringify(rooms));
+  }, [rooms]);
+
+  // Menu Items State (Live Out-of-Stock sync)
+  const [menuItems, setMenuItems] = useState(() => {
+    const saved = localStorage.getItem('bisrat_menu');
+    return saved ? JSON.parse(saved) : initialMenuItems;
+  });
+  useEffect(() => {
+    localStorage.setItem('bisrat_menu', JSON.stringify(menuItems));
+  }, [menuItems]);
+
+  // Facilities / Amenities State
+  const [facilities, setFacilities] = useState(() => {
+    const saved = localStorage.getItem('bisrat_facilities');
+    return saved ? JSON.parse(saved) : [
+      {
+        id: "fac-1",
+        iconType: "Wifi",
+        title: "High-Speed WiFi",
+        desc: "Uninterrupted fiber optic internet throughout the hotel premises.",
+        bg: "bg-sky-50 text-skybrand-600 border-sky-100"
+      },
+      {
+        id: "fac-2",
+        iconType: "Utensils",
+        title: "Gourmet Restaurant & Bar",
+        desc: "Traditional Ethiopian cuisine & international dishes prepared fresh daily.",
+        bg: "bg-blue-50 text-blue-600 border-blue-100"
+      },
+      {
+        id: "fac-3",
+        iconType: "Car",
+        title: "Ample Secure Parking",
+        desc: "24/7 guarded private parking for your vehicle's safety.",
+        bg: "bg-emerald-50 text-emerald-600 border-emerald-100"
+      },
+      {
+        id: "fac-4",
+        iconType: "Zap",
+        title: "24/7 Power Backup",
+        desc: "Automatic heavy-duty generators ensure zero power interruptions.",
+        bg: "bg-amber-50 text-amber-600 border-amber-100"
+      }
+    ];
+  });
+  useEffect(() => {
+    localStorage.setItem('bisrat_facilities', JSON.stringify(facilities));
+  }, [facilities]);
+
+  // Bookings Data State
+  const [bookings, setBookings] = useState(() => {
+    const saved = localStorage.getItem('bisrat_bookings');
+    return saved ? JSON.parse(saved) : [
+      {
+        id: "BH-2026-9041",
+        roomName: "Deluxe King Room",
+        guestName: "Abebe Bikila",
+        phone: "0911223344",
+        email: "abebe@example.com",
+        checkIn: "2026-09-10",
+        checkOut: "2026-09-12",
+        nights: 2,
+        guests: 2,
+        totalPrice: 5000,
+        paymentMethod: "telebirr",
+        status: "Confirmed",
+        createdAt: "2026-09-08"
+      }
+    ];
+  });
+  useEffect(() => {
+    localStorage.setItem('bisrat_bookings', JSON.stringify(bookings));
+  }, [bookings]);
+
+  // Reviews Data State
+  const [reviews, setReviews] = useState(() => {
+    const saved = localStorage.getItem('bisrat_reviews');
+    return saved ? JSON.parse(saved) : initialReviews;
+  });
+  useEffect(() => {
+    localStorage.setItem('bisrat_reviews', JSON.stringify(reviews));
+  }, [reviews]);
+
+  // Photo Upload Manager State
+  const [photos, setPhotos] = useState(() => {
+    const saved = localStorage.getItem('bisrat_photos');
+    return saved ? JSON.parse(saved) : {};
+  });
+  useEffect(() => {
+    localStorage.setItem('bisrat_photos', JSON.stringify(photos));
+  }, [photos]);
+
+  // Admin Auth State
+  const [isAdminAuth, setIsAdminAuth] = useState(() => {
+    return localStorage.getItem('bisrat_admin_auth') === 'true';
+  });
+
+  const handleAdminLogin = () => {
+    setIsAdminAuth(true);
+    localStorage.setItem('bisrat_admin_auth', 'true');
+  };
+
+  const handleAdminLogout = () => {
+    setIsAdminAuth(false);
+    localStorage.removeItem('bisrat_admin_auth');
+    setActiveTab('home');
+  };
+
+  // Booking Modal State
+  const [isBookingOpen, setIsBookingOpen] = useState(false);
+  const [selectedRoomForBooking, setSelectedRoomForBooking] = useState(null);
+
+  const handleOpenBooking = (room = null) => {
+    setSelectedRoomForBooking(room || rooms[0]);
+    setIsBookingOpen(true);
+  };
+
+  const handleBookingSubmit = (newBooking) => {
+    setBookings([newBooking, ...bookings]);
+  };
+
+  const handleAddReview = (newReview) => {
+    setReviews([newReview, ...reviews]);
+  };
+
+  return (
+    <div className="min-h-screen flex flex-col bg-softbg text-slate-800 selection:bg-skybrand-100 selection:text-skybrand-800">
+      
+      {/* Sticky Header with Logo, Trilingual Switcher, and Desktop/Mobile 3-Tab Bar */}
+      <Header
+        activeTab={activeTab}
+        setActiveTab={setActiveTab}
+        lang={lang}
+        setLang={setLang}
+        onBookClick={() => handleOpenBooking()}
+      />
+
+      {/* Main Content Area based on 3-Tab Bar */}
+      <main className="flex-1">
+        
+        {/* TAB 1: HOME */}
+        {activeTab === 'home' && (
+          <div className="animate-fade-in">
+            <HeroSection
+              lang={lang}
+              photos={photos}
+              onBookClick={() => handleOpenBooking()}
+              onExploreMenuClick={() => setActiveTab('menu')}
+            />
+
+            <Highlights lang={lang} facilities={facilities} />
+
+            <RoomsSection
+              rooms={rooms}
+              photos={photos}
+              lang={lang}
+              onSelectRoom={(room) => handleOpenBooking(room)}
+            />
+
+            <GallerySection
+              gallery={initialGallery}
+              photos={photos}
+              lang={lang}
+            />
+
+            <ReviewsSection
+              reviews={reviews}
+              lang={lang}
+              onAddReview={handleAddReview}
+            />
+
+            <ContactSection lang={lang} />
+          </div>
+        )}
+
+        {/* TAB 2: RESTAURANT & BAR MENU */}
+        {activeTab === 'menu' && (
+          <div className="animate-fade-in">
+            <MenuSection
+              menuItems={menuItems}
+              photos={photos}
+              lang={lang}
+            />
+          </div>
+        )}
+
+        {/* TAB 3: ADMIN PORTAL */}
+        {activeTab === 'admin' && (
+          <div className="animate-fade-in">
+            {!isAdminAuth ? (
+              <AdminLogin
+                lang={lang}
+                onLoginSuccess={handleAdminLogin}
+              />
+            ) : (
+              <AdminDashboard
+                rooms={rooms}
+                setRooms={setRooms}
+                bookings={bookings}
+                setBookings={setBookings}
+                menuItems={menuItems}
+                setMenuItems={setMenuItems}
+                reviews={reviews}
+                setReviews={setReviews}
+                photos={photos}
+                setPhotos={setPhotos}
+                facilities={facilities}
+                setFacilities={setFacilities}
+                lang={lang}
+                onLogout={handleAdminLogout}
+              />
+            )}
+          </div>
+        )}
+
+      </main>
+
+      {/* Footer */}
+      <Footer
+        lang={lang}
+        setLang={setLang}
+        setActiveTab={setActiveTab}
+      />
+
+      {/* Interactive Booking Modal */}
+      <BookingModal
+        isOpen={isBookingOpen}
+        onClose={() => setIsBookingOpen(false)}
+        selectedRoom={selectedRoomForBooking}
+        rooms={rooms}
+        lang={lang}
+        onBookingSubmit={handleBookingSubmit}
+      />
+
+    </div>
+  );
+}

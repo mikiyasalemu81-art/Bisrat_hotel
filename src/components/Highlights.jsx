@@ -1,0 +1,98 @@
+import React from 'react';
+import { Wifi, Utensils, Car, Zap, Coffee, Building2, Shield, CheckCircle2 } from 'lucide-react';
+import { translations } from '../translations';
+
+const iconMap = {
+  Wifi: Wifi,
+  Utensils: Utensils,
+  Car: Car,
+  Zap: Zap,
+  Coffee: Coffee,
+  Building2: Building2,
+  Shield: Shield
+};
+
+export default function Highlights({ lang, facilities = [] }) {
+  const t = translations[lang] || translations.en;
+
+  const defaultFeatures = [
+    {
+      id: "fac-1",
+      iconType: "Wifi",
+      title: t.highlights.wifi,
+      desc: t.highlights.wifiDesc,
+      bg: "bg-sky-50 text-skybrand-600 border-sky-100"
+    },
+    {
+      id: "fac-2",
+      iconType: "Utensils",
+      title: t.highlights.dining,
+      desc: t.highlights.diningDesc,
+      bg: "bg-blue-50 text-blue-600 border-blue-100"
+    },
+    {
+      id: "fac-3",
+      iconType: "Car",
+      title: t.highlights.parking,
+      desc: t.highlights.parkingDesc,
+      bg: "bg-emerald-50 text-emerald-600 border-emerald-100"
+    },
+    {
+      id: "fac-4",
+      iconType: "Zap",
+      title: t.highlights.power,
+      desc: t.highlights.powerDesc,
+      bg: "bg-amber-50 text-amber-600 border-amber-100"
+    }
+  ];
+
+  const displayList = facilities.length > 0 ? facilities : defaultFeatures;
+
+  return (
+    <section className="py-16 bg-white border-y border-slate-100">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        
+        <div className="text-center max-w-2xl mx-auto mb-12">
+          <h2 className="fluid-section-title font-serif font-bold text-navybrand-900 mb-3">
+            {t.highlights.title}
+          </h2>
+          <p className="text-slate-600 text-sm sm:text-base">
+            {t.highlights.subtitle}
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          {displayList.map((f, i) => {
+            const Icon = iconMap[f.iconType] || Wifi;
+            return (
+              <div 
+                key={f.id || i}
+                className="card-hover-effect rounded-2xl p-6 border border-slate-200/80 shadow-soft flex flex-col justify-between group"
+              >
+                <div>
+                  <div className={`w-12 h-12 rounded-2xl ${f.bg || 'bg-sky-50 text-skybrand-600 border-sky-100'} border flex items-center justify-center mb-4 group-hover:scale-110 transition-transform`}>
+                    <Icon className="w-6 h-6" />
+                  </div>
+
+                  <h3 className="font-serif text-lg font-bold text-navybrand-900 mb-2">
+                    {f.title}
+                  </h3>
+
+                  <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
+                    {f.desc}
+                  </p>
+                </div>
+
+                <div className="mt-4 pt-3 border-t border-slate-200/60 flex items-center gap-1.5 text-[11px] font-semibold text-skybrand-700">
+                  <CheckCircle2 className="w-3.5 h-3.5" />
+                  <span>Verified Hotel Amenity</span>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+
+      </div>
+    </section>
+  );
+}
