@@ -35,7 +35,7 @@ export default function Header({
 
   return (
     <header className={`sticky top-0 z-40 transition-all duration-300 ${
-      scrolled ? 'glass-header shadow-lg py-2 border-b border-[#2D2D2D]' : 'bg-[#1A1A1A] border-b border-[#2A2A2A] py-3'
+      scrolled ? 'glass-header shadow-lg py-1 border-b border-[#2D2D2D]' : 'bg-[#1A1A1A] border-b border-[#2A2A2A] py-1.5 sm:py-2'
     }`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between gap-3 sm:gap-4">
@@ -43,9 +43,9 @@ export default function Header({
           {/* Official Crest Logo & Brand */}
           <div 
             onClick={() => setActiveTab('home')}
-            className="flex items-center gap-2.5 sm:gap-3 cursor-pointer group select-none"
+            className="flex items-center gap-2 sm:gap-2.5 cursor-pointer group select-none"
           >
-            <div className="w-11 h-11 sm:w-12 sm:h-12 rounded-full overflow-hidden shadow-md border-2 border-[#C8A24A] bg-[#1A1A1A] p-0.5 group-hover:scale-105 transition-transform shrink-0">
+            <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-full overflow-hidden shadow-md border-2 border-[#C8A24A] bg-[#1A1A1A] p-0.5 group-hover:scale-105 transition-transform shrink-0">
               <img 
                 src="/images/logo.jpg" 
                 alt="Bisrat Luxury Hotel Logo Crest" 
@@ -55,16 +55,13 @@ export default function Header({
 
             <div>
               <div className="flex items-center gap-1.5">
-                <span className="font-serif text-xl sm:text-2xl font-bold text-white tracking-tight leading-none group-hover:text-[#C8A24A] transition-colors">
+                <span className="font-serif text-lg sm:text-xl font-bold text-white tracking-tight leading-none group-hover:text-[#C8A24A] transition-colors">
                   {t.brandName}
                 </span>
-                <span className="hidden xs:inline-block bg-[#C8A24A]/20 text-[#C8A24A] border border-[#C8A24A]/40 text-[10px] font-bold px-1.5 py-0.5 rounded uppercase">
+                <span className="hidden xs:inline-block bg-[#C8A24A]/20 text-[#C8A24A] border border-[#C8A24A]/40 text-[9px] font-bold px-1.5 py-0.5 rounded uppercase">
                   Adama
                 </span>
               </div>
-              <p className="text-[11px] text-slate-400 font-medium">
-                {t.brandAmharic} • Luxury Comfort in Adama
-              </p>
             </div>
           </div>
 

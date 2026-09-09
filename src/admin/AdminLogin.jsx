@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Lock, ShieldCheck, KeyRound, AlertCircle } from 'lucide-react';
 import { translations } from '../translations';
 
-export default function AdminLogin({ lang, onLoginSuccess }) {
+export default function AdminLogin({ lang, onLoginSuccess, adminPassword }) {
   const t = translations[lang] || translations.en;
 
   const [password, setPassword] = useState('');
@@ -10,7 +10,8 @@ export default function AdminLogin({ lang, onLoginSuccess }) {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (password === 'bisrathotel123') {
+    const validPassword = adminPassword || localStorage.getItem('bisrat_admin_password') || 'bisrathotel123';
+    if (password === validPassword) {
       setError(false);
       onLoginSuccess();
     } else {
@@ -67,10 +68,6 @@ export default function AdminLogin({ lang, onLoginSuccess }) {
             <Lock className="w-4 h-4 text-[#1A1A1A]" />
             <span>{t.admin.loginBtn}</span>
           </button>
-
-          <p className="text-[11px] text-slate-500 italic pt-2">
-            Default Password: <code className="bg-white border border-[#E8E0D2] text-[#977227] px-1.5 py-0.5 rounded font-mono font-bold">bisrathotel123</code>
-          </p>
 
         </form>
 

@@ -152,10 +152,17 @@ export default function App() {
     localStorage.setItem('bisrat_photos', JSON.stringify(photos));
   }, [photos]);
 
-  // Admin Auth State
+  // Admin Auth & Password State
   const [isAdminAuth, setIsAdminAuth] = useState(() => {
     return localStorage.getItem('bisrat_admin_auth') === 'true';
   });
+
+  const [adminPassword, setAdminPassword] = useState(() => {
+    return localStorage.getItem('bisrat_admin_password') || 'bisrathotel123';
+  });
+  useEffect(() => {
+    localStorage.setItem('bisrat_admin_password', adminPassword);
+  }, [adminPassword]);
 
   const handleAdminLogin = () => {
     setIsAdminAuth(true);
@@ -254,6 +261,7 @@ export default function App() {
               <AdminLogin
                 lang={lang}
                 onLoginSuccess={handleAdminLogin}
+                adminPassword={adminPassword}
               />
             ) : (
               <AdminDashboard
@@ -271,6 +279,8 @@ export default function App() {
                 setFacilities={setFacilities}
                 paymentSettings={paymentSettings}
                 setPaymentSettings={setPaymentSettings}
+                adminPassword={adminPassword}
+                setAdminPassword={setAdminPassword}
                 lang={lang}
                 onLogout={handleAdminLogout}
               />

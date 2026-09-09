@@ -1,7 +1,12 @@
 import React, { useState } from 'react';
-import { CreditCard, Phone, Hash, Save, CheckCircle, Smartphone, Building2, Utensils } from 'lucide-react';
+import { CreditCard, Phone, Hash, Save, CheckCircle, Smartphone, Building2, Utensils, Lock, KeyRound } from 'lucide-react';
 
-export default function PaymentSettingsManager({ paymentSettings, setPaymentSettings }) {
+export default function PaymentSettingsManager({ 
+  paymentSettings, 
+  setPaymentSettings,
+  adminPassword,
+  setAdminPassword
+}) {
   const [formData, setFormData] = useState({
     tableNumber: paymentSettings?.tableNumber || "12",
     phoneNumber: paymentSettings?.phoneNumber || "0906320251",
@@ -15,6 +20,44 @@ export default function PaymentSettingsManager({ paymentSettings, setPaymentSett
   });
 
   const [savedSuccess, setSavedSuccess] = useState(false);
+
+  // Change Password state
+  const [currentPwd, setCurrentPwd] = useState('');
+  const [newPwd, setNewPwd] = useState('');
+  const [confirmPwd, setConfirmPwd] = useState('');
+  const [pwdError, setPwdError] = useState('');
+  const [pwdSuccess, setPwdSuccess] = useState(false);
+
+  const handlePasswordChange = () => {
+    const activePassword = adminPassword || localStorage.getItem('bisrat_admin_password') || 'bisrathotel123';
+    if (!currentPwd) {
+      setPwdError('Please enter your current password.');
+      return;
+    }
+    if (currentPwd !== activePassword) {
+      setPwdError('Current password is incorrect.');
+      return;
+    }
+    if (!newPwd || newPwd.length < 4) {
+      setPwdError('New password must be at least 4 characters long.');
+      return;
+    }
+    if (newPwd !== confirmPwd) {
+      setPwdError('New password and confirmation do not match.');
+      return;
+    }
+
+    if (setAdminPassword) {
+      setAdminPassword(newPwd);
+    }
+    localStorage.setItem('bisrat_admin_password', newPwd);
+    setPwdError('');
+    setPwdSuccess(true);
+    setCurrentPwd('');
+    setNewPwd('');
+    setConfirmPwd('');
+    setTimeout(() => setPwdSuccess(false), 4000);
+  };
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -243,6 +286,80 @@ export default function PaymentSettingsManager({ paymentSettings, setPaymentSett
               />
             </label>
 
+          </div>
+        </div>
+
+        {/* Section 4: Security & Admin Password Update */}
+        <div className="bg-[#F4EFE6] p-5 rounded-2xl border border-[#E8E0D2] space-y-4">
+          <h4 className="font-bold text-sm text-[#1A1A1A] flex items-center gap-2">
+            <Lock className="w-4 h-4 text-[#C8A24A]" />
+            <span>Admin Portal Password Security</span>
+          </h4>
+
+          <div className="space-y-4">
+            {pwdError && (
+              <div className="p-3 bg-red-50 border border-red-200 text-red-700 rounded-xl text-xs font-semibold">
+                {pwdError}
+              </div>
+            )}
+            {pwdSuccess && (
+              <div className="p-3 bg-emerald-50 border border-emerald-200 text-emerald-700 rounded-xl text-xs font-semibold flex items-center gap-2">
+                <CheckCircle className="w-4 h-4 text-emerald-600" />
+                <span>Admin Password updated successfully!</span>
+              </div>
+            )}
+
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <div>
+                <label className="block text-xs font-bold text-slate-700 mb-1">
+                  Current Password
+                </label>
+                <input
+                  type="password"
+                  placeholder="Enter current password..."
+                  value={currentPwd}
+                  onChange={(e) => { setCurrentPwd(e.target.value); setPwdError(''); setPwdSuccess(false); }}
+                  className="w-full bg-white border border-[#E8E0D2] rounded-xl px-3.5 py-2.5 text-sm text-slate-800 focus:ring-2 focus:ring-[#C8A24A] focus:outline-none"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-slate-700 mb-1">
+                  New Password
+                </label>
+                <input
+                  type="password"
+                  placeholder="Enter new password..."
+                  value={newPwd}
+                  onChange={(e) => { setNewPwd(e.target.value); setPwdError(''); setPwdSuccess(false); }}
+                  className="w-full bg-white border border-[#E8E0D2] rounded-xl px-3.5 py-2.5 text-sm text-slate-800 focus:ring-2 focus:ring-[#C8A24A] focus:outline-none"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-slate-700 mb-1">
+                  Confirm New Password
+                </label>
+                <input
+                  type="password"
+                  placeholder="Confirm new password..."
+                  value={confirmPwd}
+                  onChange={(e) => { setConfirmPwd(e.target.value); setPwdError(''); setPwdSuccess(false); }}
+                  className="w-full bg-white border border-[#E8E0D2] rounded-xl px-3.5 py-2.5 text-sm text-slate-800 focus:ring-2 focus:ring-[#C8A24A] focus:outline-none"
+                />
+              </div>
+            </div>
+
+            <div className="flex justify-end pt-1">
+              <button
+                type="button"
+                onClick={handlePasswordChange}
+                className="flex items-center gap-2 bg-[#1A1A1A] hover:bg-[#262626] text-white font-bold px-5 py-2.5 rounded-xl text-xs border border-[#C8A24A]/40 shadow-sm transition-all"
+              >
+                <KeyRound className="w-4 h-4 text-[#C8A24A]" />
+                <span>Update Admin Password</span>
+              </button>
+            </div>
           </div>
         </div>
 

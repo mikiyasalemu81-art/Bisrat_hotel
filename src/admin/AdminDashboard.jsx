@@ -24,6 +24,8 @@ export default function AdminDashboard({
   setFacilities,
   paymentSettings,
   setPaymentSettings,
+  adminPassword,
+  setAdminPassword,
   lang,
   onLogout 
 }) {
@@ -127,6 +129,8 @@ export default function AdminDashboard({
           <PaymentSettingsManager 
             paymentSettings={paymentSettings} 
             setPaymentSettings={setPaymentSettings} 
+            adminPassword={adminPassword}
+            setAdminPassword={setAdminPassword}
           />
         )}
 
