@@ -84,9 +84,6 @@ export const translations = {
       collapseAll: "Collapse All",
       tapToViewPhoto: "Tap item to view photo full-screen",
       closePhoto: "Close Photo",
-      aiPromptLabel: "AI Photography Prompt",
-      copyPrompt: "Copy Prompt",
-      promptCopied: "Prompt Copied!",
       itemCount: "items",
       viewFullRes: "Full-Screen Photo",
       categories: {
@@ -296,9 +293,6 @@ export const translations = {
       collapseAll: "ሁሉንም ዝጋ",
       tapToViewPhoto: "ፎቶ በሙሉ ገጽ ለማየት ይጫኑ",
       closePhoto: "ዝጋ",
-      aiPromptLabel: "የምስል መፍጠሪያ ትእዛዝ (AI Prompt)",
-      copyPrompt: "ትእዛዝ ኮፒ አድርግ",
-      promptCopied: "ኮፒ ተደርጓል!",
       itemCount: "ዓይነቶች",
       viewFullRes: "ትልቅ ፎቶ ይመልከቱ",
       categories: {
@@ -508,9 +502,6 @@ export const translations = {
       collapseAll: "Hunda Cufi",
       tapToViewPhoto: "Suuraa guutuu argachuuf tuqaa",
       closePhoto: "Cufaa",
-      aiPromptLabel: "Ajaja Uumuu Suuraa AI",
-      copyPrompt: "Ajaja Kopiisi",
-      promptCopied: "Kopiifameera!",
       itemCount: "qoodamuu",
       viewFullRes: "Suuraa Guutuu Ilaalaa",
       categories: {

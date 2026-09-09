@@ -21,11 +21,8 @@ import {
   ChevronRight, 
   X, 
   Camera, 
-  Copy, 
-  Check, 
-  SlidersHorizontal,
-  Layers,
-  Sparkle
+  CheckCircle2,
+  Utensils
 } from 'lucide-react';
 import { CATEGORY_CONFIG } from '../data/menuData';
 import { translations } from '../translations';
@@ -54,11 +51,11 @@ export default function MenuSection({
 }) {
   const t = translations[lang] || translations.en;
 
-  // Search & Active Filter State
+  // Search & Active Category Filter State
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
 
-  // Collapsible Accordion State: record which category IDs are expanded
+  // Collapsible Accordion State
   // Default: start with the first 4 popular categories open for immediate visual appeal
   const [expandedCategories, setExpandedCategories] = useState(() => {
     return {
@@ -69,14 +66,13 @@ export default function MenuSection({
     };
   });
 
-  // Lightbox Modal State for Full-Screen Dish Photo
+  // Lightbox Modal State for Full-Screen Dish Photo (100% React state, NO history manipulation)
   const [lightboxItem, setLightboxItem] = useState(null);
-  const [isCopiedPrompt, setIsCopiedPrompt] = useState(false);
   const [imageLoading, setImageLoading] = useState(true);
 
   // Available items (only show isAvailable === true items on public menu)
   const availableItems = useMemo(() => {
-    return menuItems.filter(item => item.isAvailable !== false);
+    return menuItems.filter(item => item && item.isAvailable !== false);
   }, [menuItems]);
 
   // Group available items by category
@@ -140,7 +136,11 @@ export default function MenuSection({
   }, [searchQuery, filteredCategoryItems]);
 
   // Accordion Toggle
-  const toggleCategory = useCallback((categoryId) => {
+  const toggleCategory = useCallback((categoryId, e) => {
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
     setExpandedCategories(prev => ({
       ...prev,
       [categoryId]: !prev[categoryId]
@@ -148,7 +148,8 @@ export default function MenuSection({
   }, []);
 
   // Expand All / Collapse All
-  const handleExpandAll = useCallback(() => {
+  const handleExpandAll = useCallback((e) => {
+    if (e) e.preventDefault();
     const allExpanded = {};
     CATEGORY_CONFIG.forEach(cat => {
       allExpanded[cat.id] = true;
@@ -156,57 +157,47 @@ export default function MenuSection({
     setExpandedCategories(allExpanded);
   }, []);
 
-  const handleCollapseAll = useCallback(() => {
+  const handleCollapseAll = useCallback((e) => {
+    if (e) e.preventDefault();
     setExpandedCategories({});
   }, []);
 
-  // Open Lightbox Modal with Browser History Support (Back button closes modal)
-  const openLightbox = useCallback((item) => {
-    setImageLoading(true);
-    setIsCopiedPrompt(false);
-    setLightboxItem(item);
-
-    // Push state so mobile back button closes the lightbox
-    try {
-      window.history.pushState({ bisratModal: 'lightbox', itemId: item.id }, '');
-    } catch (e) {
-      // ignore
+  // Open Lightbox Modal (Clean React state only - no history.pushState to avoid page reload)
+  const openLightbox = useCallback((item, e) => {
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
     }
+    if (!item) return;
+    setImageLoading(true);
+    setLightboxItem(item);
   }, []);
 
   // Close Lightbox Modal
-  const closeLightbox = useCallback(() => {
+  const closeLightbox = useCallback((e) => {
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
     setLightboxItem(null);
-    setIsCopiedPrompt(false);
   }, []);
 
-  // Handle browser back button (popstate) & keyboard Escape / Arrow navigation
+  // Keyboard Escape & Arrow navigation for the lightbox
   useEffect(() => {
-    const handlePopState = (e) => {
-      if (lightboxItem) {
-        closeLightbox();
-      }
-    };
-
     const handleKeyDown = (e) => {
       if (!lightboxItem) return;
 
       if (e.key === 'Escape') {
-        closeLightbox();
+        closeLightbox(e);
       } else if (e.key === 'ArrowRight') {
-        navigateDish(1);
+        navigateDish(1, e);
       } else if (e.key === 'ArrowLeft') {
-        navigateDish(-1);
+        navigateDish(-1, e);
       }
     };
 
-    window.addEventListener('popstate', handlePopState);
     window.addEventListener('keydown', handleKeyDown);
-
-    return () => {
-      window.removeEventListener('popstate', handlePopState);
-      window.removeEventListener('keydown', handleKeyDown);
-    };
+    return () => window.removeEventListener('keydown', handleKeyDown);
   }, [lightboxItem, closeLightbox]);
 
   // Lock body scroll when lightbox is open
@@ -221,10 +212,13 @@ export default function MenuSection({
   }, [lightboxItem]);
 
   // Navigate to previous or next dish in current category / menu
-  const navigateDish = useCallback((direction) => {
+  const navigateDish = useCallback((direction, e) => {
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
     if (!lightboxItem) return;
 
-    // Get current active category list or flat list
     const currentCatList = filteredCategoryItems[lightboxItem.category] || availableItems;
     if (currentCatList.length <= 1) return;
 
@@ -237,20 +231,8 @@ export default function MenuSection({
 
     const nextItem = currentCatList[nextIndex];
     setImageLoading(true);
-    setIsCopiedPrompt(false);
     setLightboxItem(nextItem);
   }, [lightboxItem, filteredCategoryItems, availableItems]);
-
-  // Copy AI Prompt
-  const handleCopyPrompt = useCallback((promptText) => {
-    if (!promptText) return;
-    navigator.clipboard.writeText(promptText).then(() => {
-      setIsCopiedPrompt(true);
-      setTimeout(() => setIsCopiedPrompt(false), 2500);
-    }).catch(() => {
-      // fallback
-    });
-  }, []);
 
   // Helper to get image URL for an item
   const getItemImage = useCallback((item) => {
@@ -259,7 +241,7 @@ export default function MenuSection({
   }, [photos]);
 
   return (
-    <section id="menu-section" className="py-10 sm:py-16 bg-[#FAF7F0] min-h-screen text-slate-800">
+    <section id="menu-section" className="py-10 sm:py-16 bg-[#FAF7F0] min-h-screen text-slate-800 select-none">
       <div className="max-w-5xl mx-auto px-3 sm:px-6 lg:px-8">
         
         {/* Section Header */}
@@ -275,13 +257,13 @@ export default function MenuSection({
             {t.menu.subtitle}
           </p>
           <div className="flex items-center justify-center gap-2 mt-2 text-xs font-semibold text-stone-500">
-            <span>102 Gourmet Dishes & Beverages</span>
+            <span>102 Dishes & Beverages</span>
             <span>•</span>
-            <span className="text-[#977227]">Tap any item to view photo full-screen</span>
+            <span className="text-[#977227] font-bold">Tap any row or thumbnail to open full-screen photo</span>
           </div>
         </div>
 
-        {/* Sticky-Aware Controls: Search & Category Navigation Bar */}
+        {/* Sticky Controls: Search & Category Navigation Bar */}
         <div className="sticky top-16 sm:top-20 z-20 bg-[#FAF7F0]/95 backdrop-blur-md py-3 mb-6 border-y border-[#E8DFD0] -mx-3 px-3 sm:mx-0 sm:px-0">
           <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
             
@@ -298,7 +280,10 @@ export default function MenuSection({
               {searchQuery && (
                 <button
                   type="button"
-                  onClick={() => setSearchQuery('')}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    setSearchQuery('');
+                  }}
                   className="absolute right-2.5 top-1/2 -translate-y-1/2 text-stone-400 hover:text-stone-700 p-1 rounded-full"
                   aria-label="Clear search"
                 >
@@ -338,9 +323,10 @@ export default function MenuSection({
           <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar pt-3 pb-1">
             <button
               type="button"
-              onClick={() => {
+              onClick={(e) => {
+                e.preventDefault();
                 setSelectedCategory('all');
-                handleExpandAll();
+                handleExpandAll(e);
               }}
               className={`whitespace-nowrap px-3 py-1.5 rounded-full text-xs font-bold transition-all shrink-0 ${
                 selectedCategory === 'all'
@@ -361,7 +347,8 @@ export default function MenuSection({
                 <button
                   key={cat.id}
                   type="button"
-                  onClick={() => {
+                  onClick={(e) => {
+                    e.preventDefault();
                     setSelectedCategory(cat.id);
                     setExpandedCategories({ [cat.id]: true });
                     const el = document.getElementById(`cat-${cat.id}`);
@@ -399,7 +386,6 @@ export default function MenuSection({
               const catName = lang === 'am' ? cat.nameAm : lang === 'or' ? cat.nameOr : cat.nameEn;
               const secondaryCatName = lang !== 'en' ? cat.nameEn : cat.nameAm;
 
-              // If searching and this category has no matches, hide it
               if (searchQuery.trim() && items.length === 0) {
                 return null;
               }
@@ -413,7 +399,7 @@ export default function MenuSection({
                   {/* Collapsible Category Header Button */}
                   <button
                     type="button"
-                    onClick={() => toggleCategory(cat.id)}
+                    onClick={(e) => toggleCategory(cat.id, e)}
                     aria-expanded={isExpanded}
                     className="w-full px-4 sm:px-6 py-4 flex items-center justify-between text-left bg-gradient-to-r from-[#FDFBF7] to-white hover:from-[#F7F2E7] transition-all border-b border-[#E8DFD0]/60 focus:outline-none focus:ring-2 focus:ring-[#C8A24A]/40"
                   >
@@ -466,11 +452,17 @@ export default function MenuSection({
                             const itemThumb = getItemImage(item);
 
                             return (
-                              <button
+                              <div
                                 key={item.id}
-                                type="button"
-                                onClick={() => openLightbox(item)}
-                                className="w-full text-left group flex items-center justify-between py-2.5 px-3 sm:px-4 rounded-xl hover:bg-[#FAF6EE] transition-all border border-transparent hover:border-[#E8DFD0] focus:outline-none focus:ring-2 focus:ring-[#C8A24A]/40"
+                                onClick={(e) => openLightbox(item, e)}
+                                role="button"
+                                tabIndex={0}
+                                onKeyDown={(e) => {
+                                  if (e.key === 'Enter' || e.key === ' ') {
+                                    openLightbox(item, e);
+                                  }
+                                }}
+                                className="w-full cursor-pointer text-left group flex items-center justify-between py-2.5 px-3 sm:px-4 rounded-xl hover:bg-[#FAF6EE] transition-all border border-transparent hover:border-[#E8DFD0] focus:outline-none focus:ring-2 focus:ring-[#C8A24A]/40"
                               >
                                 {/* Dish Name Column */}
                                 <div className="flex flex-col min-w-0 pr-2">
@@ -516,7 +508,7 @@ export default function MenuSection({
                                     )}
                                   </div>
                                 </div>
-                              </button>
+                              </div>
                             );
                           })}
                         </div>
@@ -545,7 +537,10 @@ export default function MenuSection({
               </p>
               <button
                 type="button"
-                onClick={() => setSearchQuery('')}
+                onClick={(e) => {
+                  e.preventDefault();
+                  setSearchQuery('');
+                }}
                 className="bg-[#977227] hover:bg-[#836220] text-white font-bold px-4 py-2 rounded-xl text-xs shadow-xs transition-colors"
               >
                 Clear Search Filter
@@ -556,7 +551,7 @@ export default function MenuSection({
 
       </div>
 
-      {/* FULL-SCREEN LIGHTBOX MODAL */}
+      {/* FULL-SCREEN LIGHTBOX MODAL (NO AI TEXT, INSTANT POPUP, NO RELOAD) */}
       {lightboxItem && (
         <div
           role="dialog"
@@ -566,7 +561,7 @@ export default function MenuSection({
           onClick={(e) => {
             // Tap outside modal content closes the lightbox
             if (e.target === e.currentTarget) {
-              closeLightbox();
+              closeLightbox(e);
             }
           }}
         >
@@ -575,11 +570,11 @@ export default function MenuSection({
             className="relative bg-[#1A1A1A] text-white border border-stone-700/80 rounded-3xl max-w-2xl w-full max-h-[92vh] overflow-y-auto shadow-2xl flex flex-col no-scrollbar"
             onClick={(e) => e.stopPropagation()}
           >
-            {/* Top Close Bar */}
+            {/* Top Bar */}
             <div className="sticky top-0 z-30 flex items-center justify-between p-3.5 sm:p-4 bg-gradient-to-b from-[#1A1A1A] via-[#1A1A1A]/95 to-transparent">
               <div className="flex items-center gap-2 text-xs font-semibold text-stone-400">
                 <span className="capitalize px-2.5 py-0.5 rounded-full bg-stone-800 border border-stone-700 text-stone-300">
-                  {lightboxItem.category.replace('_', ' ')}
+                  {(lightboxItem?.category || 'menu').replace('_', ' ')}
                 </span>
                 <span>•</span>
                 <span>Bisrat Hotel Dining</span>
@@ -587,7 +582,7 @@ export default function MenuSection({
 
               <button
                 type="button"
-                onClick={closeLightbox}
+                onClick={(e) => closeLightbox(e)}
                 className="w-8 h-8 rounded-full bg-stone-800/90 hover:bg-stone-700 text-stone-200 flex items-center justify-center transition-colors border border-stone-600 focus:outline-none focus:ring-2 focus:ring-[#C8A24A]"
                 aria-label="Close photo"
               >
@@ -595,19 +590,19 @@ export default function MenuSection({
               </button>
             </div>
 
-            {/* High-Resolution Dish Photo View (Full-Screen / Plated Food Only) */}
+            {/* High-Resolution Dish Photo View (Plated Food Only) */}
             <div className="relative w-full aspect-[16/11] sm:aspect-[16/10] bg-stone-900 overflow-hidden group">
               {imageLoading && (
                 <div className="absolute inset-0 flex flex-col items-center justify-center bg-stone-900 text-stone-500 animate-pulse">
                   <Camera className="w-10 h-10 mb-2 opacity-40" />
-                  <span className="text-xs font-mono">Loading full-res dish photo...</span>
+                  <span className="text-xs font-mono">Loading dish photo...</span>
                 </div>
               )}
 
               {getItemImage(lightboxItem) ? (
                 <img
                   src={getItemImage(lightboxItem)}
-                  alt={lightboxItem.nameEn}
+                  alt={lightboxItem?.nameEn || 'Bisrat Dish'}
                   loading="eager"
                   onLoad={() => setImageLoading(false)}
                   onError={() => setImageLoading(false)}
@@ -617,16 +612,16 @@ export default function MenuSection({
                 />
               ) : (
                 <div className="w-full h-full flex flex-col items-center justify-center bg-stone-800 text-stone-400 p-6 text-center">
-                  <Camera className="w-12 h-12 text-[#C8A24A] mb-2" />
-                  <p className="text-sm font-semibold text-stone-300">Photo Ready for Upload</p>
-                  <p className="text-xs text-stone-500 mt-1 font-mono">[{lightboxItem.placeholderSlot}]</p>
+                  <Utensils className="w-12 h-12 text-[#C8A24A] mb-2" />
+                  <p className="text-sm font-semibold text-stone-300">Bisrat Hotel Signature Dish</p>
+                  <p className="text-xs text-stone-500 mt-1 font-mono">[{lightboxItem?.placeholderSlot}]</p>
                 </div>
               )}
 
               {/* Prev / Next Navigation Controls */}
               <button
                 type="button"
-                onClick={() => navigateDish(-1)}
+                onClick={(e) => navigateDish(-1, e)}
                 className="absolute left-3 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-black/60 hover:bg-black/90 text-white backdrop-blur-xs flex items-center justify-center border border-white/20 transition-all shadow-md"
                 aria-label="Previous dish"
               >
@@ -635,7 +630,7 @@ export default function MenuSection({
 
               <button
                 type="button"
-                onClick={() => navigateDish(1)}
+                onClick={(e) => navigateDish(1, e)}
                 className="absolute right-3 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-black/60 hover:bg-black/90 text-white backdrop-blur-xs flex items-center justify-center border border-white/20 transition-all shadow-md"
                 aria-label="Next dish"
               >
@@ -650,77 +645,43 @@ export default function MenuSection({
               <div className="flex flex-col sm:flex-row sm:items-baseline justify-between gap-3 border-b border-stone-800 pb-4">
                 <div>
                   <h3 id="lightbox-dish-title" className="font-serif text-2xl sm:text-3xl font-bold text-white tracking-tight">
-                    {lang === 'am' ? lightboxItem.nameAm : lang === 'or' ? lightboxItem.nameOr : lightboxItem.nameEn}
+                    {lang === 'am' ? lightboxItem?.nameAm : lang === 'or' ? lightboxItem?.nameOr : lightboxItem?.nameEn}
                   </h3>
                   <div className="flex items-center gap-2 mt-1 text-xs text-[#D8B96D] font-medium">
-                    <span>{lightboxItem.nameEn}</span>
-                    <span>•</span>
-                    <span>{lightboxItem.nameAm}</span>
+                    <span>{lightboxItem?.nameEn}</span>
+                    {lightboxItem?.nameAm && (
+                      <>
+                        <span>•</span>
+                        <span>{lightboxItem?.nameAm}</span>
+                      </>
+                    )}
                   </div>
                 </div>
 
                 <div className="shrink-0 flex items-center gap-2">
                   <div className="bg-[#FAF2E1] text-[#977227] px-3.5 py-1.5 rounded-xl font-mono font-bold text-base sm:text-lg border border-[#C8A24A]/40 shadow-xs">
-                    {lightboxItem.price} <span className="text-xs font-sans uppercase">{t.menu.currency}</span>
+                    {lightboxItem?.price} <span className="text-xs font-sans uppercase">{t.menu.currency}</span>
                   </div>
                 </div>
               </div>
 
               {/* Description */}
-              {lightboxItem.description && (
+              {lightboxItem?.description && (
                 <p className="text-sm text-stone-300 leading-relaxed">
                   {lightboxItem.description}
                 </p>
               )}
 
-              {/* AI Image Generation Prompt Card */}
-              {lightboxItem.aiPrompt && (
-                <div className="bg-stone-900/90 border border-stone-800 rounded-2xl p-3.5 sm:p-4 text-xs">
-                  <div className="flex items-center justify-between gap-2 mb-2">
-                    <div className="flex items-center gap-1.5 text-xs font-bold text-[#D8B96D]">
-                      <Sparkles className="w-3.5 h-3.5 text-[#C8A24A]" />
-                      <span>{t.menu.aiPromptLabel || 'AI Photography Prompt'}</span>
-                    </div>
-
-                    <button
-                      type="button"
-                      onClick={() => handleCopyPrompt(lightboxItem.aiPrompt)}
-                      className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-[11px] font-bold transition-all border ${
-                        isCopiedPrompt
-                          ? 'bg-emerald-600 text-white border-emerald-500'
-                          : 'bg-stone-800 hover:bg-stone-700 text-stone-300 border-stone-700'
-                      }`}
-                    >
-                      {isCopiedPrompt ? (
-                        <>
-                          <Check className="w-3.5 h-3.5 text-white" />
-                          <span>{t.menu.promptCopied || 'Copied!'}</span>
-                        </>
-                      ) : (
-                        <>
-                          <Copy className="w-3.5 h-3.5" />
-                          <span>{t.menu.copyPrompt || 'Copy Prompt'}</span>
-                        </>
-                      )}
-                    </button>
-                  </div>
-
-                  <p className="font-mono text-[11px] text-stone-400 bg-black/40 p-2.5 rounded-xl border border-stone-800/80 leading-relaxed select-all">
-                    &ldquo;{lightboxItem.aiPrompt}&rdquo;
-                  </p>
-                </div>
-              )}
-
               {/* Modal Footer Controls */}
               <div className="pt-2 flex items-center justify-between text-xs text-stone-400 border-t border-stone-800/60">
-                <span className="text-[11px]">
-                  Use <kbd className="bg-stone-800 px-1.5 py-0.5 rounded text-stone-300 border border-stone-700 font-mono">Esc</kbd> or tap outside to close
+                <span className="text-[11px] text-stone-500">
+                  Bisrat Hotel Restaurant & Bar • Fresh Daily
                 </span>
 
                 <button
                   type="button"
-                  onClick={closeLightbox}
-                  className="bg-stone-800 hover:bg-stone-700 text-stone-200 px-4 py-2 rounded-xl text-xs font-bold transition-colors border border-stone-700"
+                  onClick={(e) => closeLightbox(e)}
+                  className="bg-stone-800 hover:bg-stone-700 text-stone-200 px-5 py-2 rounded-xl text-xs font-bold transition-colors border border-stone-700"
                 >
                   {t.menu.closePhoto || 'Close'}
                 </button>

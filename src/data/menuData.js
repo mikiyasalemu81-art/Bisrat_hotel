@@ -126,7 +126,6 @@ export const initialMenuItems = [
     placeholderSlot: "menu-awash-wine.jpg",
     imageUrl: "https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?auto=format&fit=crop&w=1200&q=85",
     description: "Classic Ethiopian red wine crafted from Awash Valley grapes, featuring deep berry aromas with a smooth finish.",
-    aiPrompt: "Professional food/beverage photography of a glass of Ethiopian red wine, close-up, no text, no logos, no people, studio lighting"
   },
   {
     id: "wine-2",
@@ -139,7 +138,6 @@ export const initialMenuItems = [
     placeholderSlot: "menu-axumite-wine.jpg",
     imageUrl: "https://images.unsplash.com/photo-1506377247377-2a5b3b417ebb?auto=format&fit=crop&w=1200&q=85",
     description: "Renowned sweet Ethiopian dessert wine with gentle floral notes and a rich, velvety ruby hue.",
-    aiPrompt: "Professional food/beverage photography of a glass of Ethiopian sweet wine, close-up, no text, no logos, no people, studio lighting"
   },
   {
     id: "wine-3",
@@ -152,7 +150,6 @@ export const initialMenuItems = [
     placeholderSlot: "menu-kamila-wine.jpg",
     imageUrl: "https://images.unsplash.com/photo-1553361371-9b22f78e8b1d?auto=format&fit=crop&w=1200&q=85",
     description: "Elegantly balanced dry red wine with hints of oak and subtle spice, poured into a crystal goblet.",
-    aiPrompt: "Professional food/beverage photography of a glass of red wine, close-up, no text, no logos, no people, studio lighting"
   },
   {
     id: "wine-4",
@@ -165,7 +162,6 @@ export const initialMenuItems = [
     placeholderSlot: "menu-acacia-wine.jpg",
     imageUrl: "https://images.unsplash.com/photo-1569919659476-f0852f6834b7?auto=format&fit=crop&w=1200&q=85",
     description: "Premium reserve Ethiopian wine from Castel Winery, displaying complex tannic structure and refined elegance.",
-    aiPrompt: "Professional food/beverage photography of a glass of Ethiopian wine, close-up, no text, no logos, no people, studio lighting"
   },
 
   // ==========================================
@@ -182,7 +178,6 @@ export const initialMenuItems = [
     placeholderSlot: "menu-1l-water.jpg",
     imageUrl: "https://images.unsplash.com/photo-1548839140-29a749e1bc4e?auto=format&fit=crop&w=1200&q=85",
     description: "Chilled 1-liter sealed pure natural mineral water bottle.",
-    aiPrompt: "Professional photo of a sealed 1 liter bottled water, no text/labels emphasized, no people"
   },
   {
     id: "cold-2",
@@ -195,7 +190,6 @@ export const initialMenuItems = [
     placeholderSlot: "menu-half-l-water.jpg",
     imageUrl: "https://images.unsplash.com/photo-1559839914-17aae19cec71?auto=format&fit=crop&w=1200&q=85",
     description: "Compact 500ml chilled natural spring water bottle.",
-    aiPrompt: "Professional photo of a small 0.5 liter bottled water, no people"
   },
   {
     id: "cold-3",
@@ -208,7 +202,6 @@ export const initialMenuItems = [
     placeholderSlot: "menu-big-water.jpg",
     imageUrl: "https://images.unsplash.com/photo-1523362628745-0c100150b504?auto=format&fit=crop&w=1200&q=85",
     description: "Extra large bottle of crisp pure drinking water for tables and sharing.",
-    aiPrompt: "Professional photo of a large bottled water, no people"
   },
   {
     id: "cold-4",
@@ -221,7 +214,6 @@ export const initialMenuItems = [
     placeholderSlot: "menu-soft-drink.jpg",
     imageUrl: "https://images.unsplash.com/photo-1622483767028-3f66f32aef97?auto=format&fit=crop&w=1200&q=85",
     description: "Chilled glass with sparkling soda over ice cubes, perfectly refreshing.",
-    aiPrompt: "Professional photo of a chilled soft drink (cola/Fanta/Sprite style) glass with ice, no text, no logos, no people"
   },
   {
     id: "cold-5",
@@ -234,7 +226,6 @@ export const initialMenuItems = [
     placeholderSlot: "menu-ambo-water.jpg",
     imageUrl: "https://images.unsplash.com/photo-1603569283847-aa295f0d016a?auto=format&fit=crop&w=1200&q=85",
     description: "Ethiopia's iconic sparkling mineral water, naturally carbonated and ice-cold.",
-    aiPrompt: "Professional photo of a sparkling mineral water bottle with condensation, no logos, no people"
   },
   {
     id: "cold-6",
@@ -247,7 +238,6 @@ export const initialMenuItems = [
     placeholderSlot: "menu-normal-beer.jpg",
     imageUrl: "https://images.unsplash.com/photo-1535958636474-b021ee887b13?auto=format&fit=crop&w=1200&q=85",
     description: "Freshly poured golden lager beer with a thick, frothy white foam collar.",
-    aiPrompt: "Professional photo of a glass of draft beer with foam head, no logos, no people"
   },
   {
     id: "cold-7",
@@ -260,7 +250,6 @@ export const initialMenuItems = [
     placeholderSlot: "menu-bedele-beer.jpg",
     imageUrl: "https://images.unsplash.com/photo-1608270111664-96947b7d603b?auto=format&fit=crop&w=1200&q=85",
     description: "Full-bodied Ethiopian premium lager served cold in a chilled glass.",
-    aiPrompt: "Professional photo of a bottle and glass of Ethiopian lager beer, no logos, no people"
   },
   {
     id: "cold-8",
@@ -273,7 +262,6 @@ export const initialMenuItems = [
     placeholderSlot: "menu-arada-beer.jpg",
     imageUrl: "https://images.unsplash.com/photo-1584225064785-c62a8b43d148?auto=format&fit=crop&w=1200&q=85",
     description: "Crisp and refreshing craft-style Ethiopian beer poured to perfection.",
-    aiPrompt: "Professional photo of a bottle and glass of Ethiopian lager beer, no logos, no people"
   },
   {
     id: "cold-9",
@@ -286,7 +274,6 @@ export const initialMenuItems = [
     placeholderSlot: "menu-heineken-beer.jpg",
     imageUrl: "https://images.unsplash.com/photo-1518542698889-ca82282f08d5?auto=format&fit=crop&w=1200&q=85",
     description: "International premium pale lager served chilled with delicate malt character.",
-    aiPrompt: "Professional photo of a chilled beer bottle and glass with condensation, no logos, no people"
   },
 
   // ==========================================
@@ -303,7 +290,6 @@ export const initialMenuItems = [
     placeholderSlot: "menu-chicken-pizza.jpg",
     imageUrl: "https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?auto=format&fit=crop&w=1200&q=85",
     description: "Oven-baked crust topped with seasoned grilled chicken strips, stretchy mozzarella, and oregano.",
-    aiPrompt: "Overhead professional food photography of a whole pizza topped with grilled chicken pieces, cheese, melted, no text, no people"
   },
   {
     id: "pizza-2",
@@ -316,7 +302,6 @@ export const initialMenuItems = [
     placeholderSlot: "menu-margarita-pizza.jpg",
     imageUrl: "https://images.unsplash.com/photo-1604382355076-af4b0eb60143?auto=format&fit=crop&w=1200&q=85",
     description: "Traditional Italian recipe with crushed ripe plum tomatoes, fresh mozzarella, and aromatic basil leaves.",
-    aiPrompt: "Overhead professional food photography of a classic margherita pizza with tomato sauce, mozzarella, basil leaves, no text, no people"
   },
   {
     id: "pizza-3",
@@ -329,7 +314,6 @@ export const initialMenuItems = [
     placeholderSlot: "menu-special-bisrat-pizza.jpg",
     imageUrl: "https://images.unsplash.com/photo-1534308983496-4fabb1a015ee?auto=format&fit=crop&w=1200&q=85",
     description: "House masterpiece loaded with seasoned meats, bell peppers, sautéed mushrooms, olives, and double cheese.",
-    aiPrompt: "Overhead professional food photography of a loaded specialty pizza with mixed toppings and melted cheese, no text, no people"
   },
   {
     id: "pizza-4",
@@ -342,7 +326,6 @@ export const initialMenuItems = [
     placeholderSlot: "menu-tuna-pizza.jpg",
     imageUrl: "https://images.unsplash.com/photo-1574071318508-1cdbab80d002?auto=format&fit=crop&w=1200&q=85",
     description: "Flaked oceanic tuna with caramelized onions, tangy capers, and golden melted cheese.",
-    aiPrompt: "Overhead professional food photography of a pizza topped with tuna, onions, cheese, no text, no people"
   },
   {
     id: "pizza-5",
@@ -355,7 +338,6 @@ export const initialMenuItems = [
     placeholderSlot: "menu-vegetable-pizza.jpg",
     imageUrl: "https://images.unsplash.com/photo-1571407970349-bc81e7e96d47?auto=format&fit=crop&w=1200&q=85",
     description: "Crisp bell peppers, sweet corn, zucchini slices, ripe tomatoes, and herbs on savory crust.",
-    aiPrompt: "Overhead professional food photography of a pizza topped with mixed colorful vegetables and cheese, no text, no people"
   },
   {
     id: "pizza-6",
@@ -368,7 +350,6 @@ export const initialMenuItems = [
     placeholderSlot: "menu-kids-pizza.jpg",
     imageUrl: "https://images.unsplash.com/photo-1513104890138-7c749659a591?auto=format&fit=crop&w=1200&q=85",
     description: "Mild, kid-friendly personal cheese pizza on a thin soft crust with sweet tomato sauce.",
-    aiPrompt: "Overhead professional food photography of a small simple cheese pizza, no text, no people"
   },
 
   // ==========================================
@@ -385,7 +366,6 @@ export const initialMenuItems = [
     placeholderSlot: "menu-cheese-burger.jpg",
     imageUrl: "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?auto=format&fit=crop&w=1200&q=85",
     description: "Grilled prime beef patty draped with melted cheddar cheese, crisp lettuce, tomato, on a toasted sesame bun.",
-    aiPrompt: "Professional food photography of a beef cheeseburger with lettuce, tomato, melted cheese, sesame bun, side angle, no text, no people"
   },
   {
     id: "burger-2",
@@ -398,7 +378,6 @@ export const initialMenuItems = [
     placeholderSlot: "menu-chicken-burger.jpg",
     imageUrl: "https://images.unsplash.com/photo-1625813506062-0aeb1d7a094b?auto=format&fit=crop&w=1200&q=85",
     description: "Golden crispy fried chicken breast fillet with garlic mayo and shredded lettuce inside a brioche bun.",
-    aiPrompt: "Professional food photography of a crispy chicken burger with lettuce and sauce in a bun, no text, no people"
   },
   {
     id: "burger-3",
@@ -411,7 +390,6 @@ export const initialMenuItems = [
     placeholderSlot: "menu-normal-burger.jpg",
     imageUrl: "https://images.unsplash.com/photo-1550547660-d9450f859349?auto=format&fit=crop&w=1200&q=85",
     description: "Pure lean ground beef patty flame-grilled with fresh sliced pickles, sweet onions, and house burger relish.",
-    aiPrompt: "Professional food photography of a classic beef burger with lettuce, tomato, bun, no text, no people"
   },
   {
     id: "burger-4",
@@ -424,7 +402,6 @@ export const initialMenuItems = [
     placeholderSlot: "menu-special-bisrat-burger.jpg",
     imageUrl: "https://images.unsplash.com/photo-1586190848861-99aa4a171e90?auto=format&fit=crop&w=1200&q=85",
     description: "Grand double-stack beef burger with caramelized onions, fried egg, cheese slice, and secret house sauce.",
-    aiPrompt: "Professional food photography of a tall loaded specialty burger with multiple toppings, no text, no people"
   },
 
   // ==========================================
@@ -441,7 +418,6 @@ export const initialMenuItems = [
     placeholderSlot: "menu-chicken-mexican.jpg",
     imageUrl: "https://images.unsplash.com/photo-1604908176997-125f25cc6f3d?auto=format&fit=crop&w=1200&q=85",
     description: "Spicy Mexican-style shredded chicken seasoned with roasted peppers, cumin, and fresh cilantro garnish.",
-    aiPrompt: "Professional food photography of Mexican-style seasoned shredded chicken plate with garnish, no text, no people"
   },
   {
     id: "chicken-2",
@@ -454,7 +430,6 @@ export const initialMenuItems = [
     placeholderSlot: "menu-chicken-nugget.jpg",
     imageUrl: "https://images.unsplash.com/photo-1562967914-608f82629710?auto=format&fit=crop&w=1200&q=85",
     description: "Crispy panko-breaded tender chicken breast bites served with dipping sauces on a clean white plate.",
-    aiPrompt: "Professional food photography of crispy golden chicken nuggets with dipping sauce, no text, no people"
   },
   {
     id: "chicken-3",
@@ -467,7 +442,6 @@ export const initialMenuItems = [
     placeholderSlot: "menu-chicken-wing.jpg",
     imageUrl: "https://images.unsplash.com/photo-1567620832903-9fc6debc209f?auto=format&fit=crop&w=1200&q=85",
     description: "Tender glazed chicken wings baked and pan-finished with house barbecue spice rub.",
-    aiPrompt: "Professional food photography of grilled/glazed chicken wings on a plate, no text, no people"
   },
   {
     id: "chicken-4",
@@ -480,7 +454,6 @@ export const initialMenuItems = [
     placeholderSlot: "menu-grilled-chicken.jpg",
     imageUrl: "https://images.unsplash.com/photo-1598515214211-89d3c73ae83b?auto=format&fit=crop&w=1200&q=85",
     description: "Juicy marinated chicken fillet flame-grilled with distinct char marks and herbs.",
-    aiPrompt: "Professional food photography of a grilled chicken piece with char marks, garnished, no text, no people"
   },
   {
     id: "chicken-5",
@@ -493,7 +466,6 @@ export const initialMenuItems = [
     placeholderSlot: "menu-lemon-chicken.jpg",
     imageUrl: "https://images.unsplash.com/photo-1532550907401-a500c9a57435?auto=format&fit=crop&w=1200&q=85",
     description: "Pan-seared tender chicken breast in a vibrant garlic lemon butter sauce with fresh thyme.",
-    aiPrompt: "Professional food photography of chicken with lemon slices and herbs, no text, no people"
   },
   {
     id: "chicken-6",
@@ -506,7 +478,6 @@ export const initialMenuItems = [
     placeholderSlot: "menu-special-bisrat-chicken.jpg",
     imageUrl: "https://images.unsplash.com/photo-1626082927389-6cd097cdc6ec?auto=format&fit=crop&w=1200&q=85",
     description: "Chef's secret spice marinated chicken roasted to golden perfection and plated with sautéed vegetables.",
-    aiPrompt: "Professional food photography of a specialty seasoned roasted chicken dish, plated, no text, no people"
   },
   {
     id: "chicken-7",
@@ -519,7 +490,6 @@ export const initialMenuItems = [
     placeholderSlot: "menu-half-roast-chicken.jpg",
     imageUrl: "https://images.unsplash.com/photo-1514944298352-7a711425101a?auto=format&fit=crop&w=1200&q=85",
     description: "Half of a whole oven-roasted country chicken with crackling golden skin and herb dressing.",
-    aiPrompt: "Professional food photography of half a roasted whole chicken on a plate with garnish, no text, no people"
   },
   {
     id: "chicken-8",
@@ -532,7 +502,6 @@ export const initialMenuItems = [
     placeholderSlot: "menu-whole-roasted-chicken.jpg",
     imageUrl: "https://images.unsplash.com/photo-1574484284002-952d92456975?auto=format&fit=crop&w=1200&q=85",
     description: "Grand whole roasted chicken, golden brown and served on an elegant family platter with festive garnish.",
-    aiPrompt: "Professional food photography of a whole roasted chicken, golden brown, on a serving platter with garnish, no text, no people"
   },
 
   // ==========================================
@@ -549,7 +518,6 @@ export const initialMenuItems = [
     placeholderSlot: "menu-chicken-noodle.jpg",
     imageUrl: "https://images.unsplash.com/photo-1552611052-33e04de081de?auto=format&fit=crop&w=1200&q=85",
     description: "Stir-fried noodles with chicken strips, crisp vegetables, and savory Asian garlic sauce.",
-    aiPrompt: "Professional food photography of chicken noodle pasta in sauce, plated, no text, no people"
   },
   {
     id: "pasta-2",
@@ -562,7 +530,6 @@ export const initialMenuItems = [
     placeholderSlot: "menu-pasta-arbiyata.jpg",
     imageUrl: "https://images.unsplash.com/photo-1551183053-bf91a1d81141?auto=format&fit=crop&w=1200&q=85",
     description: "Penne pasta in fiery garlic chili tomato sauce, garnished with fresh basil leaves.",
-    aiPrompt: "Professional food photography of penne pasta in spicy arrabbiata tomato sauce, garnished with basil, no text, no people"
   },
   {
     id: "pasta-3",
@@ -575,7 +542,6 @@ export const initialMenuItems = [
     placeholderSlot: "menu-pasta-bolonez.jpg",
     imageUrl: "https://images.unsplash.com/photo-1621996346565-e3d5d6281691?auto=format&fit=crop&w=1200&q=85",
     description: "Classic spaghetti coated with rich, slow-simmered minced beef and tomato ragù.",
-    aiPrompt: "Professional food photography of spaghetti bolognese with meat sauce, garnished, no text, no people"
   },
   {
     id: "pasta-4",
@@ -588,7 +554,6 @@ export const initialMenuItems = [
     placeholderSlot: "menu-pasta-carbonara.jpg",
     imageUrl: "https://images.unsplash.com/photo-1612874742237-6526221588e3?auto=format&fit=crop&w=1200&q=85",
     description: "Al dente pasta swirled in creamy parmesan egg sauce with cured meat crisps.",
-    aiPrompt: "Professional food photography of creamy pasta carbonara with bacon bits, no text, no people"
   },
   {
     id: "pasta-5",
@@ -601,7 +566,6 @@ export const initialMenuItems = [
     placeholderSlot: "menu-pasta-tomato.jpg",
     imageUrl: "https://images.unsplash.com/photo-1555949258-eb67b1ef0ceb?auto=format&fit=crop&w=1200&q=85",
     description: "Simple Italian comfort: spaghetti in freshly crushed tomato and olive oil pomodoro sauce.",
-    aiPrompt: "Professional food photography of pasta in simple tomato sauce, garnished with basil, no text, no people"
   },
   {
     id: "pasta-6",
@@ -614,7 +578,6 @@ export const initialMenuItems = [
     placeholderSlot: "menu-pasta-egg.jpg",
     imageUrl: "https://images.unsplash.com/photo-1546549032-9571cd6b27df?auto=format&fit=crop&w=1200&q=85",
     description: "Sautéed pasta crowned with a sunny-side-up farm fresh egg and ground black pepper.",
-    aiPrompt: "Professional food photography of pasta topped with a fried egg, no text, no people"
   },
   {
     id: "pasta-7",
@@ -627,7 +590,6 @@ export const initialMenuItems = [
     placeholderSlot: "menu-pasta-tuna.jpg",
     imageUrl: "https://images.unsplash.com/photo-1608897013039-887f21d8c804?auto=format&fit=crop&w=1200&q=85",
     description: "Spaghetti tossed with ocean tuna flakes, garlic, cherry tomatoes, and parsley.",
-    aiPrompt: "Professional food photography of pasta with tuna and tomato sauce, no text, no people"
   },
   {
     id: "pasta-8",
@@ -640,7 +602,6 @@ export const initialMenuItems = [
     placeholderSlot: "menu-pasta-vegetable.jpg",
     imageUrl: "https://images.unsplash.com/photo-1473093295043-cdd812d0e601?auto=format&fit=crop&w=1200&q=85",
     description: "Pasta tossed with colorful garden vegetables including zucchini, carrots, and sweet bell peppers.",
-    aiPrompt: "Professional food photography of pasta with mixed sautéed vegetables, no text, no people"
   },
   {
     id: "pasta-9",
@@ -653,7 +614,6 @@ export const initialMenuItems = [
     placeholderSlot: "menu-telateli.jpg",
     imageUrl: "https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?auto=format&fit=crop&w=1200&q=85",
     description: "Delicate flat ribbon tagliatelle pasta coated with savory tomato herb reduction.",
-    aiPrompt: "Professional food photography of thin spaghetti pasta with tomato sauce and herbs, no text, no people"
   },
   {
     id: "pasta-10",
@@ -666,7 +626,6 @@ export const initialMenuItems = [
     placeholderSlot: "menu-penne-rice-bolonese.jpg",
     imageUrl: "https://images.unsplash.com/photo-1598866594230-a7c12756260f?auto=format&fit=crop&w=1200&q=85",
     description: "Ridged penne tubes or fragrant steamed rice covered in hearty meat bolognese sauce.",
-    aiPrompt: "Professional food photography of penne pasta with rich meat bolognese sauce, no text, no people"
   },
   {
     id: "pasta-11",
@@ -679,7 +638,6 @@ export const initialMenuItems = [
     placeholderSlot: "menu-penne-rice-tuna.jpg",
     imageUrl: "https://images.unsplash.com/photo-1543339308-43e59d6b73a6?auto=format&fit=crop&w=1200&q=85",
     description: "Penne or rice paired with savory flake tuna and rich tomato basil sauce.",
-    aiPrompt: "Professional food photography of penne pasta with tuna in tomato sauce, no text, no people"
   },
   {
     id: "pasta-12",
@@ -692,7 +650,6 @@ export const initialMenuItems = [
     placeholderSlot: "menu-penne-rice-carbonara.jpg",
     imageUrl: "https://images.unsplash.com/photo-1555949258-eb67b1ef0ceb?auto=format&fit=crop&w=1200&q=85",
     description: "Creamy silky carbonara reduction coating warm penne pasta or rice.",
-    aiPrompt: "Professional food photography of penne pasta in creamy carbonara sauce, no text, no people"
   },
   {
     id: "pasta-13",
@@ -705,7 +662,6 @@ export const initialMenuItems = [
     placeholderSlot: "menu-penne-rice-tomato.jpg",
     imageUrl: "https://images.unsplash.com/photo-1589302168068-964664d93dc0?auto=format&fit=crop&w=1200&q=85",
     description: "Tender penne or fluffy rice finished in fragrant home-style tomato sauce.",
-    aiPrompt: "Professional food photography of penne pasta in tomato sauce with basil, no text, no people"
   },
   {
     id: "pasta-14",
@@ -718,7 +674,6 @@ export const initialMenuItems = [
     placeholderSlot: "menu-penne-rice-vegetable.jpg",
     imageUrl: "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?auto=format&fit=crop&w=1200&q=85",
     description: "Vibrant vegetable medley pan-sautéed with penne or fluffy steamed rice.",
-    aiPrompt: "Professional food photography of penne pasta with colorful mixed vegetables, no text, no people"
   },
   {
     id: "pasta-15",
@@ -731,7 +686,6 @@ export const initialMenuItems = [
     placeholderSlot: "menu-penne-rice-arbiyata.jpg",
     imageUrl: "https://images.unsplash.com/photo-1551183053-bf91a1d81141?auto=format&fit=crop&w=1200&q=85",
     description: "Fiery arrabbiata tomato chili sauce tossed over al dente penne or rice.",
-    aiPrompt: "Professional food photography of penne pasta in spicy arrabbiata sauce, no text, no people"
   },
   {
     id: "pasta-16",
@@ -744,7 +698,6 @@ export const initialMenuItems = [
     placeholderSlot: "menu-penne-rice-egg.jpg",
     imageUrl: "https://images.unsplash.com/photo-1546549032-9571cd6b27df?auto=format&fit=crop&w=1200&q=85",
     description: "Warm penne or seasoned rice accompanied by a freshly prepared farm egg.",
-    aiPrompt: "Professional food photography of penne pasta topped with a fried egg, no text, no people"
   },
 
   // ==========================================
@@ -759,9 +712,8 @@ export const initialMenuItems = [
     price: 380,
     isAvailable: true,
     placeholderSlot: "menu-bozena-shiro.jpg",
-    imageUrl: "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=1200&q=85",
+    imageUrl: "/images/ethiopian-shiro.jpg",
     description: "Traditional roasted chickpea stew simmered with tender minced beef and spiced butter, served with fresh injera.",
-    aiPrompt: "Professional food photography of Ethiopian bozena shiro (spiced chickpea stew with meat) served with injera, no text, no people"
   },
   {
     id: "trad-2",
@@ -772,9 +724,8 @@ export const initialMenuItems = [
     price: 650,
     isAvailable: true,
     placeholderSlot: "menu-chekena-tibs.jpg",
-    imageUrl: "https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=1200&q=85",
+    imageUrl: "/images/ethiopian-tibs.jpg",
     description: "Finest prime tenderloin beef cubes sautéed with rosemary, red onions, garlic, and fresh jalapeños.",
-    aiPrompt: "Professional food photography of Ethiopian sautéed beef tibs with peppers and onions on a plate, no text, no people"
   },
   {
     id: "trad-3",
@@ -785,9 +736,8 @@ export const initialMenuItems = [
     price: 320,
     isAvailable: true,
     placeholderSlot: "menu-fasting-shiro.jpg",
-    imageUrl: "https://images.unsplash.com/photo-1543339308-43e59d6b73a6?auto=format&fit=crop&w=1200&q=85",
+    imageUrl: "/images/ethiopian-shiro.jpg",
     description: "Silky spiced chickpea and split-pea stew cooked with garlic and berbere, 100% vegan with injera.",
-    aiPrompt: "Professional food photography of Ethiopian shiro (chickpea flour stew, vegan) served with injera, no text, no people"
   },
   {
     id: "trad-4",
@@ -798,9 +748,8 @@ export const initialMenuItems = [
     price: 720,
     isAvailable: true,
     placeholderSlot: "menu-lamb-tibs.jpg",
-    imageUrl: "https://images.unsplash.com/photo-1603360946369-dc9bb6258143?auto=format&fit=crop&w=1200&q=85",
+    imageUrl: "/images/ethiopian-tibs.jpg",
     description: "Succulent cubes of tender highland lamb seared in spiced butter with peppers and onions.",
-    aiPrompt: "Professional food photography of Ethiopian grilled lamb tibs cubes with rice and side sauce, no text, no people"
   },
   {
     id: "trad-5",
@@ -811,9 +760,8 @@ export const initialMenuItems = [
     price: 380,
     isAvailable: true,
     placeholderSlot: "menu-shiro-butter.jpg",
-    imageUrl: "https://images.unsplash.com/photo-1540420773420-3366772f4999?auto=format&fit=crop&w=1200&q=85",
+    imageUrl: "/images/ethiopian-shiro.jpg",
     description: "Steaming hot chickpea stew finished with a lavish spoonful of fragrant Ethiopian niter kibbeh.",
-    aiPrompt: "Professional food photography of Ethiopian shiro stew with visible butter swirl, served with injera, no text, no people"
   },
   {
     id: "trad-6",
@@ -824,9 +772,8 @@ export const initialMenuItems = [
     price: 420,
     isAvailable: true,
     placeholderSlot: "menu-special-shiro.jpg",
-    imageUrl: "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?auto=format&fit=crop&w=1200&q=85",
+    imageUrl: "/images/ethiopian-shiro-tegamino.jpg",
     description: "House signature shiro loaded with extra aromatics, butter, and served bubbling with fresh injera.",
-    aiPrompt: "Professional food photography of Ethiopian special shiro stew, rich and garnished, served with injera, no text, no people"
   },
   {
     id: "trad-7",
@@ -837,9 +784,8 @@ export const initialMenuItems = [
     price: 450,
     isAvailable: true,
     placeholderSlot: "menu-suf-fitfit.jpg",
-    imageUrl: "https://images.unsplash.com/photo-1505253758473-96b46deae2cd?auto=format&fit=crop&w=1200&q=85",
+    imageUrl: "/images/ethiopian-firfir.jpg",
     description: "Shredded fresh injera steeped in chilled savory ground niger-seed milk, peppers, and onions.",
-    aiPrompt: "Professional food photography of Ethiopian suf fitfit (torn injera mixed with ground niger-seed sauce), no text, no people"
   },
   {
     id: "trad-8",
@@ -850,9 +796,8 @@ export const initialMenuItems = [
     price: 350,
     isAvailable: true,
     placeholderSlot: "menu-tegabino.jpg",
-    imageUrl: "https://images.unsplash.com/photo-1589301760014-d929f3979dbc?auto=format&fit=crop&w=1200&q=85",
+    imageUrl: "/images/ethiopian-shiro-tegamino.jpg",
     description: "Thick, bubbling chickpea stew served sizzling directly in a traditional Ethiopian earthenware clay pot.",
-    aiPrompt: "Professional food photography of Ethiopian tegabino chickpea stew in a clay pot with injera, no text, no people"
   },
   {
     id: "trad-9",
@@ -863,9 +808,8 @@ export const initialMenuItems = [
     price: 450,
     isAvailable: true,
     placeholderSlot: "menu-dulet.jpg",
-    imageUrl: "https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=1200&q=85",
+    imageUrl: "/images/ethiopian-wat.jpg",
     description: "Finely minced tripe, liver, and lean beef seasoned with mitmita, niter kibbeh, and green chili.",
-    aiPrompt: "Professional food photography of Ethiopian dulet (minced tripe, liver and beef dish) served with injera, no text, no people"
   },
   {
     id: "trad-10",
@@ -876,9 +820,8 @@ export const initialMenuItems = [
     price: 1780,
     isAvailable: true,
     placeholderSlot: "menu-fasting-combo.jpg",
-    imageUrl: "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=1200&q=85",
+    imageUrl: "/images/ethiopian-combo.jpg",
     description: "Platter of assorted vegan delicacies: Misir wot, Kik alicha, Gomen, Atakilt wot, Shiro, and Fosolia on injera.",
-    aiPrompt: "Professional food photography of an Ethiopian vegan fasting combo platter with multiple stews on injera, no text, no people"
   },
   {
     id: "trad-11",
@@ -889,9 +832,8 @@ export const initialMenuItems = [
     price: 4655,
     isAvailable: true,
     placeholderSlot: "menu-special-combo.jpg",
-    imageUrl: "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?auto=format&fit=crop&w=1200&q=85",
+    imageUrl: "/images/ethiopian-combo.jpg",
     description: "Grand banquet feast: Special kitfo, doro wot, sizzling beef tibs, gomen be-sega, and assorted sides on giant injera.",
-    aiPrompt: "Professional food photography of a large Ethiopian combo platter with meat stews, tibs, and injera, no text, no people"
   },
 
   // ==========================================
@@ -908,7 +850,6 @@ export const initialMenuItems = [
     placeholderSlot: "menu-beet-root-soup.jpg",
     imageUrl: "https://images.unsplash.com/photo-1547592166-23ac45744acd?auto=format&fit=crop&w=1200&q=85",
     description: "Vibrant ruby-magenta beetroot soup lightly seasoned and swirled with fresh cream.",
-    aiPrompt: "Professional food photography of magenta-colored beet root soup in a bowl, garnished, no text, no people"
   },
   {
     id: "soup-2",
@@ -921,7 +862,6 @@ export const initialMenuItems = [
     placeholderSlot: "menu-chicken-cream-soup.jpg",
     imageUrl: "https://images.unsplash.com/photo-1547592180-85f173990554?auto=format&fit=crop&w=1200&q=85",
     description: "Velvety smooth chicken broth with shredded tender breast meat, cream, and freshly chopped herbs.",
-    aiPrompt: "Professional food photography of creamy pale chicken soup in a bowl, garnished with herbs, no text, no people"
   },
   {
     id: "soup-3",
@@ -934,7 +874,6 @@ export const initialMenuItems = [
     placeholderSlot: "menu-hungarian-soup.jpg",
     imageUrl: "https://images.unsplash.com/photo-1541832676-9b763b0239ab?auto=format&fit=crop&w=1200&q=85",
     description: "Hearty reddish beef goulash soup with potatoes, paprika, and savory root vegetables.",
-    aiPrompt: "Professional food photography of reddish hearty Hungarian-style soup in a bowl, no text, no people"
   },
   {
     id: "soup-4",
@@ -947,7 +886,6 @@ export const initialMenuItems = [
     placeholderSlot: "menu-minestrone-soup.jpg",
     imageUrl: "https://images.unsplash.com/photo-1603105037880-880cd4edfb0d?auto=format&fit=crop&w=1200&q=85",
     description: "Traditional Italian chunky vegetable soup with beans, tomatoes, celery, and ditalini pasta.",
-    aiPrompt: "Professional food photography of Italian minestrone vegetable soup with visible chunks, no text, no people"
   },
   {
     id: "soup-5",
@@ -960,7 +898,6 @@ export const initialMenuItems = [
     placeholderSlot: "menu-mushroom-cream-soup.jpg",
     imageUrl: "https://images.unsplash.com/photo-1547592180-85f173990554?auto=format&fit=crop&w=1200&q=85",
     description: "Rich earth-mushroom velouté enriched with cream, garlic, and cracked pepper.",
-    aiPrompt: "Professional food photography of creamy beige mushroom soup in a bowl, garnished, no text, no people"
   },
   {
     id: "soup-6",
@@ -973,7 +910,6 @@ export const initialMenuItems = [
     placeholderSlot: "menu-special-bisrat-soup.jpg",
     imageUrl: "https://images.unsplash.com/photo-1582878826629-29b7ad1cdc43?auto=format&fit=crop&w=1200&q=85",
     description: "House chef's special warming blend of chicken, select vegetables, and Ethiopian aromatic spices.",
-    aiPrompt: "Professional food photography of a signature house soup in a bowl, garnished, no text, no people"
   },
   {
     id: "soup-7",
@@ -986,7 +922,6 @@ export const initialMenuItems = [
     placeholderSlot: "menu-tomato-soup.jpg",
     imageUrl: "https://images.unsplash.com/photo-1547592166-23ac45744acd?auto=format&fit=crop&w=1200&q=85",
     description: "Sweet sun-ripened roasted tomato soup topped with cream swirl and fresh basil.",
-    aiPrompt: "Professional food photography of red tomato soup in a bowl, garnished with cream swirl, no text, no people"
   },
   {
     id: "soup-8",
@@ -999,7 +934,6 @@ export const initialMenuItems = [
     placeholderSlot: "menu-vegetable-soup.jpg",
     imageUrl: "https://images.unsplash.com/photo-1603105037880-880cd4edfb0d?auto=format&fit=crop&w=1200&q=85",
     description: "Clear garden broth loaded with freshly diced zucchini, carrots, potatoes, and parsley.",
-    aiPrompt: "Professional food photography of mixed vegetable soup in a bowl, no text, no people"
   },
   {
     id: "soup-9",
@@ -1012,7 +946,6 @@ export const initialMenuItems = [
     placeholderSlot: "menu-carrot-soup.jpg",
     imageUrl: "https://images.unsplash.com/photo-1547592180-85f173990554?auto=format&fit=crop&w=1200&q=85",
     description: "Smooth golden carrot soup simmered with ginger, coriander, and light coconut cream.",
-    aiPrompt: "Professional food photography of orange carrot soup in a bowl, garnished, no text, no people"
   },
 
   // ==========================================
@@ -1029,7 +962,6 @@ export const initialMenuItems = [
     placeholderSlot: "menu-avocado-salad.jpg",
     imageUrl: "https://images.unsplash.com/photo-1540420773420-3366772f4999?auto=format&fit=crop&w=1200&q=85",
     description: "Ripe butter avocado slices laid over crisp mixed greens, tomatoes, red onion, and lime vinaigrette.",
-    aiPrompt: "Professional food photography of a fresh avocado salad with greens, no text, no people"
   },
   {
     id: "salad-2",
@@ -1042,7 +974,6 @@ export const initialMenuItems = [
     placeholderSlot: "menu-chicken-salad.jpg",
     imageUrl: "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?auto=format&fit=crop&w=1200&q=85",
     description: "Tender grilled chicken slices atop crunchy romaine lettuce, cucumber, and light house dressing.",
-    aiPrompt: "Professional food photography of a chicken salad with lettuce, vegetables, no text, no people"
   },
   {
     id: "salad-3",
@@ -1055,7 +986,6 @@ export const initialMenuItems = [
     placeholderSlot: "menu-mixed-salad.jpg",
     imageUrl: "https://images.unsplash.com/photo-1505253758473-96b46deae2cd?auto=format&fit=crop&w=1200&q=85",
     description: "Rainbow garden salad with cucumbers, tomatoes, carrots, radishes, and lemon olive oil.",
-    aiPrompt: "Professional food photography of a colorful mixed vegetable salad, no text, no people"
   },
   {
     id: "salad-4",
@@ -1068,7 +998,6 @@ export const initialMenuItems = [
     placeholderSlot: "menu-roasted-salad.jpg",
     imageUrl: "https://images.unsplash.com/photo-1540420773420-3366772f4999?auto=format&fit=crop&w=1200&q=85",
     description: "Oven-roasted peppers, eggplants, and sweet onions tossed in balsamic vinaigrette.",
-    aiPrompt: "Professional food photography of a roasted vegetable salad, no text, no people"
   },
   {
     id: "salad-5",
@@ -1081,7 +1010,6 @@ export const initialMenuItems = [
     placeholderSlot: "menu-tuna-salad.jpg",
     imageUrl: "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=1200&q=85",
     description: "Flaked ocean tuna over crisp garden leaves, sliced boiled eggs, olives, and fresh tomatoes.",
-    aiPrompt: "Professional food photography of a tuna salad with greens and tomato, no text, no people"
   },
 
   // ==========================================
@@ -1098,7 +1026,6 @@ export const initialMenuItems = [
     placeholderSlot: "menu-fish-cotelet.jpg",
     imageUrl: "https://images.unsplash.com/photo-1519708227418-c8fd9a32b7a2?auto=format&fit=crop&w=1200&q=85",
     description: "Golden breaded fried lake fish cutlet served with zesty tartar sauce and fresh lemon wedges.",
-    aiPrompt: "Professional food photography of breaded fried fish cutlet on a plate, no text, no people"
   },
   {
     id: "fish-2",
@@ -1111,7 +1038,6 @@ export const initialMenuItems = [
     placeholderSlot: "menu-fish-chips.jpg",
     imageUrl: "https://images.unsplash.com/photo-1534422298391-e4f8c172dddb?auto=format&fit=crop&w=1200&q=85",
     description: "Crispy battered fish fillets accompanied by a generous portion of seasoned french fries.",
-    aiPrompt: "Professional food photography of fried fish fillet with french fries, no text, no people"
   },
   {
     id: "fish-3",
@@ -1124,7 +1050,6 @@ export const initialMenuItems = [
     placeholderSlot: "menu-fish-gulash.jpg",
     imageUrl: "https://images.unsplash.com/photo-1534939561126-855b8675edd7?auto=format&fit=crop&w=1200&q=85",
     description: "Tender chunks of lake fish simmered in a spiced tomato, paprika, and bell pepper stew.",
-    aiPrompt: "Professional food photography of fish goulash stew in a bowl, no text, no people"
   },
   {
     id: "fish-4",
@@ -1137,7 +1062,6 @@ export const initialMenuItems = [
     placeholderSlot: "menu-grilled-fish.jpg",
     imageUrl: "https://images.unsplash.com/photo-1519708227418-c8fd9a32b7a2?auto=format&fit=crop&w=1200&q=85",
     description: "Whole fresh lake fish seasoned with herbs and flame-grilled, accompanied by lemon slices and steamed veggies.",
-    aiPrompt: "Professional food photography of a whole grilled fish with lemon and vegetables, no text, no people"
   },
   {
     id: "fish-5",
@@ -1150,7 +1074,6 @@ export const initialMenuItems = [
     placeholderSlot: "menu-stir-fried-fish.jpg",
     imageUrl: "https://images.unsplash.com/photo-1534422298391-e4f8c172dddb?auto=format&fit=crop&w=1200&q=85",
     description: "Tender fish bites wok-fried with crisp bell peppers, onions, ginger, and light soy glaze.",
-    aiPrompt: "Professional food photography of stir-fried fish pieces with vegetables, no text, no people"
   },
 
   // ==========================================
@@ -1165,9 +1088,8 @@ export const initialMenuItems = [
     price: 320,
     isAvailable: true,
     placeholderSlot: "menu-chechebsa.jpg",
-    imageUrl: "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=1200&q=85",
+    imageUrl: "/images/ethiopian-chechebsa.jpg",
     description: "Ethiopian shredded pita flatbread pan-tossed in fragrant niter kibbeh spiced butter and berbere.",
-    aiPrompt: "Professional food photography of Ethiopian chechebsa (shredded flatbread with spiced butter and berbere), no text, no people"
   },
   {
     id: "bf-2",
@@ -1180,7 +1102,6 @@ export const initialMenuItems = [
     placeholderSlot: "menu-cheese-omelet.jpg",
     imageUrl: "https://images.unsplash.com/photo-1510693206972-df098062cb71?auto=format&fit=crop&w=1200&q=85",
     description: "Fluffy folded golden egg omelet bursting with melted cheddar and mozzarella cheese.",
-    aiPrompt: "Professional food photography of a folded cheese omelet on a plate, no text, no people"
   },
   {
     id: "bf-3",
@@ -1193,7 +1114,6 @@ export const initialMenuItems = [
     placeholderSlot: "menu-continental-bf.jpg",
     imageUrl: "https://images.unsplash.com/photo-1533089860892-a7c6f0a88666?auto=format&fit=crop&w=1200&q=85",
     description: "Toasted breads, butter, marmalade, fresh eggs, and sliced fruits served with morning tea or coffee.",
-    aiPrompt: "Professional food photography of a continental breakfast plate with bread, eggs, and sides, no text, no people"
   },
   {
     id: "bf-4",
@@ -1204,9 +1124,8 @@ export const initialMenuItems = [
     price: 200,
     isAvailable: true,
     placeholderSlot: "menu-fasting-firfir.jpg",
-    imageUrl: "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=1200&q=85",
+    imageUrl: "/images/ethiopian-firfir.jpg",
     description: "Shredded fresh injera cooked in a savory, aromatic berbere, tomato, and onion sauce.",
-    aiPrompt: "Professional food photography of Ethiopian vegan firfir (torn injera in spiced sauce), no text, no people"
   },
   {
     id: "bf-5",
@@ -1219,7 +1138,6 @@ export const initialMenuItems = [
     placeholderSlot: "menu-kinche.jpg",
     imageUrl: "https://images.unsplash.com/photo-1586444248902-2f64eddc13df?auto=format&fit=crop&w=1200&q=85",
     description: "Traditional cracked wheat porridge gently simmered and flavored with Ethiopian spiced butter or oil.",
-    aiPrompt: "Professional food photography of Ethiopian kinche (cracked wheat porridge) in a bowl, no text, no people"
   },
   {
     id: "bf-6",
@@ -1232,7 +1150,6 @@ export const initialMenuItems = [
     placeholderSlot: "menu-oats.jpg",
     imageUrl: "https://images.unsplash.com/photo-1517673400267-0251440c45dc?auto=format&fit=crop&w=1200&q=85",
     description: "Warm wholesome oatmeal cooked with fresh milk, honey drizzle, and cinnamon dusting.",
-    aiPrompt: "Professional food photography of a bowl of oatmeal porridge, garnished, no text, no people"
   },
   {
     id: "bf-7",
@@ -1245,7 +1162,6 @@ export const initialMenuItems = [
     placeholderSlot: "menu-omelet.jpg",
     imageUrl: "https://images.unsplash.com/photo-1510693206972-df098062cb71?auto=format&fit=crop&w=1200&q=85",
     description: "Classic pan-fried egg omelet with finely chopped sweet onions and green peppers.",
-    aiPrompt: "Professional food photography of a classic folded omelet on a plate, no text, no people"
   },
   {
     id: "bf-8",
@@ -1258,7 +1174,6 @@ export const initialMenuItems = [
     placeholderSlot: "menu-pancake.jpg",
     imageUrl: "https://images.unsplash.com/photo-1528207776546-365bb710ee93?auto=format&fit=crop&w=1200&q=85",
     description: "Stack of fluffy golden pancakes topped with butter pat and rich pure honey.",
-    aiPrompt: "Professional food photography of stacked pancakes, no text, no people"
   },
   {
     id: "bf-9",
@@ -1269,9 +1184,8 @@ export const initialMenuItems = [
     price: 450,
     isAvailable: true,
     placeholderSlot: "menu-quanta-firfir.jpg",
-    imageUrl: "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=1200&q=85",
+    imageUrl: "/images/ethiopian-firfir.jpg",
     description: "Dried cured spiced beef (quanta) stewed in rich berbere sauce and infused with rolled injera pieces.",
-    aiPrompt: "Professional food photography of Ethiopian firfir mixed with dried spiced beef (quanta), no text, no people"
   },
   {
     id: "bf-10",
@@ -1284,7 +1198,6 @@ export const initialMenuItems = [
     placeholderSlot: "menu-scramble-egg.jpg",
     imageUrl: "https://images.unsplash.com/photo-1525351484163-7529414344d8?auto=format&fit=crop&w=1200&q=85",
     description: "Freshly scrambled farm eggs seasoned with sea salt, butter, and black pepper.",
-    aiPrompt: "Professional food photography of scrambled eggs on a plate, no text, no people"
   },
   {
     id: "bf-11",
@@ -1297,7 +1210,6 @@ export const initialMenuItems = [
     placeholderSlot: "menu-scramble-egg-meat.jpg",
     imageUrl: "https://images.unsplash.com/photo-1525351484163-7529414344d8?auto=format&fit=crop&w=1200&q=85",
     description: "Hearty scrambled eggs sautéed with spiced minced beef, onions, and jalapeño pepper.",
-    aiPrompt: "Professional food photography of scrambled eggs mixed with minced meat, no text, no people"
   },
   {
     id: "bf-12",
@@ -1308,9 +1220,8 @@ export const initialMenuItems = [
     price: 400,
     isAvailable: true,
     placeholderSlot: "menu-sega-firfir.jpg",
-    imageUrl: "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=1200&q=85",
+    imageUrl: "/images/ethiopian-firfir.jpg",
     description: "Tender sautéed beef pieces folded into spicy injera firfir in rich tomato sauce.",
-    aiPrompt: "Professional food photography of Ethiopian firfir mixed with meat sauce, no text, no people"
   },
   {
     id: "bf-13",
@@ -1321,9 +1232,8 @@ export const initialMenuItems = [
     price: 450,
     isAvailable: true,
     placeholderSlot: "menu-tebs-firfir.jpg",
-    imageUrl: "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=1200&q=85",
+    imageUrl: "/images/ethiopian-tibs-firfir.jpg",
     description: "Pan-sautéed succulent beef tibs combined with seasoned injera firfir and green chilies.",
-    aiPrompt: "Professional food photography of Ethiopian firfir mixed with sautéed tibs meat pieces, no text, no people"
   },
   {
     id: "bf-14",
@@ -1334,9 +1244,8 @@ export const initialMenuItems = [
     price: 450,
     isAvailable: true,
     placeholderSlot: "menu-dulet-bf.jpg",
-    imageUrl: "https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=1200&q=85",
+    imageUrl: "/images/ethiopian-wat.jpg",
     description: "Morning specialty dulet: minced liver, tripe, and lean meat spiced with mitmita and served with hot injera.",
-    aiPrompt: "Professional food photography of Ethiopian dulet breakfast dish with injera, no text, no people"
   },
   {
     id: "bf-15",
@@ -1349,7 +1258,6 @@ export const initialMenuItems = [
     placeholderSlot: "menu-fetira-honey.jpg",
     imageUrl: "https://images.unsplash.com/photo-1528207776546-365bb710ee93?auto=format&fit=crop&w=1200&q=85",
     description: "Flaky layered Ethiopian pancake pastry fried crisp and generously drizzled with pure highland honey.",
-    aiPrompt: "Professional food photography of Ethiopian fetira flatbread drizzled with honey, no text, no people"
   },
 
   // ==========================================
@@ -1366,7 +1274,6 @@ export const initialMenuItems = [
     placeholderSlot: "menu-avocado-juice.jpg",
     imageUrl: "https://images.unsplash.com/photo-1540420773420-3366772f4999?auto=format&fit=crop&w=1200&q=85",
     description: "Thick creamy freshly puréed avocado juice with a hint of fresh lime.",
-    aiPrompt: "Professional beverage photography of a glass of thick green avocado juice, no text, no logos, no people"
   },
   {
     id: "juice-2",
@@ -1379,7 +1286,6 @@ export const initialMenuItems = [
     placeholderSlot: "menu-banana-shake.jpg",
     imageUrl: "https://images.unsplash.com/photo-1553530666-ba11a7da3888?auto=format&fit=crop&w=1200&q=85",
     description: "Luscious creamy banana milkshake blended with vanilla and chilled fresh milk.",
-    aiPrompt: "Professional beverage photography of a glass of creamy banana shake, no text, no logos, no people"
   },
   {
     id: "juice-3",
@@ -1392,7 +1298,6 @@ export const initialMenuItems = [
     placeholderSlot: "menu-fruit-punch.jpg",
     imageUrl: "https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?auto=format&fit=crop&w=1200&q=85",
     description: "Refreshing medley of citrus, berry, and tropical fruit juices served over ice.",
-    aiPrompt: "Professional beverage photography of a glass of colorful mixed fruit punch with fruit garnish, no text, no logos, no people"
   },
   {
     id: "juice-4",
@@ -1405,7 +1310,6 @@ export const initialMenuItems = [
     placeholderSlot: "menu-mango-juice.jpg",
     imageUrl: "https://images.unsplash.com/photo-1546173159-315724a31696?auto=format&fit=crop&w=1200&q=85",
     description: "Vibrant golden mango juice made from sweet local sun-ripened mangos.",
-    aiPrompt: "Professional beverage photography of a glass of orange mango juice, no text, no logos, no people"
   },
   {
     id: "juice-5",
@@ -1418,7 +1322,6 @@ export const initialMenuItems = [
     placeholderSlot: "menu-mixed-juice.jpg",
     imageUrl: "https://images.unsplash.com/photo-1527661591475-527312dd65f5?auto=format&fit=crop&w=1200&q=85",
     description: "Famous Ethiopian 'Spris' multi-layered juice: fresh avocado, mango, and papaya in distinct color bands.",
-    aiPrompt: "Professional beverage photography of a layered glass of mixed fruit juice, no text, no logos, no people"
   },
   {
     id: "juice-6",
@@ -1431,7 +1334,6 @@ export const initialMenuItems = [
     placeholderSlot: "menu-papaya-juice.jpg",
     imageUrl: "https://images.unsplash.com/photo-1546173159-315724a31696?auto=format&fit=crop&w=1200&q=85",
     description: "Silky tropical papaya juice pressed fresh with a squeeze of tangy lime.",
-    aiPrompt: "Professional beverage photography of a glass of orange papaya juice, no text, no logos, no people"
   },
   {
     id: "juice-7",
@@ -1444,7 +1346,6 @@ export const initialMenuItems = [
     placeholderSlot: "menu-pineapple-juice.jpg",
     imageUrl: "https://images.unsplash.com/photo-1550258987-190a2d41a8ba?auto=format&fit=crop&w=1200&q=85",
     description: "Sweet and tangy pressed pure pineapple juice served ice-cold.",
-    aiPrompt: "Professional beverage photography of a glass of yellow pineapple juice, no text, no logos, no people"
   },
   {
     id: "juice-8",
@@ -1457,7 +1358,6 @@ export const initialMenuItems = [
     placeholderSlot: "menu-special-juice.jpg",
     imageUrl: "https://images.unsplash.com/photo-1527661591475-527312dd65f5?auto=format&fit=crop&w=1200&q=85",
     description: "Artisanal specialty layered smoothie with avocado, mango, strawberry, and vimto reduction.",
-    aiPrompt: "Professional beverage photography of a glass of layered specialty mixed fruit juice with garnish, no text, no logos, no people"
   },
   {
     id: "juice-9",
@@ -1470,7 +1370,6 @@ export const initialMenuItems = [
     placeholderSlot: "menu-strawberry-juice.jpg",
     imageUrl: "https://images.unsplash.com/photo-1553530666-ba11a7da3888?auto=format&fit=crop&w=1200&q=85",
     description: "Luscious sweet pink strawberry juice blended fresh with ice.",
-    aiPrompt: "Professional beverage photography of a glass of pink strawberry juice, no text, no logos, no people"
   },
   {
     id: "juice-10",
@@ -1483,7 +1382,6 @@ export const initialMenuItems = [
     placeholderSlot: "menu-telba-juice.jpg",
     imageUrl: "https://images.unsplash.com/photo-1548839140-29a749e1bc4e?auto=format&fit=crop&w=1200&q=85",
     description: "Traditional Ethiopian nutritious roasted flaxseed drink blended cold with honey and water.",
-    aiPrompt: "Professional beverage photography of a glass of Ethiopian telba (flaxseed) juice, no text, no logos, no people"
   },
   {
     id: "juice-11",
@@ -1496,7 +1394,6 @@ export const initialMenuItems = [
     placeholderSlot: "menu-watermelon-juice.jpg",
     imageUrl: "https://images.unsplash.com/photo-1589733955941-5eeaf752f6dd?auto=format&fit=crop&w=1200&q=85",
     description: "Crisp, ultra-hydrating chilled ruby watermelon juice with crushed ice.",
-    aiPrompt: "Professional beverage photography of a glass of red watermelon juice, no text, no logos, no people"
   },
 
   // ==========================================
@@ -1513,7 +1410,6 @@ export const initialMenuItems = [
     placeholderSlot: "menu-machiato.jpg",
     imageUrl: "https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?auto=format&fit=crop&w=1200&q=85",
     description: "Classic Ethiopian macchiato with strong espresso layered under velvety frothed steamed milk.",
-    aiPrompt: "Professional beverage photography of a macchiato coffee in a small cup, no text, no logos, no people"
   },
   {
     id: "hot-2",
@@ -1524,9 +1420,8 @@ export const initialMenuItems = [
     price: 50,
     isAvailable: true,
     placeholderSlot: "menu-traditional-coffee.jpg",
-    imageUrl: "https://images.unsplash.com/photo-1511920170033-f8396924c348?auto=format&fit=crop&w=1200&q=85",
+    imageUrl: "/images/ethiopian-coffee.jpg",
     description: "Freshly roasted organic Ethiopian highland coffee brewed in a clay Jebena and poured into small cups.",
-    aiPrompt: "Professional beverage photography of Ethiopian traditional coffee in a small ceramic cup, no text, no logos, no people"
   },
   {
     id: "hot-3",
@@ -1539,7 +1434,6 @@ export const initialMenuItems = [
     placeholderSlot: "menu-machine-coffee.jpg",
     imageUrl: "https://images.unsplash.com/photo-1510591509098-f4fdc6d0ff04?auto=format&fit=crop&w=1200&q=85",
     description: "Rich and intense double-shot espresso brewed on commercial Italian espresso machines.",
-    aiPrompt: "Professional beverage photography of espresso machine coffee in a cup, no text, no logos, no people"
   },
   {
     id: "hot-4",
@@ -1552,7 +1446,6 @@ export const initialMenuItems = [
     placeholderSlot: "menu-milk.jpg",
     imageUrl: "https://images.unsplash.com/photo-1550583724-b2692b85b150?auto=format&fit=crop&w=1200&q=85",
     description: "Steamed pure fresh whole milk served hot in a clear glass tumbler.",
-    aiPrompt: "Professional beverage photography of a glass of warm milk, no text, no logos, no people"
   },
   {
     id: "hot-5",
@@ -1565,7 +1458,6 @@ export const initialMenuItems = [
     placeholderSlot: "menu-peanut-tea.jpg",
     imageUrl: "https://images.unsplash.com/photo-1576092768241-dec231879fc3?auto=format&fit=crop&w=1200&q=85",
     description: "Sweet infused tea enriched with ground roasted peanuts for a rich, nutty warm beverage.",
-    aiPrompt: "Professional beverage photography of a cup of peanut-infused tea, no text, no logos, no people"
   },
   {
     id: "hot-6",
@@ -1578,7 +1470,6 @@ export const initialMenuItems = [
     placeholderSlot: "menu-special-tea.jpg",
     imageUrl: "https://images.unsplash.com/photo-1597481499750-3e6b22637e12?auto=format&fit=crop&w=1200&q=85",
     description: "Aromatic blend of black tea spiced with cinnamon, cardamom, cloves, and ginger.",
-    aiPrompt: "Professional beverage photography of a cup of specialty spiced tea, no text, no logos, no people"
   },
   {
     id: "hot-7",
@@ -1591,7 +1482,6 @@ export const initialMenuItems = [
     placeholderSlot: "menu-black-tea.jpg",
     imageUrl: "https://images.unsplash.com/photo-1544787219-7f47ccb76574?auto=format&fit=crop&w=1200&q=85",
     description: "Steaming hot fragrant black tea served with fresh mint sprig and lemon slice on the side.",
-    aiPrompt: "Professional beverage photography of a cup of black tea, no text, no logos, no people"
   },
   {
     id: "hot-8",
@@ -1604,6 +1494,5 @@ export const initialMenuItems = [
     placeholderSlot: "menu-ginger-tea.jpg",
     imageUrl: "https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?auto=format&fit=crop&w=1200&q=85",
     description: "Soothing natural tea steeped with fresh crushed spicy ginger roots and lemon.",
-    aiPrompt: "Professional beverage photography of a cup of ginger tea with visible ginger slice, no text, no logos, no people"
   }
 ];
