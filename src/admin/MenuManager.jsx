@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { Utensils, ToggleLeft, ToggleRight, AlertCircle, CheckCircle2, Eye, EyeOff, Plus, Trash2, Upload, Link as LinkIcon, Edit } from 'lucide-react';
 import { translations } from '../translations';
 
+import { savePhotoToStorage } from '../utils/imageStorage';
+
 export default function MenuManager({ 
   menuItems, 
   setMenuItems, 
@@ -11,6 +13,8 @@ export default function MenuManager({
 
   const [showAddForm, setShowAddForm] = useState(false);
   const [successMsg, setSuccessMsg] = useState('');
+  const [isUploading, setIsUploading] = useState(false);
+  const [uploadError, setUploadError] = useState('');
 
   // Add Item Form State
   const [nameEn, setNameEn] = useState('');
@@ -28,20 +32,43 @@ export default function MenuManager({
     );
   };
 
-  const handleFileUpload = (e) => {
+  const handleFileUpload = async (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      setImageUrl(reader.result);
-    };
-    reader.readAsDataURL(file);
+    setIsUploading(true);
+    setUploadError('');
+    try {
+      const slotName = `menu-custom-${Date.now()}.jpg`;
+      const result = await savePhotoToStorage(slotName, file);
+      setImageUrl(result.dataUrl);
+    } catch (err) {
+      setUploadError('Failed to process image: ' + (err.message || 'Invalid file format'));
+    } finally {
+      setIsUploading(false);
+    }
   };
 
-  const handleAddMenuItem = (e) => {
+  const handleAddMenuItem = async (e) => {
     e.preventDefault();
     if (!nameEn || !price) return;
+
+    let finalImageUrl = imageUrl;
+    if (imageUrl && !imageUrl.startsWith('data:image')) {
+      // If direct URL was pasted, compress and store it
+      setIsUploading(true);
+      try {
+        const slotName = `menu-custom-${Date.now()}.jpg`;
+        const result = await savePhotoToStorage(slotName, imageUrl);
+        finalImageUrl = result.dataUrl;
+      } catch (err) {
+        console.warn('Image URL optimization failed, using raw URL:', err);
+      } finally {
+        setIsUploading(false);
+      }
+    }
+
+    const slotKey = `custom-${Date.now()}.jpg`;
 
     const newItem = {
       id: `menu-${Date.now()}`,
@@ -51,8 +78,8 @@ export default function MenuManager({
       category,
       price: Number(price),
       isAvailable: true,
-      placeholderSlot: `custom-${Date.now()}.jpg`,
-      customImage: imageUrl || null,
+      placeholderSlot: slotKey,
+      customImage: finalImageUrl || null,
       description: description || "Freshly prepared dish at Bisrat Hotel Restaurant & Bar."
     };
 
@@ -209,11 +236,18 @@ export default function MenuManager({
               <span>Attach Item Photo (Upload File or Image URL):</span>
             </label>
 
+            {uploadError && (
+              <div className="p-2 bg-rose-50 border border-rose-200 text-rose-700 rounded-lg text-xs font-semibold flex items-center gap-1.5">
+                <AlertCircle className="w-4 h-4 shrink-0 text-rose-600" />
+                <span>{uploadError}</span>
+              </div>
+            )}
+
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div>
-                <label className="bg-sky-50 hover:bg-sky-100 border border-sky-200 text-skybrand-700 font-bold px-3 py-2 rounded-xl text-xs cursor-pointer block text-center transition-colors">
-                  Choose Photo File
-                  <input type="file" accept="image/*" onChange={handleFileUpload} className="hidden" />
+                <label className={`bg-sky-50 hover:bg-sky-100 border border-sky-200 text-skybrand-700 font-bold px-3 py-2 rounded-xl text-xs cursor-pointer block text-center transition-colors ${isUploading ? 'opacity-50 pointer-events-none' : ''}`}>
+                  {isUploading ? 'Optimizing & Saving...' : 'Choose Photo File'}
+                  <input type="file" accept="image/*" onChange={handleFileUpload} disabled={isUploading} className="hidden" />
                 </label>
               </div>
 
@@ -223,15 +257,16 @@ export default function MenuManager({
                   placeholder="Or paste image URL (https://...)"
                   value={imageUrl}
                   onChange={(e) => setImageUrl(e.target.value)}
+                  disabled={isUploading}
                   className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-1.5 text-xs text-slate-800 focus:ring-2 focus:ring-skybrand-500"
                 />
               </div>
             </div>
 
-            {imageUrl && (
+            {imageUrl && !isUploading && (
               <div className="flex items-center gap-3 pt-2">
                 <img src={imageUrl} alt="Preview" className="w-16 h-12 object-cover rounded-lg border border-slate-200" />
-                <span className="text-[11px] text-emerald-700 font-bold">✓ Image attached</span>
+                <span className="text-[11px] text-emerald-700 font-bold">✓ Image attached & permanently stored</span>
               </div>
             )}
           </div>

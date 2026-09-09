@@ -19,6 +19,8 @@ import { initialMenuItems } from './data/menuData';
 import { initialGallery } from './data/galleryData';
 import { initialReviews } from './data/reviewsData';
 
+import { loadAllPhotosFromStorage } from './utils/imageStorage';
+
 export default function App() {
   // Trilingual Language State (remembers choice)
   const [lang, setLang] = useState(() => {
@@ -143,14 +145,23 @@ export default function App() {
     localStorage.setItem('bisrat_reviews', JSON.stringify(reviews));
   }, [reviews]);
 
-  // Photo Upload Manager State
+  // Photo Upload Manager State (Persistent Storage via IndexedDB + localStorage)
   const [photos, setPhotos] = useState(() => {
-    const saved = localStorage.getItem('bisrat_photos');
-    return saved ? JSON.parse(saved) : {};
+    try {
+      const saved = localStorage.getItem('bisrat_photos');
+      return saved ? JSON.parse(saved) : {};
+    } catch {
+      return {};
+    }
   });
+
   useEffect(() => {
-    localStorage.setItem('bisrat_photos', JSON.stringify(photos));
-  }, [photos]);
+    loadAllPhotosFromStorage().then(loadedPhotos => {
+      if (loadedPhotos && Object.keys(loadedPhotos).length > 0) {
+        setPhotos(prev => ({ ...prev, ...loadedPhotos }));
+      }
+    });
+  }, []);
 
   // Admin Auth & Password State
   const [isAdminAuth, setIsAdminAuth] = useState(() => {

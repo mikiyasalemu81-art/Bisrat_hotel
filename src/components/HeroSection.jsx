@@ -4,6 +4,7 @@ import { translations } from '../translations';
 
 export default function HeroSection({ 
   lang, 
+  photos = {},
   paymentSettings = {},
   onBookClick,
   onExploreMenuClick 
@@ -17,7 +18,7 @@ export default function HeroSection({
       
       {/* Full-width Exterior Background Image */}
       <img
-        src="/images/exterior-building.jpg"
+        src={photos?.['hero-exterior.jpg'] || "/images/exterior-building.jpg"}
         alt="Bisrat Luxury Hotel Exterior Adama"
         className="absolute inset-0 w-full h-full object-cover object-center transform scale-105 transition-transform duration-1000"
       />
