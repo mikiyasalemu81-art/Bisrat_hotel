@@ -6,6 +6,8 @@
   html {
     scroll-behavior: smooth;
     font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    background-color: #FAF7F0;
+    color: #1A1A1A;
   }
   
   h1, h2, h3, .font-serif {
@@ -13,19 +15,19 @@
   }
 }
 
-/* Custom scrollbar */
+/* Custom scrollbar in Gold & Charcoal */
 ::-webkit-scrollbar {
   width: 8px;
 }
 ::-webkit-scrollbar-track {
-  background: #F1F5F9;
+  background: #1A1A1A;
 }
 ::-webkit-scrollbar-thumb {
-  background: #BAE6FD;
+  background: #C8A24A;
   border-radius: 4px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #4FA8DA;
+  background: #B58E38;
 }
 
 /* Animations */
@@ -38,9 +40,9 @@
   animation: fadeIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
-/* Glassmorphism Header */
+/* Dark Glassmorphism Header */
 .glass-header {
-  background: rgba(255, 255, 255, 0.94);
+  background: rgba(26, 26, 26, 0.95);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
 }
@@ -55,14 +57,16 @@
   font-size: clamp(1.6rem, 2.5vw + 1rem, 2.5rem);
 }
 
-/* Card Hover Effect: Default white background, on hover smooth transition to light sky blue background with subtle shadow lift */
+/* Card Hover Effect in Gold Accent */
 .card-hover-effect {
   background-color: #ffffff;
   transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+  border: 1px solid #E8E0D2;
 }
 
 .card-hover-effect:hover {
-  background-color: #F0F9FF; /* light sky blue */
+  background-color: #FAF2E1; /* Light gold glow */
+  border-color: #C8A24A;
   transform: translateY(-5px);
-  box-shadow: 0 20px 40px -10px rgba(14, 165, 233, 0.18), 0 8px 16px -4px rgba(15, 23, 42, 0.06);
+  box-shadow: 0 20px 40px -10px rgba(200, 162, 74, 0.25), 0 8px 16px -4px rgba(26, 26, 26, 0.12);
 }

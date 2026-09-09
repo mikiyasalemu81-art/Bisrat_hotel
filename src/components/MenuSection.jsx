@@ -32,16 +32,16 @@ export default function MenuSection({
   });
 
   return (
-    <section id="menu-section" className="py-12 lg:py-20 bg-white min-h-[70vh]">
+    <section id="menu-section" className="py-12 lg:py-20 bg-[#FAF7F0] min-h-[70vh]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* Section Header */}
         <div className="text-center max-w-3xl mx-auto mb-10">
-          <div className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-skybrand-700 bg-sky-50 border border-sky-200 px-3.5 py-1 rounded-full mb-3">
-            <Sparkles className="w-3.5 h-3.5 text-skybrand-500" />
+          <div className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-[#C8A24A] bg-[#FAF2E1] border border-[#C8A24A]/40 px-3.5 py-1 rounded-full mb-3">
+            <Sparkles className="w-3.5 h-3.5 text-[#C8A24A]" />
             <span>Bisrat Hotel Gourmet Dining</span>
           </div>
-          <h2 className="fluid-section-title font-serif font-bold text-navybrand-900 mb-3">
+          <h2 className="fluid-section-title font-serif font-bold text-[#1A1A1A] mb-3">
             {t.menu.title}
           </h2>
           <p className="text-slate-600 text-sm sm:text-base">
@@ -60,7 +60,7 @@ export default function MenuSection({
               placeholder={t.menu.searchPlaceholder}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full bg-slate-50 border border-slate-200 rounded-2xl pl-10 pr-4 py-2.5 text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-skybrand-500 shadow-xs"
+              className="w-full bg-white border border-[#E8E0D2] rounded-2xl pl-10 pr-4 py-2.5 text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-[#C8A24A] shadow-xs"
             />
           </div>
 
@@ -73,10 +73,10 @@ export default function MenuSection({
                 <button
                   key={cat.id}
                   onClick={() => setActiveCategory(cat.id)}
-                  className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all ${
+                  className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all ${
                     isSelected
-                      ? 'bg-skybrand-500 text-white shadow-md'
-                      : 'bg-slate-100 text-slate-700 hover:bg-slate-200/80'
+                      ? 'bg-[#C8A24A] text-[#1A1A1A] shadow-md border border-[#D8B96D]'
+                      : 'bg-[#F4EFE6] text-slate-700 hover:bg-[#E8E0D2] border border-[#E8E0D2]'
                   }`}
                 >
                   <Icon className="w-4 h-4" />
@@ -98,7 +98,7 @@ export default function MenuSection({
               return (
                 <div
                   key={item.id}
-                  className="bg-slate-50/70 border border-slate-200/80 rounded-2xl overflow-hidden shadow-soft hover:shadow-soft-hover transition-all duration-300 flex flex-col justify-between group"
+                  className="bg-[#F4EFE6] border border-[#E8E0D2] rounded-2xl overflow-hidden shadow-soft hover:shadow-xl transition-all duration-300 flex flex-col justify-between group"
                 >
                   <div>
                     {/* Item Image Slot or Custom Image */}
@@ -112,27 +112,27 @@ export default function MenuSection({
 
                     <div className="p-5">
                       <div className="flex items-start justify-between gap-3 mb-2">
-                        <h3 className="font-serif text-lg font-bold text-navybrand-900 group-hover:text-skybrand-600 transition-colors">
+                        <h3 className="font-serif text-lg font-bold text-[#1A1A1A] group-hover:text-[#C8A24A] transition-colors">
                           {displayName}
                         </h3>
 
-                        <div className="bg-skybrand-100 text-skybrand-800 text-xs font-mono font-bold px-2.5 py-1 rounded-lg shrink-0">
+                        <div className="bg-[#FAF2E1] border border-[#C8A24A]/40 text-[#977227] text-xs font-mono font-bold px-2.5 py-1 rounded-lg shrink-0">
                           {item.price} {t.menu.currency}
                         </div>
                       </div>
 
-                      <p className="text-xs text-slate-600 leading-relaxed mb-3">
+                      <p className="text-xs text-slate-700 leading-relaxed mb-3">
                         {item.description}
                       </p>
                     </div>
                   </div>
 
-                  <div className="px-5 pb-4 pt-0 flex items-center justify-between border-t border-slate-200/60 text-[11px] font-semibold text-emerald-700 mt-2">
+                  <div className="px-5 pb-4 pt-0 flex items-center justify-between border-t border-[#E8E0D2] text-[11px] font-semibold text-emerald-700 mt-2">
                     <span className="flex items-center gap-1">
-                      <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500" />
+                      <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
                       Fresh Daily
                     </span>
-                    <span className="text-slate-400 capitalize">{item.category}</span>
+                    <span className="text-slate-500 capitalize">{item.category}</span>
                   </div>
 
                 </div>
@@ -141,9 +141,9 @@ export default function MenuSection({
           </div>
         ) : (
           /* Empty State if no items found or all out of stock */
-          <div className="text-center py-16 bg-slate-50 rounded-2xl border border-slate-200 max-w-md mx-auto">
-            <Utensils className="w-12 h-12 text-slate-400 mx-auto mb-3" />
-            <p className="text-slate-600 font-semibold text-sm">
+          <div className="text-center py-16 bg-[#F4EFE6] rounded-2xl border border-[#E8E0D2] max-w-md mx-auto">
+            <Utensils className="w-12 h-12 text-[#C8A24A] mx-auto mb-3" />
+            <p className="text-slate-700 font-semibold text-sm">
               {t.menu.noItems}
             </p>
           </div>

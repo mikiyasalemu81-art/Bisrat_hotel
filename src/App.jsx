@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import Header from './components/Header';
+import BottomNav from './components/BottomNav';
 import HeroSection from './components/HeroSection';
 import Highlights from './components/Highlights';
 import RoomsSection from './components/RoomsSection';
@@ -30,6 +31,27 @@ export default function App() {
 
   // Persistent 3-Tab Main Navigation ('home' | 'menu' | 'admin')
   const [activeTab, setActiveTab] = useState('home');
+
+  // Payment & Contact Settings State
+  const [paymentSettings, setPaymentSettings] = useState(() => {
+    const saved = localStorage.getItem('bisrat_payment_settings');
+    return saved ? JSON.parse(saved) : {
+      tableNumber: "12",
+      phoneNumber: "0906320251",
+      landlinePhone: "022 211 2555",
+      cbeAccountNumber: "1000123456789",
+      cbeAccountName: "Bisrat Hotel Adama",
+      telebirrShortcode: "654321",
+      paymentMethods: {
+        telebirr: true,
+        cbe: true,
+        arrival: true,
+      }
+    };
+  });
+  useEffect(() => {
+    localStorage.setItem('bisrat_payment_settings', JSON.stringify(paymentSettings));
+  }, [paymentSettings]);
 
   // Rooms Data State
   const [rooms, setRooms] = useState(() => {
@@ -164,9 +186,9 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-softbg text-slate-800 selection:bg-skybrand-100 selection:text-skybrand-800">
+    <div className="min-h-screen flex flex-col bg-softbg text-slate-800 selection:bg-skybrand-100 selection:text-skybrand-800 pb-16 sm:pb-20">
       
-      {/* Sticky Header with Logo, Trilingual Switcher, and Desktop/Mobile 3-Tab Bar */}
+      {/* Sticky Header with Logo, Trilingual Switcher, Reception Phone, and Book Button */}
       <Header
         activeTab={activeTab}
         setActiveTab={setActiveTab}
@@ -184,6 +206,7 @@ export default function App() {
             <HeroSection
               lang={lang}
               photos={photos}
+              paymentSettings={paymentSettings}
               onBookClick={() => handleOpenBooking()}
               onExploreMenuClick={() => setActiveTab('menu')}
             />
@@ -246,6 +269,8 @@ export default function App() {
                 setPhotos={setPhotos}
                 facilities={facilities}
                 setFacilities={setFacilities}
+                paymentSettings={paymentSettings}
+                setPaymentSettings={setPaymentSettings}
                 lang={lang}
                 onLogout={handleAdminLogout}
               />
@@ -262,6 +287,13 @@ export default function App() {
         setActiveTab={setActiveTab}
       />
 
+      {/* Fixed Compact Bottom Navigation Bar */}
+      <BottomNav
+        activeTab={activeTab}
+        setActiveTab={setActiveTab}
+        lang={lang}
+      />
+
       {/* Interactive Booking Modal */}
       <BookingModal
         isOpen={isBookingOpen}
@@ -269,6 +301,7 @@ export default function App() {
         selectedRoom={selectedRoomForBooking}
         rooms={rooms}
         lang={lang}
+        paymentSettings={paymentSettings}
         onBookingSubmit={handleBookingSubmit}
       />
 

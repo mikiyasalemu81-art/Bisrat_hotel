@@ -32,15 +32,15 @@ export default function ContactSection({ lang }) {
   const whatsappUrl = `https://wa.me/251906320251?text=${whatsappMessage}`;
 
   return (
-    <section id="contact" className="py-16 lg:py-24 bg-softbg">
+    <section id="contact" className="py-16 lg:py-24 bg-[#FAF7F0] border-t border-[#E8E0D2]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* Section Header */}
         <div className="text-center max-w-3xl mx-auto mb-12">
-          <span className="inline-block text-xs font-bold uppercase tracking-wider text-skybrand-700 bg-skybrand-100/80 px-3 py-1 rounded-full mb-3">
+          <span className="inline-block text-xs font-bold uppercase tracking-wider text-[#C8A24A] bg-[#FAF2E1] border border-[#C8A24A]/40 px-3 py-1 rounded-full mb-3">
             Reach Out to Bisrat Hotel
           </span>
-          <h2 className="fluid-section-title font-serif font-bold text-navybrand-900 mb-3">
+          <h2 className="fluid-section-title font-serif font-bold text-[#1A1A1A] mb-3">
             {t.contact.title}
           </h2>
           <p className="text-slate-600 text-sm sm:text-base">
@@ -57,39 +57,39 @@ export default function ContactSection({ lang }) {
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               
               {/* Location Card */}
-              <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-soft">
-                <div className="w-9 h-9 rounded-xl bg-sky-50 text-skybrand-600 flex items-center justify-center mb-2">
-                  <MapPin className="w-4 h-4" />
+              <div className="bg-[#F4EFE6] p-4 rounded-2xl border border-[#E8E0D2] shadow-soft">
+                <div className="w-9 h-9 rounded-xl bg-[#FAF2E1] text-[#C8A24A] flex items-center justify-center mb-2">
+                  <MapPin className="w-4 h-4 text-[#C8A24A]" />
                 </div>
                 <h3 className="text-[11px] font-bold text-slate-500 uppercase">{t.contact.addressTitle}</h3>
-                <p className="font-serif text-sm font-bold text-navybrand-900 mt-0.5">
+                <p className="font-serif text-sm font-bold text-[#1A1A1A] mt-0.5">
                   {t.contact.addressVal}
                 </p>
               </div>
 
               {/* Mobile Phone Card */}
-              <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-soft">
-                <div className="w-9 h-9 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center mb-2">
-                  <Phone className="w-4 h-4" />
+              <div className="bg-[#F4EFE6] p-4 rounded-2xl border border-[#E8E0D2] shadow-soft">
+                <div className="w-9 h-9 rounded-xl bg-[#FAF2E1] text-[#C8A24A] flex items-center justify-center mb-2">
+                  <Phone className="w-4 h-4 text-[#C8A24A]" />
                 </div>
                 <h3 className="text-[11px] font-bold text-slate-500 uppercase">{t.contact.mobileTitle}</h3>
                 <a 
                   href="tel:0906320251" 
-                  className="font-serif text-base font-bold text-skybrand-600 hover:underline block mt-0.5"
+                  className="font-serif text-base font-bold text-[#C8A24A] hover:underline block mt-0.5"
                 >
                   0906320251
                 </a>
               </div>
 
               {/* Reception Landline Card */}
-              <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-soft">
-                <div className="w-9 h-9 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center mb-2">
-                  <Building2 className="w-4 h-4" />
+              <div className="bg-[#F4EFE6] p-4 rounded-2xl border border-[#E8E0D2] shadow-soft">
+                <div className="w-9 h-9 rounded-xl bg-[#FAF2E1] text-[#C8A24A] flex items-center justify-center mb-2">
+                  <Building2 className="w-4 h-4 text-[#C8A24A]" />
                 </div>
                 <h3 className="text-[11px] font-bold text-slate-500 uppercase">{t.contact.landlineTitle}</h3>
                 <a 
                   href="tel:0222112555" 
-                  className="font-serif text-base font-bold text-navybrand-900 hover:underline block mt-0.5"
+                  className="font-serif text-base font-bold text-[#1A1A1A] hover:underline block mt-0.5"
                 >
                   022 211 2555
                 </a>
@@ -103,7 +103,7 @@ export default function ContactSection({ lang }) {
               {/* WhatsApp Click-to-Chat */}
               <div className="bg-emerald-50 border border-emerald-200/80 p-4 rounded-2xl flex items-center justify-between gap-3">
                 <div className="flex items-center gap-3">
-                  <div className="w-9 h-9 rounded-xl bg-emerald-500 text-white flex items-center justify-center shrink-0 shadow-sm">
+                  <div className="w-9 h-9 rounded-xl bg-emerald-600 text-white flex items-center justify-center shrink-0 shadow-sm">
                     <MessageSquare className="w-5 h-5" />
                   </div>
                   <div>
@@ -127,19 +127,19 @@ export default function ContactSection({ lang }) {
                 href="https://www.tiktok.com/@bisrat_hotel"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="bg-slate-900 hover:bg-slate-800 text-white p-4 rounded-2xl flex items-center justify-between gap-3 border border-slate-700 transition-colors"
+                className="bg-[#1A1A1A] hover:bg-[#262626] text-white p-4 rounded-2xl flex items-center justify-between gap-3 border border-[#C8A24A]/40 transition-colors"
               >
                 <div className="flex items-center gap-3">
-                  <div className="w-9 h-9 rounded-xl bg-slate-800 text-white flex items-center justify-center shrink-0 border border-slate-700">
-                    <TikTokIcon className="w-5 h-5" />
+                  <div className="w-9 h-9 rounded-xl bg-[#262626] text-[#C8A24A] flex items-center justify-center shrink-0 border border-[#C8A24A]/40">
+                    <TikTokIcon className="w-5 h-5 text-[#C8A24A]" />
                   </div>
                   <div>
                     <h4 className="font-bold text-white text-xs">Follow on TikTok</h4>
-                    <p className="text-[10px] text-skybrand-400 font-mono">@bisrat_hotel</p>
+                    <p className="text-[10px] text-[#C8A24A] font-mono">@bisrat_hotel</p>
                   </div>
                 </div>
 
-                <span className="bg-skybrand-500 text-white text-[10px] font-bold px-2.5 py-1 rounded-lg">
+                <span className="bg-[#C8A24A] text-[#1A1A1A] text-[10px] font-bold px-2.5 py-1 rounded-lg">
                   Follow
                 </span>
               </a>
@@ -147,8 +147,8 @@ export default function ContactSection({ lang }) {
             </div>
 
             {/* Contact Form */}
-            <div className="bg-white p-6 sm:p-8 rounded-3xl border border-slate-200 shadow-soft">
-              <h3 className="font-serif text-xl font-bold text-navybrand-900 mb-4">
+            <div className="bg-[#F4EFE6] p-6 sm:p-8 rounded-3xl border border-[#E8E0D2] shadow-soft">
+              <h3 className="font-serif text-xl font-bold text-[#1A1A1A] mb-4">
                 {t.contact.formTitle}
               </h3>
 
@@ -169,7 +169,7 @@ export default function ContactSection({ lang }) {
                       value={name}
                       onChange={(e) => setName(e.target.value)}
                       placeholder="Your name"
-                      className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm text-slate-800 focus:ring-2 focus:ring-skybrand-500 focus:outline-none"
+                      className="w-full bg-white border border-[#E8E0D2] rounded-xl px-3.5 py-2.5 text-sm text-slate-800 focus:ring-2 focus:ring-[#C8A24A] focus:outline-none"
                     />
                   </div>
 
@@ -183,15 +183,15 @@ export default function ContactSection({ lang }) {
                       value={message}
                       onChange={(e) => setMessage(e.target.value)}
                       placeholder="Type your message or inquiry..."
-                      className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm text-slate-800 focus:ring-2 focus:ring-skybrand-500 focus:outline-none"
+                      className="w-full bg-white border border-[#E8E0D2] rounded-xl px-3.5 py-2.5 text-sm text-slate-800 focus:ring-2 focus:ring-[#C8A24A] focus:outline-none"
                     />
                   </div>
 
                   <button
                     type="submit"
-                    className="w-full bg-skybrand-500 hover:bg-skybrand-600 text-white font-semibold py-3 px-4 rounded-xl shadow-sm transition-all text-sm flex items-center justify-center gap-2"
+                    className="w-full bg-[#C8A24A] hover:bg-[#B58E38] text-[#1A1A1A] font-bold py-3 px-4 rounded-xl shadow-md transition-all text-sm flex items-center justify-center gap-2 border border-[#D8B96D]"
                   >
-                    <Send className="w-4 h-4" />
+                    <Send className="w-4 h-4 text-[#1A1A1A]" />
                     <span>{t.contact.sendMessage}</span>
                   </button>
                 </form>
@@ -203,7 +203,7 @@ export default function ContactSection({ lang }) {
           {/* Right Column: Embedded Map & Local Guide */}
           <div className="lg:col-span-5 space-y-6">
             
-            <div className="bg-white p-2 rounded-3xl border border-slate-200 shadow-soft overflow-hidden">
+            <div className="bg-[#F4EFE6] p-2 rounded-3xl border border-[#E8E0D2] shadow-soft overflow-hidden">
               <div className="relative w-full h-64 rounded-2xl overflow-hidden bg-slate-100">
                 <iframe
                   title="Bisrat Hotel Location Map"
@@ -218,7 +218,7 @@ export default function ContactSection({ lang }) {
                 />
               </div>
               <div className="p-3 text-center">
-                <p className="text-xs font-bold text-navybrand-900">
+                <p className="text-xs font-bold text-[#1A1A1A]">
                   Bisrat Hotel (ብስራት ሆቴል) • Adama, Ethiopia
                 </p>
                 <p className="text-[11px] text-slate-500">

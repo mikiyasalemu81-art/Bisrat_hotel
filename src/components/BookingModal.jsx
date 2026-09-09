@@ -8,11 +8,14 @@ export default function BookingModal({
   selectedRoom, 
   rooms = [], 
   lang,
+  paymentSettings = {},
   onBookingSubmit 
 }) {
   if (!isOpen) return null;
 
   const t = translations[lang] || translations.en;
+
+  const enabledMethods = paymentSettings?.paymentMethods || { telebirr: true, cbe: true, arrival: true };
 
   const [activeRoomId, setActiveRoomId] = useState(selectedRoom?.id || rooms[0]?.id || '');
   const [fullName, setFullName] = useState('');
@@ -21,7 +24,11 @@ export default function BookingModal({
   const [checkIn, setCheckIn] = useState(new Date().toISOString().split('T')[0]);
   const [checkOut, setCheckOut] = useState(new Date(Date.now() + 86400000).toISOString().split('T')[0]);
   const [guests, setGuests] = useState(1);
-  const [paymentMethod, setPaymentMethod] = useState('telebirr'); // 'telebirr' | 'cbe' | 'arrival'
+  const [paymentMethod, setPaymentMethod] = useState(() => {
+    if (enabledMethods.telebirr) return 'telebirr';
+    if (enabledMethods.cbe) return 'cbe';
+    return 'arrival';
+  });
   const [confirmedBooking, setConfirmedBooking] = useState(null);
 
   const currentRoom = rooms.find(r => r.id === activeRoomId) || selectedRoom || rooms[0];
@@ -81,11 +88,11 @@ export default function BookingModal({
           <div>
             {/* Header */}
             <div className="mb-6">
-              <div className="inline-flex items-center gap-1 text-xs font-bold text-skybrand-700 bg-sky-50 border border-sky-200 px-3 py-1 rounded-full mb-2">
-                <Sparkles className="w-3.5 h-3.5 text-skybrand-500" />
+              <div className="inline-flex items-center gap-1 text-xs font-bold text-[#C8A24A] bg-[#FAF2E1] border border-[#C8A24A]/40 px-3 py-1 rounded-full mb-2">
+                <Sparkles className="w-3.5 h-3.5 text-[#C8A24A]" />
                 <span>Bisrat Hotel Reservation</span>
               </div>
-              <h2 className="font-serif text-2xl sm:text-3xl font-bold text-navybrand-900">
+              <h2 className="font-serif text-2xl sm:text-3xl font-bold text-[#1A1A1A]">
                 {t.booking.modalTitle}
               </h2>
             </div>
@@ -100,7 +107,7 @@ export default function BookingModal({
                 <select
                   value={activeRoomId}
                   onChange={(e) => setActiveRoomId(e.target.value)}
-                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm font-semibold text-slate-800 focus:ring-2 focus:ring-skybrand-500 focus:outline-none"
+                  className="w-full bg-[#FAF7F0] border border-[#E8E0D2] rounded-xl px-3.5 py-2.5 text-sm font-semibold text-slate-800 focus:ring-2 focus:ring-[#C8A24A] focus:outline-none"
                 >
                   {rooms.map((r) => (
                     <option key={r.id} value={r.id}>
@@ -114,7 +121,7 @@ export default function BookingModal({
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <div>
                   <label className="block text-xs font-bold text-slate-700 mb-1 flex items-center gap-1">
-                    <Calendar className="w-3.5 h-3.5 text-skybrand-500" />
+                    <Calendar className="w-3.5 h-3.5 text-[#C8A24A]" />
                     {t.hero.checkIn}
                   </label>
                   <input
@@ -122,13 +129,13 @@ export default function BookingModal({
                     value={checkIn}
                     onChange={(e) => setCheckIn(e.target.value)}
                     required
-                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs sm:text-sm font-medium text-slate-800 focus:ring-2 focus:ring-skybrand-500 focus:outline-none"
+                    className="w-full bg-[#FAF7F0] border border-[#E8E0D2] rounded-xl px-3 py-2 text-xs sm:text-sm font-medium text-slate-800 focus:ring-2 focus:ring-[#C8A24A] focus:outline-none"
                   />
                 </div>
 
                 <div>
                   <label className="block text-xs font-bold text-slate-700 mb-1 flex items-center gap-1">
-                    <Calendar className="w-3.5 h-3.5 text-skybrand-500" />
+                    <Calendar className="w-3.5 h-3.5 text-[#C8A24A]" />
                     {t.hero.checkOut}
                   </label>
                   <input
@@ -136,19 +143,19 @@ export default function BookingModal({
                     value={checkOut}
                     onChange={(e) => setCheckOut(e.target.value)}
                     required
-                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs sm:text-sm font-medium text-slate-800 focus:ring-2 focus:ring-skybrand-500 focus:outline-none"
+                    className="w-full bg-[#FAF7F0] border border-[#E8E0D2] rounded-xl px-3 py-2 text-xs sm:text-sm font-medium text-slate-800 focus:ring-2 focus:ring-[#C8A24A] focus:outline-none"
                   />
                 </div>
 
                 <div>
                   <label className="block text-xs font-bold text-slate-700 mb-1 flex items-center gap-1">
-                    <User className="w-3.5 h-3.5 text-skybrand-500" />
+                    <User className="w-3.5 h-3.5 text-[#C8A24A]" />
                     {t.booking.guestsCount}
                   </label>
                   <select
                     value={guests}
                     onChange={(e) => setGuests(Number(e.target.value))}
-                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs sm:text-sm font-medium text-slate-800 focus:ring-2 focus:ring-skybrand-500 focus:outline-none"
+                    className="w-full bg-[#FAF7F0] border border-[#E8E0D2] rounded-xl px-3 py-2 text-xs sm:text-sm font-medium text-slate-800 focus:ring-2 focus:ring-[#C8A24A] focus:outline-none"
                   >
                     <option value={1}>1 Guest</option>
                     <option value={2}>2 Guests</option>
@@ -162,7 +169,7 @@ export default function BookingModal({
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-xs font-bold text-slate-700 mb-1 flex items-center gap-1">
-                    <User className="w-3.5 h-3.5 text-skybrand-500" />
+                    <User className="w-3.5 h-3.5 text-[#C8A24A]" />
                     {t.booking.fullName} *
                   </label>
                   <input
@@ -171,13 +178,13 @@ export default function BookingModal({
                     placeholder={t.booking.fullNamePlaceholder}
                     value={fullName}
                     onChange={(e) => setFullName(e.target.value)}
-                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm text-slate-800 focus:ring-2 focus:ring-skybrand-500 focus:outline-none"
+                    className="w-full bg-[#FAF7F0] border border-[#E8E0D2] rounded-xl px-3.5 py-2.5 text-sm text-slate-800 focus:ring-2 focus:ring-[#C8A24A] focus:outline-none"
                   />
                 </div>
 
                 <div>
                   <label className="block text-xs font-bold text-slate-700 mb-1 flex items-center gap-1">
-                    <Phone className="w-3.5 h-3.5 text-skybrand-500" />
+                    <Phone className="w-3.5 h-3.5 text-[#C8A24A]" />
                     {t.booking.phoneLabel} *
                   </label>
                   <input
@@ -186,7 +193,7 @@ export default function BookingModal({
                     placeholder={t.booking.phonePlaceholder}
                     value={phone}
                     onChange={(e) => setPhone(e.target.value)}
-                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm text-slate-800 focus:ring-2 focus:ring-skybrand-500 focus:outline-none"
+                    className="w-full bg-[#FAF7F0] border border-[#E8E0D2] rounded-xl px-3.5 py-2.5 text-sm text-slate-800 focus:ring-2 focus:ring-[#C8A24A] focus:outline-none"
                   />
                 </div>
               </div>
@@ -200,114 +207,122 @@ export default function BookingModal({
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                   
                   {/* Telebirr Choice */}
-                  <div
-                    onClick={() => setPaymentMethod('telebirr')}
-                    className={`cursor-pointer rounded-2xl p-3.5 border-2 transition-all flex flex-col justify-between ${
-                      paymentMethod === 'telebirr'
-                        ? 'border-skybrand-500 bg-sky-50/70 shadow-sm'
-                        : 'border-slate-200 bg-white hover:border-slate-300'
-                    }`}
-                  >
-                    <div className="flex items-center justify-between mb-2">
-                      <span className="font-bold text-xs text-skybrand-700 bg-sky-100 px-2 py-0.5 rounded">
-                        telebirr
-                      </span>
-                      <input 
-                        type="radio" 
-                        name="payment" 
-                        checked={paymentMethod === 'telebirr'} 
-                        onChange={() => setPaymentMethod('telebirr')}
-                      />
+                  {enabledMethods.telebirr && (
+                    <div
+                      onClick={() => setPaymentMethod('telebirr')}
+                      className={`cursor-pointer rounded-2xl p-3.5 border-2 transition-all flex flex-col justify-between ${
+                        paymentMethod === 'telebirr'
+                          ? 'border-[#C8A24A] bg-[#FAF2E1] shadow-sm'
+                          : 'border-slate-200 bg-white hover:border-slate-300'
+                      }`}
+                    >
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="font-bold text-xs text-[#977227] bg-[#FAF2E1] px-2 py-0.5 rounded border border-[#C8A24A]/30">
+                          telebirr
+                        </span>
+                        <input 
+                          type="radio" 
+                          name="payment" 
+                          checked={paymentMethod === 'telebirr'} 
+                          onChange={() => setPaymentMethod('telebirr')}
+                        />
+                      </div>
+                      <p className="text-xs font-semibold text-[#1A1A1A]">{t.booking.telebirr}</p>
+                      <p className="text-[10px] text-slate-500 mt-1">{t.booking.telebirrDesc}</p>
                     </div>
-                    <p className="text-xs font-semibold text-navybrand-900">{t.booking.telebirr}</p>
-                    <p className="text-[10px] text-slate-500 mt-1">{t.booking.telebirrDesc}</p>
-                  </div>
+                  )}
 
                   {/* CBE Birr Choice */}
-                  <div
-                    onClick={() => setPaymentMethod('cbe')}
-                    className={`cursor-pointer rounded-2xl p-3.5 border-2 transition-all flex flex-col justify-between ${
-                      paymentMethod === 'cbe'
-                        ? 'border-skybrand-500 bg-sky-50/70 shadow-sm'
-                        : 'border-slate-200 bg-white hover:border-slate-300'
-                    }`}
-                  >
-                    <div className="flex items-center justify-between mb-2">
-                      <span className="font-bold text-xs text-purple-700 bg-purple-100 px-2 py-0.5 rounded">
-                        CBE Birr
-                      </span>
-                      <input 
-                        type="radio" 
-                        name="payment" 
-                        checked={paymentMethod === 'cbe'} 
-                        onChange={() => setPaymentMethod('cbe')}
-                      />
+                  {enabledMethods.cbe && (
+                    <div
+                      onClick={() => setPaymentMethod('cbe')}
+                      className={`cursor-pointer rounded-2xl p-3.5 border-2 transition-all flex flex-col justify-between ${
+                        paymentMethod === 'cbe'
+                          ? 'border-[#C8A24A] bg-[#FAF2E1] shadow-sm'
+                          : 'border-slate-200 bg-white hover:border-slate-300'
+                      }`}
+                    >
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="font-bold text-xs text-purple-700 bg-purple-100 px-2 py-0.5 rounded">
+                          CBE Birr
+                        </span>
+                        <input 
+                          type="radio" 
+                          name="payment" 
+                          checked={paymentMethod === 'cbe'} 
+                          onChange={() => setPaymentMethod('cbe')}
+                        />
+                      </div>
+                      <p className="text-xs font-semibold text-[#1A1A1A]">{t.booking.cbe}</p>
+                      <p className="text-[10px] text-slate-500 mt-1">{t.booking.cbeDesc}</p>
                     </div>
-                    <p className="text-xs font-semibold text-navybrand-900">{t.booking.cbe}</p>
-                    <p className="text-[10px] text-slate-500 mt-1">{t.booking.cbeDesc}</p>
-                  </div>
+                  )}
 
                   {/* Pay on Arrival Choice */}
-                  <div
-                    onClick={() => setPaymentMethod('arrival')}
-                    className={`cursor-pointer rounded-2xl p-3.5 border-2 transition-all flex flex-col justify-between ${
-                      paymentMethod === 'arrival'
-                        ? 'border-skybrand-500 bg-sky-50/70 shadow-sm'
-                        : 'border-slate-200 bg-white hover:border-slate-300'
-                    }`}
-                  >
-                    <div className="flex items-center justify-between mb-2">
-                      <Building2 className="w-4 h-4 text-emerald-600" />
-                      <input 
-                        type="radio" 
-                        name="payment" 
-                        checked={paymentMethod === 'arrival'} 
-                        onChange={() => setPaymentMethod('arrival')}
-                      />
+                  {enabledMethods.arrival && (
+                    <div
+                      onClick={() => setPaymentMethod('arrival')}
+                      className={`cursor-pointer rounded-2xl p-3.5 border-2 transition-all flex flex-col justify-between ${
+                        paymentMethod === 'arrival'
+                          ? 'border-[#C8A24A] bg-[#FAF2E1] shadow-sm'
+                          : 'border-slate-200 bg-white hover:border-slate-300'
+                      }`}
+                    >
+                      <div className="flex items-center justify-between mb-2">
+                        <Building2 className="w-4 h-4 text-[#C8A24A]" />
+                        <input 
+                          type="radio" 
+                          name="payment" 
+                          checked={paymentMethod === 'arrival'} 
+                          onChange={() => setPaymentMethod('arrival')}
+                        />
+                      </div>
+                      <p className="text-xs font-semibold text-[#1A1A1A]">{t.booking.arrival}</p>
+                      <p className="text-[10px] text-slate-500 mt-1">{t.booking.arrivalDesc}</p>
                     </div>
-                    <p className="text-xs font-semibold text-navybrand-900">{t.booking.arrival}</p>
-                    <p className="text-[10px] text-slate-500 mt-1">{t.booking.arrivalDesc}</p>
-                  </div>
+                  )}
 
                 </div>
               </div>
 
               {/* Payment Instructions Display */}
-              {paymentMethod === 'telebirr' && (
-                <div className="bg-sky-50/80 border border-sky-200 rounded-2xl p-4 text-xs text-slate-700 space-y-1">
-                  <p className="font-bold text-skybrand-900">{t.booking.telebirrInstrTitle}</p>
-                  <p className="font-mono text-skybrand-800 bg-white px-2 py-1 rounded inline-block border border-sky-200 font-bold">
-                    {t.booking.telebirrShortcode}
+              {paymentMethod === 'telebirr' && enabledMethods.telebirr && (
+                <div className="bg-[#FAF2E1] border border-[#C8A24A]/40 rounded-2xl p-4 text-xs text-slate-800 space-y-1">
+                  <p className="font-bold text-[#1A1A1A]">{t.booking.telebirrInstrTitle}</p>
+                  <p className="font-mono text-[#977227] bg-white px-2 py-1 rounded inline-block border border-[#C8A24A]/40 font-bold">
+                    Shortcode / Merchant ID: {paymentSettings.telebirrShortcode || t.booking.telebirrShortcode}
                   </p>
                   <p className="text-[11px] text-slate-600 mt-1">{t.booking.telebirrSteps}</p>
                 </div>
               )}
 
-              {paymentMethod === 'cbe' && (
+              {paymentMethod === 'cbe' && enabledMethods.cbe && (
                 <div className="bg-purple-50/80 border border-purple-200 rounded-2xl p-4 text-xs text-slate-700 space-y-1">
                   <p className="font-bold text-purple-900">{t.booking.cbeInstrTitle}</p>
                   <p className="font-mono text-purple-900 bg-white px-2 py-1 rounded inline-block border border-purple-200 font-bold">
-                    {t.booking.cbeAccNum}
+                    CBE Account #: {paymentSettings.cbeAccountNumber || t.booking.cbeAccNum}
                   </p>
-                  <p className="text-[11px] text-purple-800 font-medium">{t.booking.cbeAcc}</p>
+                  <p className="text-[11px] text-purple-800 font-medium">
+                    Account Name: {paymentSettings.cbeAccountName || "Bisrat Hotel"}
+                  </p>
                 </div>
               )}
 
-              {/* Price Calculation Summary */}
-              <div className="bg-slate-900 text-white rounded-2xl p-4 flex items-center justify-between">
+              {/* Price Calculation Summary & Submit Button (Gold Background + Dark Text) */}
+              <div className="bg-[#1A1A1A] text-white rounded-2xl p-4 flex items-center justify-between border border-[#C8A24A]/30">
                 <div>
                   <p className="text-xs text-slate-300 font-medium">
                     {t.booking.totalPrice} ({nights} {t.booking.nightsCount})
                   </p>
-                  <p className="text-xl font-serif font-bold text-skybrand-300">
+                  <p className="text-xl font-serif font-bold text-[#C8A24A]">
                     {totalPrice.toLocaleString()} ETB
                   </p>
                 </div>
                 <button
                   type="submit"
-                  className="bg-skybrand-500 hover:bg-skybrand-600 text-white font-bold px-6 py-3 rounded-xl shadow-md transition-all text-sm flex items-center gap-2"
+                  className="bg-[#C8A24A] hover:bg-[#B58E38] text-[#1A1A1A] font-bold px-6 py-3 rounded-xl shadow-md transition-all text-sm flex items-center gap-2 border border-[#D8B96D]"
                 >
-                  <ShieldCheck className="w-4 h-4" />
+                  <ShieldCheck className="w-4 h-4 text-[#1A1A1A]" />
                   <span>{t.booking.submitButton}</span>
                 </button>
               </div>

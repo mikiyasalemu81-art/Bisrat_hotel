@@ -43,38 +43,38 @@ export default function ReviewsSection({
   };
 
   return (
-    <section id="reviews" className="py-16 bg-white border-y border-slate-100">
+    <section id="reviews" className="py-16 bg-[#1A1A1A] text-white border-y border-[#2A2A2A]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* Section Header */}
         <div className="flex flex-col md:flex-row items-center justify-between gap-6 mb-12">
           <div>
-            <span className="inline-block text-xs font-bold uppercase tracking-wider text-skybrand-700 bg-sky-50 border border-sky-200 px-3 py-1 rounded-full mb-3">
+            <span className="inline-block text-xs font-bold uppercase tracking-wider text-[#C8A24A] bg-[#C8A24A]/20 border border-[#C8A24A]/40 px-3 py-1 rounded-full mb-3">
               Bisrat Hotel Guest Experience
             </span>
-            <h2 className="fluid-section-title font-serif font-bold text-navybrand-900 mb-2">
+            <h2 className="fluid-section-title font-serif font-bold text-white mb-2">
               {t.reviews.title}
             </h2>
-            <p className="text-slate-600 text-sm">
+            <p className="text-slate-300 text-sm">
               {t.reviews.subtitle}
             </p>
           </div>
 
           {/* Rating Badge & Leave Review Trigger */}
-          <div className="flex items-center gap-4 bg-slate-50 p-4 rounded-2xl border border-slate-200">
-            <div className="text-center pr-4 border-r border-slate-200">
-              <span className="font-serif text-3xl font-bold text-navybrand-900">4.9</span>
-              <div className="flex text-amber-400 text-xs mt-0.5">
+          <div className="flex items-center gap-4 bg-[#242424] p-4 rounded-2xl border border-[#C8A24A]/30 shadow-lg">
+            <div className="text-center pr-4 border-r border-[#333333]">
+              <span className="font-serif text-3xl font-bold text-[#C8A24A]">4.9</span>
+              <div className="flex text-[#C8A24A] text-xs mt-0.5">
                 {'★'.repeat(5)}
               </div>
-              <p className="text-[10px] text-slate-500 mt-0.5">Overall Rating</p>
+              <p className="text-[10px] text-slate-400 mt-0.5">Overall Rating</p>
             </div>
 
             <button
               onClick={() => setShowForm(!showForm)}
-              className="flex items-center gap-2 bg-skybrand-500 hover:bg-skybrand-600 text-white font-semibold text-xs sm:text-sm px-4 py-2.5 rounded-xl shadow-xs transition-colors"
+              className="flex items-center gap-2 bg-[#C8A24A] hover:bg-[#B58E38] text-[#1A1A1A] font-bold text-xs sm:text-sm px-4 py-2.5 rounded-xl shadow-md transition-colors border border-[#D8B96D]"
             >
-              <MessageSquarePlus className="w-4 h-4" />
+              <MessageSquarePlus className="w-4 h-4 text-[#1A1A1A]" />
               <span>{t.reviews.leaveReview}</span>
             </button>
           </div>
@@ -82,21 +82,21 @@ export default function ReviewsSection({
 
         {/* Leave Review Form Modal / Drawer */}
         {showForm && (
-          <div className="mb-10 bg-sky-50/60 border border-sky-200 p-6 rounded-3xl max-w-xl mx-auto animate-fade-in">
+          <div className="mb-10 bg-[#242424] border border-[#C8A24A]/40 p-6 rounded-3xl max-w-xl mx-auto animate-fade-in text-white shadow-2xl">
             {submittedSuccess ? (
               <div className="text-center py-4 space-y-2">
-                <CheckCircle2 className="w-10 h-10 text-emerald-500 mx-auto" />
-                <p className="font-bold text-slate-800 text-sm">{t.reviews.reviewSubmitted}</p>
+                <CheckCircle2 className="w-10 h-10 text-emerald-400 mx-auto" />
+                <p className="font-bold text-white text-sm">{t.reviews.reviewSubmitted}</p>
               </div>
             ) : (
               <form onSubmit={handleSubmit} className="space-y-4">
-                <h3 className="font-serif text-lg font-bold text-navybrand-900">
+                <h3 className="font-serif text-lg font-bold text-[#C8A24A]">
                   {t.reviews.leaveReview}
                 </h3>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-xs font-bold text-slate-700 mb-1">
+                    <label className="block text-xs font-bold text-slate-300 mb-1">
                       {t.reviews.yourName} *
                     </label>
                     <input
@@ -105,18 +105,18 @@ export default function ReviewsSection({
                       placeholder="e.g. Almaz Bekele"
                       value={author}
                       onChange={(e) => setAuthor(e.target.value)}
-                      className="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-sm text-slate-800 focus:ring-2 focus:ring-skybrand-500 focus:outline-none"
+                      className="w-full bg-[#1A1A1A] border border-[#333333] rounded-xl px-3 py-2 text-sm text-white focus:ring-2 focus:ring-[#C8A24A] focus:outline-none"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-xs font-bold text-slate-700 mb-1">
+                    <label className="block text-xs font-bold text-slate-300 mb-1">
                       {t.reviews.rating}
                     </label>
                     <select
                       value={rating}
                       onChange={(e) => setRating(Number(e.target.value))}
-                      className="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-sm text-slate-800 focus:ring-2 focus:ring-skybrand-500 focus:outline-none font-bold text-amber-600"
+                      className="w-full bg-[#1A1A1A] border border-[#333333] rounded-xl px-3 py-2 text-sm text-[#C8A24A] focus:ring-2 focus:ring-[#C8A24A] focus:outline-none font-bold"
                     >
                       <option value={5}>★★★★★ (5/5 Excellent)</option>
                       <option value={4}>★★★★☆ (4/5 Very Good)</option>
@@ -126,7 +126,7 @@ export default function ReviewsSection({
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1">
+                  <label className="block text-xs font-bold text-slate-300 mb-1">
                     {t.reviews.yourReview} *
                   </label>
                   <textarea
@@ -135,7 +135,7 @@ export default function ReviewsSection({
                     placeholder="Share your experience at Bisrat Hotel..."
                     value={comment}
                     onChange={(e) => setComment(e.target.value)}
-                    className="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-sm text-slate-800 focus:ring-2 focus:ring-skybrand-500 focus:outline-none"
+                    className="w-full bg-[#1A1A1A] border border-[#333333] rounded-xl px-3 py-2 text-sm text-white focus:ring-2 focus:ring-[#C8A24A] focus:outline-none"
                   />
                 </div>
 
@@ -143,14 +143,14 @@ export default function ReviewsSection({
                   <button
                     type="button"
                     onClick={() => setShowForm(false)}
-                    className="px-4 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-200/60 rounded-xl"
+                    className="px-4 py-2 text-xs font-semibold text-slate-300 hover:bg-[#333333] rounded-xl"
                   >
                     Cancel
                   </button>
 
                   <button
                     type="submit"
-                    className="bg-skybrand-500 hover:bg-skybrand-600 text-white font-semibold px-5 py-2 rounded-xl text-xs shadow-xs"
+                    className="bg-[#C8A24A] hover:bg-[#B58E38] text-[#1A1A1A] font-bold px-5 py-2 rounded-xl text-xs shadow-md border border-[#D8B96D]"
                   >
                     {t.reviews.submitReview}
                   </button>
@@ -165,34 +165,34 @@ export default function ReviewsSection({
           {approvedReviews.map((rev) => (
             <div
               key={rev.id}
-              className="bg-slate-50/80 rounded-2xl p-6 border border-slate-200/80 shadow-soft hover:shadow-soft-hover transition-all flex flex-col justify-between"
+              className="bg-[#242424] rounded-2xl p-6 border border-[#C8A24A]/20 shadow-xl hover:border-[#C8A24A]/50 transition-all flex flex-col justify-between"
             >
               <div>
                 {/* Stars & Verified Badge */}
                 <div className="flex items-center justify-between mb-3">
-                  <div className="flex text-amber-400 text-sm">
+                  <div className="flex text-[#C8A24A] text-sm">
                     {Array.from({ length: rev.rating }).map((_, i) => (
-                      <Star key={i} className="w-4 h-4 fill-amber-400" />
+                      <Star key={i} className="w-4 h-4 fill-[#C8A24A] text-[#C8A24A]" />
                     ))}
                   </div>
 
                   {rev.isVerified && (
-                    <span className="inline-flex items-center gap-1 text-[10px] font-bold text-emerald-700 bg-emerald-100/90 px-2 py-0.5 rounded-full">
-                      <UserCheck className="w-3 h-3 text-emerald-600" />
+                    <span className="inline-flex items-center gap-1 text-[10px] font-bold text-emerald-400 bg-emerald-950/80 border border-emerald-500/30 px-2 py-0.5 rounded-full">
+                      <UserCheck className="w-3 h-3 text-emerald-400" />
                       <span>{t.reviews.verifiedBadge}</span>
                     </span>
                   )}
                 </div>
 
-                <p className="text-xs sm:text-sm text-slate-700 leading-relaxed italic mb-4">
+                <p className="text-xs sm:text-sm text-slate-300 leading-relaxed italic mb-4">
                   "{rev.comment}"
                 </p>
               </div>
 
-              <div className="pt-3 border-t border-slate-200/60 flex items-center justify-between text-xs">
+              <div className="pt-3 border-t border-[#333333] flex items-center justify-between text-xs">
                 <div>
-                  <p className="font-bold text-navybrand-900">{rev.author}</p>
-                  <p className="text-[10px] text-slate-500">{rev.location}</p>
+                  <p className="font-bold text-white">{rev.author}</p>
+                  <p className="text-[10px] text-slate-400">{rev.location}</p>
                 </div>
                 <span className="text-[10px] text-slate-400">{rev.date}</span>
               </div>

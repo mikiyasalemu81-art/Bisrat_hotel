@@ -49,11 +49,11 @@ export default function Highlights({ lang, facilities = [] }) {
   const displayList = facilities.length > 0 ? facilities : defaultFeatures;
 
   return (
-    <section className="py-16 bg-white border-y border-slate-100">
+    <section className="py-16 bg-[#FAF7F0] border-y border-[#E8E0D2]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         <div className="text-center max-w-2xl mx-auto mb-12">
-          <h2 className="fluid-section-title font-serif font-bold text-navybrand-900 mb-3">
+          <h2 className="fluid-section-title font-serif font-bold text-[#1A1A1A] mb-3">
             {t.highlights.title}
           </h2>
           <p className="text-slate-600 text-sm sm:text-base">
@@ -67,23 +67,23 @@ export default function Highlights({ lang, facilities = [] }) {
             return (
               <div 
                 key={f.id || i}
-                className="card-hover-effect rounded-2xl p-6 border border-slate-200/80 shadow-soft flex flex-col justify-between group"
+                className="card-hover-effect rounded-2xl p-6 border border-[#E8E0D2] bg-[#F4EFE6] shadow-soft flex flex-col justify-between group"
               >
                 <div>
-                  <div className={`w-12 h-12 rounded-2xl ${f.bg || 'bg-sky-50 text-skybrand-600 border-sky-100'} border flex items-center justify-center mb-4 group-hover:scale-110 transition-transform`}>
-                    <Icon className="w-6 h-6" />
+                  <div className="w-12 h-12 rounded-2xl bg-[#FAF2E1] text-[#C8A24A] border border-[#C8A24A]/30 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                    <Icon className="w-6 h-6 text-[#C8A24A]" />
                   </div>
 
-                  <h3 className="font-serif text-lg font-bold text-navybrand-900 mb-2">
+                  <h3 className="font-serif text-lg font-bold text-[#1A1A1A] mb-2">
                     {f.title}
                   </h3>
 
-                  <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
+                  <p className="text-xs sm:text-sm text-slate-700 leading-relaxed">
                     {f.desc}
                   </p>
                 </div>
 
-                <div className="mt-4 pt-3 border-t border-slate-200/60 flex items-center gap-1.5 text-[11px] font-semibold text-skybrand-700">
+                <div className="mt-4 pt-3 border-t border-[#E8E0D2] flex items-center gap-1.5 text-[11px] font-bold text-[#C8A24A]">
                   <CheckCircle2 className="w-3.5 h-3.5" />
                   <span>Verified Hotel Amenity</span>
                 </div>

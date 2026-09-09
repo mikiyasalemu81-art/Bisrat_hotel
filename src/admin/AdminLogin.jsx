@@ -19,14 +19,14 @@ export default function AdminLogin({ lang, onLoginSuccess }) {
   };
 
   return (
-    <div className="py-16 px-4 flex items-center justify-center min-h-[60vh]">
-      <div className="bg-white rounded-3xl shadow-2xl border border-slate-100 max-w-md w-full p-8 text-center animate-fade-in">
+    <div className="py-16 px-4 flex items-center justify-center min-h-[60vh] bg-[#FAF7F0]">
+      <div className="bg-[#F4EFE6] rounded-3xl shadow-2xl border border-[#E8E0D2] max-w-md w-full p-8 text-center animate-fade-in">
         
-        <div className="w-14 h-14 rounded-2xl bg-sky-50 text-skybrand-600 flex items-center justify-center mx-auto mb-4 border border-sky-200">
-          <ShieldCheck className="w-8 h-8" />
+        <div className="w-14 h-14 rounded-2xl bg-[#FAF2E1] text-[#C8A24A] flex items-center justify-center mx-auto mb-4 border border-[#C8A24A]/40">
+          <ShieldCheck className="w-8 h-8 text-[#C8A24A]" />
         </div>
 
-        <h2 className="font-serif text-2xl font-bold text-navybrand-900 mb-1">
+        <h2 className="font-serif text-2xl font-bold text-[#1A1A1A] mb-1">
           {t.admin.title}
         </h2>
         <p className="text-xs text-slate-500 mb-6">
@@ -37,7 +37,7 @@ export default function AdminLogin({ lang, onLoginSuccess }) {
           
           <div className="text-left">
             <label className="block text-xs font-bold text-slate-700 mb-1 flex items-center gap-1">
-              <KeyRound className="w-3.5 h-3.5 text-skybrand-500" />
+              <KeyRound className="w-3.5 h-3.5 text-[#C8A24A]" />
               {t.admin.passwordLabel}
             </label>
             <input
@@ -49,7 +49,7 @@ export default function AdminLogin({ lang, onLoginSuccess }) {
                 setPassword(e.target.value);
                 setError(false);
               }}
-              className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm text-slate-900 focus:ring-2 focus:ring-skybrand-500 focus:outline-none"
+              className="w-full bg-white border border-[#E8E0D2] rounded-xl px-4 py-3 text-sm text-slate-900 focus:ring-2 focus:ring-[#C8A24A] focus:outline-none"
             />
           </div>
 
@@ -62,14 +62,14 @@ export default function AdminLogin({ lang, onLoginSuccess }) {
 
           <button
             type="submit"
-            className="w-full bg-navybrand-900 hover:bg-slate-800 text-white font-semibold py-3 rounded-xl text-sm shadow-md transition-colors flex items-center justify-center gap-2"
+            className="w-full bg-[#C8A24A] hover:bg-[#B58E38] text-[#1A1A1A] font-bold py-3 rounded-xl text-sm shadow-md transition-colors flex items-center justify-center gap-2 border border-[#D8B96D]"
           >
-            <Lock className="w-4 h-4 text-skybrand-400" />
+            <Lock className="w-4 h-4 text-[#1A1A1A]" />
             <span>{t.admin.loginBtn}</span>
           </button>
 
-          <p className="text-[11px] text-slate-400 italic pt-2">
-            Default Password: <code className="bg-slate-100 text-slate-700 px-1.5 py-0.5 rounded font-mono font-bold">bisrathotel123</code>
+          <p className="text-[11px] text-slate-500 italic pt-2">
+            Default Password: <code className="bg-white border border-[#E8E0D2] text-[#977227] px-1.5 py-0.5 rounded font-mono font-bold">bisrathotel123</code>
           </p>
 
         </form>
