@@ -64,11 +64,11 @@ export default function App() {
     localStorage.setItem('bisrat_rooms', JSON.stringify(rooms));
   }, [rooms]);
 
-  // Menu Items State (Live Out-of-Stock sync & versioned migration to full 102 items)
+  // Menu Items State (Live Out-of-Stock sync & versioned migration to full catalog)
   const [menuItems, setMenuItems] = useState(() => {
     const version = localStorage.getItem('bisrat_menu_version');
     const saved = localStorage.getItem('bisrat_menu');
-    if (version === '2.1' && saved) {
+    if (version === '2.2' && saved) {
       try {
         const parsed = JSON.parse(saved);
         if (Array.isArray(parsed) && parsed.length >= 100) {
@@ -78,13 +78,13 @@ export default function App() {
         console.warn("Failed to parse saved menu, reverting to catalog:", e);
       }
     }
-    localStorage.setItem('bisrat_menu_version', '2.1');
+    localStorage.setItem('bisrat_menu_version', '2.2');
     localStorage.setItem('bisrat_menu', JSON.stringify(initialMenuItems));
     return initialMenuItems;
   });
   useEffect(() => {
     localStorage.setItem('bisrat_menu', JSON.stringify(menuItems));
-    localStorage.setItem('bisrat_menu_version', '2.1');
+    localStorage.setItem('bisrat_menu_version', '2.2');
   }, [menuItems]);
 
   // Facilities / Amenities State

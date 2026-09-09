@@ -551,7 +551,7 @@ export default function MenuSection({
 
       </div>
 
-      {/* FULL-SCREEN LIGHTBOX MODAL (NO AI TEXT, INSTANT POPUP, NO RELOAD) */}
+      {/* FULL-SCREEN LIGHTBOX MODAL (INSTANT POPUP, NO RELOAD) */}
       {lightboxItem && (
         <div
           role="dialog"

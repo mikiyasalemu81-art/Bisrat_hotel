@@ -1,7 +1,7 @@
 /**
  * Bisrat Hotel — Full Digitized Menu Catalog (102 Items across 13 Categories)
  * Contains exact prices in ETB, trilingual names, descriptions, 
- * curated photography, and exact AI image generation prompts.
+ * and authentic culinary photography. Handcrafted by manual coding.
  */
 
 export const CATEGORY_CONFIG = [
@@ -11,7 +11,7 @@ export const CATEGORY_CONFIG = [
     nameAm: "የወይን ጠጅ",
     nameOr: "Wayinii",
     icon: "Wine",
-    description: "Curated collection of premier Ethiopian and regional wines."
+    description: "Curated collection of premier Ethiopian and regional wines.",
   },
   {
     id: "cold_beverages",
@@ -19,7 +19,7 @@ export const CATEGORY_CONFIG = [
     nameAm: "ቀዝቃዛ መጠጦች",
     nameOr: "Dhugaatii Qabbanaawaa",
     icon: "Beer",
-    description: "Chilled bottled waters, sparkling minerals, soft drinks & cold beers."
+    description: "Chilled bottled waters, sparkling minerals, soft drinks & cold beers.",
   },
   {
     id: "pizza",
@@ -27,7 +27,7 @@ export const CATEGORY_CONFIG = [
     nameAm: "የፒዛ ዝርዝር",
     nameOr: "Pitsaa Addaa",
     icon: "Pizza",
-    description: "Stone-baked artisanal pizzas with rich cheeses and fresh savory toppings."
+    description: "Stone-baked artisanal pizzas with rich cheeses and fresh savory toppings.",
   },
   {
     id: "burger",
@@ -35,7 +35,7 @@ export const CATEGORY_CONFIG = [
     nameAm: "በርገር",
     nameOr: "Bargerii",
     icon: "Sandwich",
-    description: "Juicy beef and crispy chicken burgers served with gourmet toppings."
+    description: "Juicy beef and crispy chicken burgers served with gourmet toppings.",
   },
   {
     id: "chicken",
@@ -43,7 +43,7 @@ export const CATEGORY_CONFIG = [
     nameAm: "የዶሮ ምግቦች",
     nameOr: "Nyaata Lukkuu",
     icon: "Drumstick",
-    description: "Crispy nuggets, glazed wings, grilled and seasoned whole roasts."
+    description: "Crispy nuggets, glazed wings, grilled and seasoned whole roasts.",
   },
   {
     id: "pasta",
@@ -51,7 +51,7 @@ export const CATEGORY_CONFIG = [
     nameAm: "ፓስታ እና ሩዝ",
     nameOr: "Paastaa fi Ruuza",
     icon: "UtensilsCrossed",
-    description: "Authentic Italian style pastas tossed in rich sauces and fresh herbs."
+    description: "Authentic Italian style pastas tossed in rich sauces and fresh herbs.",
   },
   {
     id: "traditional",
@@ -59,7 +59,7 @@ export const CATEGORY_CONFIG = [
     nameAm: "የሀበሻ ባህላዊ ምግቦች",
     nameOr: "Nyaata Aadaa",
     icon: "Flame",
-    description: "Heritage Ethiopian stews, sizzling tibs, and grand combo platters on injera."
+    description: "Heritage Ethiopian stews, sizzling tibs, and grand combo platters on injera.",
   },
   {
     id: "soup",
@@ -67,7 +67,7 @@ export const CATEGORY_CONFIG = [
     nameAm: "ሾርባዎች",
     nameOr: "Shorbaa",
     icon: "Soup",
-    description: "Warm, nourishing chef-crafted broths and creamy vegetable purees."
+    description: "Warm, nourishing chef-crafted broths and creamy vegetable purees.",
   },
   {
     id: "salad",
@@ -75,7 +75,7 @@ export const CATEGORY_CONFIG = [
     nameAm: "ሰላጣዎች",
     nameOr: "Salaaxaa",
     icon: "Salad",
-    description: "Crisp garden greens, avocado bowls, and fresh proteins with zesty dressings."
+    description: "Crisp garden greens, avocado bowls, and fresh proteins with zesty dressings.",
   },
   {
     id: "fish",
@@ -83,7 +83,7 @@ export const CATEGORY_CONFIG = [
     nameAm: "የዓሣ ምግቦች",
     nameOr: "Nyaata Qurxummii",
     icon: "Fish",
-    description: "Freshly prepared lake fish cutlets, golden chips, and seasoned grilled fish."
+    description: "Freshly prepared lake fish cutlets, golden chips, and seasoned grilled fish.",
   },
   {
     id: "breakfast",
@@ -91,7 +91,7 @@ export const CATEGORY_CONFIG = [
     nameAm: "የቁርስ ምግቦች",
     nameOr: "Ciree",
     icon: "Egg",
-    description: "Energizing morning staples: Chechebsa, omelets, firfir varieties & pancakes."
+    description: "Energizing morning staples: Chechebsa, omelets, firfir varieties & pancakes.",
   },
   {
     id: "juice",
@@ -99,7 +99,7 @@ export const CATEGORY_CONFIG = [
     nameAm: "ትኩስ ጁስ እና ሼክ",
     nameOr: "Juusii fi Sheekii",
     icon: "Citrus",
-    description: "100% natural tropical fruit smoothies, spris layers, and healthy elixirs."
+    description: "100% natural tropical fruit smoothies, spris layers, and healthy elixirs.",
   },
   {
     id: "hot_drink",
@@ -107,7 +107,7 @@ export const CATEGORY_CONFIG = [
     nameAm: "ትኩስ መጠጦች",
     nameOr: "Dhugaatii Ho'aa",
     icon: "Coffee",
-    description: "Traditional Jebena brews, aromatic macchiatos, and spiced infused teas."
+    description: "Traditional Jebena brews, aromatic macchiatos, and spiced infused teas.",
   }
 ];
 
@@ -176,7 +176,7 @@ export const initialMenuItems = [
     price: 75,
     isAvailable: true,
     placeholderSlot: "menu-1l-water.jpg",
-    imageUrl: "https://images.unsplash.com/photo-1548839140-29a749e1bc4e?auto=format&fit=crop&w=1200&q=85",
+    imageUrl: "/images/cold-water-1l.jpg",
     description: "Chilled 1-liter sealed pure natural mineral water bottle.",
   },
   {
@@ -212,8 +212,8 @@ export const initialMenuItems = [
     price: 90,
     isAvailable: true,
     placeholderSlot: "menu-soft-drink.jpg",
-    imageUrl: "https://images.unsplash.com/photo-1622483767028-3f66f32aef97?auto=format&fit=crop&w=1200&q=85",
-    description: "Chilled glass with sparkling soda over ice cubes, perfectly refreshing.",
+    imageUrl: "/images/cold-soft-drink.jpg",
+    description: "Chilled refreshing soft drink served ice cold in a glass bottle with ice.",
   },
   {
     id: "cold-5",
@@ -224,8 +224,8 @@ export const initialMenuItems = [
     price: 70,
     isAvailable: true,
     placeholderSlot: "menu-ambo-water.jpg",
-    imageUrl: "https://images.unsplash.com/photo-1603569283847-aa295f0d016a?auto=format&fit=crop&w=1200&q=85",
-    description: "Ethiopia's iconic sparkling mineral water, naturally carbonated and ice-cold.",
+    imageUrl: "/images/cold-ambo-water.jpg",
+    description: "Ethiopia's iconic Ambo sparkling mineral water, naturally carbonated and ice-cold.",
   },
   {
     id: "cold-6",
@@ -236,8 +236,8 @@ export const initialMenuItems = [
     price: 130,
     isAvailable: true,
     placeholderSlot: "menu-normal-beer.jpg",
-    imageUrl: "https://images.unsplash.com/photo-1535958636474-b021ee887b13?auto=format&fit=crop&w=1200&q=85",
-    description: "Freshly poured golden lager beer with a thick, frothy white foam collar.",
+    imageUrl: "/images/ethiopian-beer-stgeorge.jpg",
+    description: "Authentic chilled Ethiopian lager beer (St. George / Giorgis) poured with a thick frothy collar.",
   },
   {
     id: "cold-7",
@@ -248,8 +248,8 @@ export const initialMenuItems = [
     price: 150,
     isAvailable: true,
     placeholderSlot: "menu-bedele-beer.jpg",
-    imageUrl: "https://images.unsplash.com/photo-1608270111664-96947b7d603b?auto=format&fit=crop&w=1200&q=85",
-    description: "Full-bodied Ethiopian premium lager served cold in a chilled glass.",
+    imageUrl: "/images/cold-beer-bedele.jpg",
+    description: "Famous Ethiopian Bedele Special premium export-quality lager brewed with 100% natural ingredients.",
   },
   {
     id: "cold-8",
@@ -260,8 +260,8 @@ export const initialMenuItems = [
     price: 130,
     isAvailable: true,
     placeholderSlot: "menu-arada-beer.jpg",
-    imageUrl: "https://images.unsplash.com/photo-1584225064785-c62a8b43d148?auto=format&fit=crop&w=1200&q=85",
-    description: "Crisp and refreshing craft-style Ethiopian beer poured to perfection.",
+    imageUrl: "/images/ethiopian-arada-drink.jpg",
+    description: "Authentic Ethiopian Arada refreshing drink crafted with natural fruit essences and sparkling water.",
   },
   {
     id: "cold-9",
@@ -272,8 +272,8 @@ export const initialMenuItems = [
     price: 160,
     isAvailable: true,
     placeholderSlot: "menu-heineken-beer.jpg",
-    imageUrl: "https://images.unsplash.com/photo-1518542698889-ca82282f08d5?auto=format&fit=crop&w=1200&q=85",
-    description: "International premium pale lager served chilled with delicate malt character.",
+    imageUrl: "/images/cold-beer-heineken.jpg",
+    description: "International premium pale lager served chilled in a cold glass with crisp foam.",
   },
 
   // ==========================================
@@ -488,8 +488,8 @@ export const initialMenuItems = [
     price: 2550,
     isAvailable: true,
     placeholderSlot: "menu-half-roast-chicken.jpg",
-    imageUrl: "https://images.unsplash.com/photo-1514944298352-7a711425101a?auto=format&fit=crop&w=1200&q=85",
-    description: "Half of a whole oven-roasted country chicken with crackling golden skin and herb dressing.",
+    imageUrl: "/images/chicken-half-roast.jpg",
+    description: "Succulent half roast chicken with crispy golden-brown skin, herb butter, and roasted potatoes.",
   },
   {
     id: "chicken-8",
@@ -500,8 +500,8 @@ export const initialMenuItems = [
     price: 5970,
     isAvailable: true,
     placeholderSlot: "menu-whole-roasted-chicken.jpg",
-    imageUrl: "https://images.unsplash.com/photo-1574484284002-952d92456975?auto=format&fit=crop&w=1200&q=85",
-    description: "Grand whole roasted chicken, golden brown and served on an elegant family platter with festive garnish.",
+    imageUrl: "/images/chicken-whole-roast.jpg",
+    description: "Magnificent whole roasted golden chicken on a serving platter with rosemary and lemon slices.",
   },
 
   // ==========================================
@@ -540,8 +540,8 @@ export const initialMenuItems = [
     price: 550,
     isAvailable: true,
     placeholderSlot: "menu-pasta-bolonez.jpg",
-    imageUrl: "https://images.unsplash.com/photo-1621996346565-e3d5d6281691?auto=format&fit=crop&w=1200&q=85",
-    description: "Classic spaghetti coated with rich, slow-simmered minced beef and tomato ragù.",
+    imageUrl: "/images/pasta-bolognese.jpg",
+    description: "Classic spaghetti bolognese tossed in a rich slow-simmered minced beef tomato ragù and parmesan.",
   },
   {
     id: "pasta-4",
@@ -984,8 +984,8 @@ export const initialMenuItems = [
     price: 300,
     isAvailable: true,
     placeholderSlot: "menu-mixed-salad.jpg",
-    imageUrl: "https://images.unsplash.com/photo-1505253758473-96b46deae2cd?auto=format&fit=crop&w=1200&q=85",
-    description: "Rainbow garden salad with cucumbers, tomatoes, carrots, radishes, and lemon olive oil.",
+    imageUrl: "/images/salad-mixed.jpg",
+    description: "Fresh crisp mixed garden salad with crunchy greens, cucumber, ripe tomatoes, and light vinaigrette.",
   },
   {
     id: "salad-4",
@@ -1272,8 +1272,8 @@ export const initialMenuItems = [
     price: 150,
     isAvailable: true,
     placeholderSlot: "menu-avocado-juice.jpg",
-    imageUrl: "https://images.unsplash.com/photo-1540420773420-3366772f4999?auto=format&fit=crop&w=1200&q=85",
-    description: "Thick creamy freshly puréed avocado juice with a hint of fresh lime.",
+    imageUrl: "/images/juice-avocado.jpg",
+    description: "Thick, silky smooth Ethiopian-style avocado purée served in a tall glass with a squeeze of fresh lime.",
   },
   {
     id: "juice-2",
@@ -1284,8 +1284,8 @@ export const initialMenuItems = [
     price: 200,
     isAvailable: true,
     placeholderSlot: "menu-banana-shake.jpg",
-    imageUrl: "https://images.unsplash.com/photo-1553530666-ba11a7da3888?auto=format&fit=crop&w=1200&q=85",
-    description: "Luscious creamy banana milkshake blended with vanilla and chilled fresh milk.",
+    imageUrl: "/images/juice-banana-shake.jpg",
+    description: "Rich creamy pale yellow banana milkshake smoothie topped with fresh banana slices and a paper straw.",
   },
   {
     id: "juice-3",
@@ -1296,8 +1296,8 @@ export const initialMenuItems = [
     price: 200,
     isAvailable: true,
     placeholderSlot: "menu-fruit-punch.jpg",
-    imageUrl: "https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?auto=format&fit=crop&w=1200&q=85",
-    description: "Refreshing medley of citrus, berry, and tropical fruit juices served over ice.",
+    imageUrl: "/images/juice-fruit-punch.jpg",
+    description: "Vibrant tropical fruit punch cocktail made with fresh fruit extracts and citrus.",
   },
   {
     id: "juice-4",
@@ -1308,8 +1308,8 @@ export const initialMenuItems = [
     price: 150,
     isAvailable: true,
     placeholderSlot: "menu-mango-juice.jpg",
-    imageUrl: "https://images.unsplash.com/photo-1546173159-315724a31696?auto=format&fit=crop&w=1200&q=85",
-    description: "Vibrant golden mango juice made from sweet local sun-ripened mangos.",
+    imageUrl: "/images/juice-mango.jpg",
+    description: "Pure rich golden mango juice pressed from fresh ripe mangoes, served chilled and sweet.",
   },
   {
     id: "juice-5",
@@ -1320,8 +1320,8 @@ export const initialMenuItems = [
     price: 180,
     isAvailable: true,
     placeholderSlot: "menu-mixed-juice.jpg",
-    imageUrl: "https://images.unsplash.com/photo-1527661591475-527312dd65f5?auto=format&fit=crop&w=1200&q=85",
-    description: "Famous Ethiopian 'Spris' multi-layered juice: fresh avocado, mango, and papaya in distinct color bands.",
+    imageUrl: "/images/juice-spris-mixed.jpg",
+    description: "Authentic Ethiopian Spris (ስፕሪስ) with distinct colorful horizontal layers of avocado, mango, and papaya.",
   },
   {
     id: "juice-6",
@@ -1332,8 +1332,8 @@ export const initialMenuItems = [
     price: 150,
     isAvailable: true,
     placeholderSlot: "menu-papaya-juice.jpg",
-    imageUrl: "https://images.unsplash.com/photo-1546173159-315724a31696?auto=format&fit=crop&w=1200&q=85",
-    description: "Silky tropical papaya juice pressed fresh with a squeeze of tangy lime.",
+    imageUrl: "/images/juice-papaya.jpg",
+    description: "Fresh coral-orange papaya nectar served in a tall glass with a fresh lime wheel garnish and straw.",
   },
   {
     id: "juice-7",
@@ -1344,8 +1344,8 @@ export const initialMenuItems = [
     price: 180,
     isAvailable: true,
     placeholderSlot: "menu-pineapple-juice.jpg",
-    imageUrl: "https://images.unsplash.com/photo-1550258987-190a2d41a8ba?auto=format&fit=crop&w=1200&q=85",
-    description: "Sweet and tangy pressed pure pineapple juice served ice-cold.",
+    imageUrl: "/images/juice-pineapple.jpg",
+    description: "Fresh chilled golden pineapple juice served in a tall glass with ice cubes, straw, and a fresh pineapple slice.",
   },
   {
     id: "juice-8",
@@ -1356,8 +1356,8 @@ export const initialMenuItems = [
     price: 250,
     isAvailable: true,
     placeholderSlot: "menu-special-juice.jpg",
-    imageUrl: "https://images.unsplash.com/photo-1527661591475-527312dd65f5?auto=format&fit=crop&w=1200&q=85",
-    description: "Artisanal specialty layered smoothie with avocado, mango, strawberry, and vimto reduction.",
+    imageUrl: "/images/juice-spris-mixed.jpg",
+    description: "Chef's signature multi-fruit layered Ethiopian special juice, richly blended and served ice cold.",
   },
   {
     id: "juice-9",
@@ -1368,8 +1368,8 @@ export const initialMenuItems = [
     price: 230,
     isAvailable: true,
     placeholderSlot: "menu-strawberry-juice.jpg",
-    imageUrl: "https://images.unsplash.com/photo-1553530666-ba11a7da3888?auto=format&fit=crop&w=1200&q=85",
-    description: "Luscious sweet pink strawberry juice blended fresh with ice.",
+    imageUrl: "/images/juice-strawberry.jpg",
+    description: "Fresh chilled red strawberry juice served in a glass with ripe berry notes.",
   },
   {
     id: "juice-10",
@@ -1380,8 +1380,8 @@ export const initialMenuItems = [
     price: 180,
     isAvailable: true,
     placeholderSlot: "menu-telba-juice.jpg",
-    imageUrl: "https://images.unsplash.com/photo-1548839140-29a749e1bc4e?auto=format&fit=crop&w=1200&q=85",
-    description: "Traditional Ethiopian nutritious roasted flaxseed drink blended cold with honey and water.",
+    imageUrl: "/images/juice-telba.jpg",
+    description: "Traditional Ethiopian Telba (ተልባ) — roasted flaxseed smoothie gently sweetened and served chilled with ice.",
   },
   {
     id: "juice-11",
@@ -1392,8 +1392,8 @@ export const initialMenuItems = [
     price: 180,
     isAvailable: true,
     placeholderSlot: "menu-watermelon-juice.jpg",
-    imageUrl: "https://images.unsplash.com/photo-1589733955941-5eeaf752f6dd?auto=format&fit=crop&w=1200&q=85",
-    description: "Crisp, ultra-hydrating chilled ruby watermelon juice with crushed ice.",
+    imageUrl: "/images/juice-watermelon.jpg",
+    description: "Crisp, cooling ruby-red watermelon juice served chilled with fresh mint garnish.",
   },
 
   // ==========================================
@@ -1456,7 +1456,7 @@ export const initialMenuItems = [
     price: 65,
     isAvailable: true,
     placeholderSlot: "menu-peanut-tea.jpg",
-    imageUrl: "https://images.unsplash.com/photo-1576092768241-dec231879fc3?auto=format&fit=crop&w=1200&q=85",
+    imageUrl: "/images/hot-peanut-tea.jpg",
     description: "Sweet infused tea enriched with ground roasted peanuts for a rich, nutty warm beverage.",
   },
   {
