@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { Utensils, ToggleLeft, ToggleRight, AlertCircle, CheckCircle2, Eye, EyeOff, Plus, Trash2, Upload, Link as LinkIcon, Edit } from 'lucide-react';
+import { Utensils, ToggleLeft, ToggleRight, AlertCircle, CheckCircle2, Eye, EyeOff, Plus, Trash2, Upload, Link as LinkIcon, Edit, Search } from 'lucide-react';
 import { translations } from '../translations';
+import { CATEGORY_CONFIG } from '../data/menuData';
 
 import { savePhotoToStorage } from '../utils/imageStorage';
 
@@ -19,10 +20,14 @@ export default function MenuManager({
   // Add Item Form State
   const [nameEn, setNameEn] = useState('');
   const [nameAm, setNameAm] = useState('');
-  const [category, setCategory] = useState('ethiopian');
+  const [category, setCategory] = useState(CATEGORY_CONFIG[0]?.id || 'wine');
   const [price, setPrice] = useState('');
   const [description, setDescription] = useState('');
   const [imageUrl, setImageUrl] = useState('');
+
+  // Search & Filter State for 102 items in Admin
+  const [adminSearch, setAdminSearch] = useState('');
+  const [adminCategoryFilter, setAdminCategoryFilter] = useState('all');
 
   const toggleAvailability = (id) => {
     setMenuItems(prev => 
@@ -196,12 +201,13 @@ export default function MenuManager({
               <select
                 value={category}
                 onChange={(e) => setCategory(e.target.value)}
-                className="w-full bg-white border border-slate-300 rounded-xl px-3.5 py-2 text-xs font-semibold text-slate-800 focus:ring-2 focus:ring-skybrand-500"
+                className="w-full bg-white border border-slate-300 rounded-xl px-3.5 py-2 text-xs font-semibold text-slate-800 focus:ring-2 focus:ring-skybrand-500 capitalize"
               >
-                <option value="ethiopian">Ethiopian Cuisine</option>
-                <option value="international">International</option>
-                <option value="beverages">Coffee & Hot Drinks</option>
-                <option value="bar">Bar & Beverages</option>
+                {CATEGORY_CONFIG.map((cat) => (
+                  <option key={cat.id} value={cat.id}>
+                    {cat.nameEn} ({cat.nameAm})
+                  </option>
+                ))}
               </select>
             </div>
 
@@ -289,9 +295,46 @@ export default function MenuManager({
         </form>
       )}
 
+      {/* Admin Search & Category Filter */}
+      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 bg-white p-3.5 rounded-2xl border border-slate-200">
+        <div className="relative flex-1">
+          <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+          <input
+            type="text"
+            placeholder="Search dishes by English or Amharic name..."
+            value={adminSearch}
+            onChange={(e) => setAdminSearch(e.target.value)}
+            className="w-full bg-slate-50 border border-slate-200 rounded-xl pl-9 pr-3 py-2 text-xs text-slate-800 focus:outline-none focus:ring-2 focus:ring-skybrand-500"
+          />
+        </div>
+
+        <div className="flex items-center gap-2">
+          <span className="text-xs font-semibold text-slate-500 whitespace-nowrap">Filter:</span>
+          <select
+            value={adminCategoryFilter}
+            onChange={(e) => setAdminCategoryFilter(e.target.value)}
+            className="bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-skybrand-500 capitalize"
+          >
+            <option value="all">All Categories ({menuItems.length})</option>
+            {CATEGORY_CONFIG.map((cat) => (
+              <option key={cat.id} value={cat.id}>
+                {cat.nameEn} ({menuItems.filter(i => i.category === cat.id).length})
+              </option>
+            ))}
+          </select>
+        </div>
+      </div>
+
       {/* Menu Items Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {menuItems.map((item) => (
+        {menuItems
+          .filter((item) => {
+            const matchesCat = adminCategoryFilter === 'all' || item.category === adminCategoryFilter;
+            const nameText = ((item.nameEn || '') + ' ' + (item.nameAm || '') + ' ' + (item.category || '')).toLowerCase();
+            const matchesQuery = !adminSearch || nameText.includes(adminSearch.toLowerCase());
+            return matchesCat && matchesQuery;
+          })
+          .map((item) => (
           <div 
             key={item.id}
             className={`p-5 rounded-2xl border transition-all flex items-center justify-between gap-4 ${
