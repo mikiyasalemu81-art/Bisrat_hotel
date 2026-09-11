@@ -2,12 +2,25 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  --brand-green: #1B4D3E;
+  --accent-gold: #C5A059;
+  --bg-main: #FDFCF7;
+  --surface-card: #FFFFFF;
+  --border-subtle: #E8EFE9;
+  --text-dark: #1A1C19;
+  /* compatibility aliases */
+  --primary-green: #1B4D3E;
+  --accent-yellow: #C5A059;
+  --bg-light: #FDFCF7;
+}
+
 @layer base {
   html {
     scroll-behavior: smooth;
     font-family: 'Inter', system-ui, -apple-system, sans-serif;
-    background-color: #FAF7F0;
-    color: #1A1A1A;
+    background-color: var(--bg-main);
+    color: var(--text-dark);
   }
   
   h1, h2, h3, .font-serif {
@@ -15,34 +28,50 @@
   }
 }
 
-/* Custom scrollbar in Gold & Charcoal */
+/* Custom scrollbar in Deep Emerald & Warm Champagne Gold */
 ::-webkit-scrollbar {
   width: 8px;
 }
 ::-webkit-scrollbar-track {
-  background: #1A1A1A;
+  background: #13382D;
 }
 ::-webkit-scrollbar-thumb {
-  background: #C8A24A;
+  background: #1B4D3E;
   border-radius: 4px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #B58E38;
+  background: #C5A059;
 }
 
 /* Animations */
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(12px); }
-  to { opacity: 1; transform: translateY(0); }
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: none; }
 }
 
 .animate-fade-in {
-  animation: fadeIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  animation: fadeIn 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
-/* Dark Glassmorphism Header */
+/* Food Menu Card Image Wrapper (Uniform 180px height & centered crop) */
+.dish-card-img-wrapper {
+  width: 100%;
+  height: 180px;
+  overflow: hidden;
+  border-radius: 8px;
+}
+.dish-card-img-wrapper img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center center;
+  display: block;
+}
+
+
+/* Deep Emerald Glassmorphism Header */
 .glass-header {
-  background: rgba(26, 26, 26, 0.95);
+  background: rgba(27, 77, 62, 0.96);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
 }
@@ -57,16 +86,16 @@
   font-size: clamp(1.6rem, 2.5vw + 1rem, 2.5rem);
 }
 
-/* Card Hover Effect in Gold Accent */
+/* Card Hover Effect */
 .card-hover-effect {
   background-color: #ffffff;
-  transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
-  border: 1px solid #E8E0D2;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  border: 1px solid #E5E7EB;
 }
 
 .card-hover-effect:hover {
-  background-color: #FAF2E1; /* Light gold glow */
-  border-color: #C8A24A;
-  transform: translateY(-5px);
-  box-shadow: 0 20px 40px -10px rgba(200, 162, 74, 0.25), 0 8px 16px -4px rgba(26, 26, 26, 0.12);
+  background-color: #FDFCF7;
+  border-color: #1B4D3E;
+  transform: translateY(-4px);
+  box-shadow: 0 16px 32px -8px rgba(27, 77, 62, 0.18), 0 4px 12px -2px rgba(26, 28, 25, 0.08);
 }

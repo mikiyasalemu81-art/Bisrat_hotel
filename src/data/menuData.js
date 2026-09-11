@@ -124,7 +124,7 @@ export const initialMenuItems = [
     price: 1000,
     isAvailable: true,
     placeholderSlot: "menu-awash-wine.jpg",
-    imageUrl: "https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?auto=format&fit=crop&w=1200&q=85",
+    imageUrl: "/images/01_Awash_White_Wine.jpg",
     description: "Classic Ethiopian red wine crafted from Awash Valley grapes, featuring deep berry aromas with a smooth finish.",
   },
   {
@@ -136,7 +136,7 @@ export const initialMenuItems = [
     price: 1200,
     isAvailable: true,
     placeholderSlot: "menu-axumite-wine.jpg",
-    imageUrl: "https://images.unsplash.com/photo-1506377247377-2a5b3b417ebb?auto=format&fit=crop&w=1200&q=85",
+    imageUrl: "/images/09_Axumit_Red_Wine.png",
     description: "Renowned sweet Ethiopian dessert wine with gentle floral notes and a rich, velvety ruby hue.",
   },
   {
@@ -148,7 +148,7 @@ export const initialMenuItems = [
     price: 1200,
     isAvailable: true,
     placeholderSlot: "menu-kamila-wine.jpg",
-    imageUrl: "https://images.unsplash.com/photo-1553361371-9b22f78e8b1d?auto=format&fit=crop&w=1200&q=85",
+    imageUrl: "/images/04_Kenila_Rose_and_White_Wine.png",
     description: "Elegantly balanced dry red wine with hints of oak and subtle spice, poured into a crystal goblet.",
   },
   {
@@ -160,7 +160,7 @@ export const initialMenuItems = [
     price: 2800,
     isAvailable: true,
     placeholderSlot: "menu-acacia-wine.jpg",
-    imageUrl: "https://images.unsplash.com/photo-1569919659476-f0852f6834b7?auto=format&fit=crop&w=1200&q=85",
+    imageUrl: "/images/03_Acacia_Dry_Red_Wine.jpg",
     description: "Premium reserve Ethiopian wine from Castel Winery, displaying complex tannic structure and refined elegance.",
   },
 
@@ -188,7 +188,7 @@ export const initialMenuItems = [
     price: 60,
     isAvailable: true,
     placeholderSlot: "menu-half-l-water.jpg",
-    imageUrl: "https://images.unsplash.com/photo-1559839914-17aae19cec71?auto=format&fit=crop&w=1200&q=85",
+    imageUrl: "/images/07_TOP_Mineral_Water.png",
     description: "Compact 500ml chilled natural spring water bottle.",
   },
   {
@@ -200,7 +200,7 @@ export const initialMenuItems = [
     price: 90,
     isAvailable: true,
     placeholderSlot: "menu-big-water.jpg",
-    imageUrl: "https://images.unsplash.com/photo-1523362628745-0c100150b504?auto=format&fit=crop&w=1200&q=85",
+    imageUrl: "/images/08_Gold_Water_Bottle.jpg",
     description: "Extra large bottle of crisp pure drinking water for tables and sharing.",
   },
   {
@@ -212,7 +212,7 @@ export const initialMenuItems = [
     price: 90,
     isAvailable: true,
     placeholderSlot: "menu-soft-drink.jpg",
-    imageUrl: "/images/cold-soft-drink.jpg",
+    imageUrl: "/images/11_Sprite_Fanta_Coca_Cola_Bottles.jpg",
     description: "Chilled refreshing soft drink served ice cold in a glass bottle with ice.",
   },
   {
@@ -224,7 +224,7 @@ export const initialMenuItems = [
     price: 70,
     isAvailable: true,
     placeholderSlot: "menu-ambo-water.jpg",
-    imageUrl: "/images/cold-ambo-water.jpg",
+    imageUrl: "/images/15_Ambo_Sparkling_Water.jpg",
     description: "Ethiopia's iconic Ambo sparkling mineral water, naturally carbonated and ice-cold.",
   },
   {
@@ -236,7 +236,7 @@ export const initialMenuItems = [
     price: 130,
     isAvailable: true,
     placeholderSlot: "menu-normal-beer.jpg",
-    imageUrl: "/images/ethiopian-beer-stgeorge.jpg",
+    imageUrl: "/images/18_Beer_Mug.jpg",
     description: "Authentic chilled Ethiopian lager beer (St. George / Giorgis) poured with a thick frothy collar.",
   },
   {
@@ -248,7 +248,7 @@ export const initialMenuItems = [
     price: 150,
     isAvailable: true,
     placeholderSlot: "menu-bedele-beer.jpg",
-    imageUrl: "/images/cold-beer-bedele.jpg",
+    imageUrl: "/images/02_Bedele_Special_Beer.webp",
     description: "Famous Ethiopian Bedele Special premium export-quality lager brewed with 100% natural ingredients.",
   },
   {
@@ -260,7 +260,7 @@ export const initialMenuItems = [
     price: 130,
     isAvailable: true,
     placeholderSlot: "menu-arada-beer.jpg",
-    imageUrl: "/images/ethiopian-arada-drink.jpg",
+    imageUrl: "/images/17_Arada_Beer_Illustrated_Bottles.jpg",
     description: "Authentic Ethiopian Arada refreshing drink crafted with natural fruit essences and sparkling water.",
   },
   {
@@ -272,7 +272,7 @@ export const initialMenuItems = [
     price: 160,
     isAvailable: true,
     placeholderSlot: "menu-heineken-beer.jpg",
-    imageUrl: "/images/cold-beer-heineken.jpg",
+    imageUrl: "/images/12_Heineken_Beer_Bottles.jpg",
     description: "International premium pale lager served chilled in a cold glass with crisp foam.",
   },
 
@@ -416,7 +416,7 @@ export const initialMenuItems = [
     price: 600,
     isAvailable: true,
     placeholderSlot: "menu-chicken-mexican.jpg",
-    imageUrl: "https://images.unsplash.com/photo-1604908176997-125f25cc6f3d?auto=format&fit=crop&w=1200&q=85",
+    imageUrl: "/images/04_Spicy_Pan_Fried_Chicken.jpg",
     description: "Spicy Mexican-style shredded chicken seasoned with roasted peppers, cumin, and fresh cilantro garnish.",
   },
   {
@@ -724,7 +724,7 @@ export const initialMenuItems = [
     price: 650,
     isAvailable: true,
     placeholderSlot: "menu-chekena-tibs.jpg",
-    imageUrl: "/images/ethiopian-tibs.jpg",
+    imageUrl: "/images/01_Awaze_Tibs_with_Bread_and_Injera.jpg",
     description: "Finest prime tenderloin beef cubes sautéed with rosemary, red onions, garlic, and fresh jalapeños.",
   },
   {
@@ -736,7 +736,7 @@ export const initialMenuItems = [
     price: 320,
     isAvailable: true,
     placeholderSlot: "menu-fasting-shiro.jpg",
-    imageUrl: "/images/ethiopian-shiro.jpg",
+    imageUrl: "/images/06_Shiro_with_Injera_Rolls.jpg",
     description: "Silky spiced chickpea and split-pea stew cooked with garlic and berbere, 100% vegan with injera.",
   },
   {
@@ -748,7 +748,7 @@ export const initialMenuItems = [
     price: 720,
     isAvailable: true,
     placeholderSlot: "menu-lamb-tibs.jpg",
-    imageUrl: "/images/ethiopian-tibs.jpg",
+    imageUrl: "/images/19_Beef_Tibs_with_Injera.jpg",
     description: "Succulent cubes of tender highland lamb seared in spiced butter with peppers and onions.",
   },
   {
@@ -760,7 +760,7 @@ export const initialMenuItems = [
     price: 380,
     isAvailable: true,
     placeholderSlot: "menu-shiro-butter.jpg",
-    imageUrl: "/images/ethiopian-shiro.jpg",
+    imageUrl: "/images/14_Shiro_with_Injera_Plate.jpg",
     description: "Steaming hot chickpea stew finished with a lavish spoonful of fragrant Ethiopian niter kibbeh.",
   },
   {
@@ -772,7 +772,7 @@ export const initialMenuItems = [
     price: 420,
     isAvailable: true,
     placeholderSlot: "menu-special-shiro.jpg",
-    imageUrl: "/images/ethiopian-shiro-tegamino.jpg",
+    imageUrl: "/images/16_Shiro_Dip_Bowl.jpg",
     description: "House signature shiro loaded with extra aromatics, butter, and served bubbling with fresh injera.",
   },
   {
@@ -796,7 +796,7 @@ export const initialMenuItems = [
     price: 350,
     isAvailable: true,
     placeholderSlot: "menu-tegabino.jpg",
-    imageUrl: "/images/ethiopian-shiro-tegamino.jpg",
+    imageUrl: "/images/20_Shiro_with_Injera.jpg",
     description: "Thick, bubbling chickpea stew served sizzling directly in a traditional Ethiopian earthenware clay pot.",
   },
   {
@@ -808,7 +808,7 @@ export const initialMenuItems = [
     price: 450,
     isAvailable: true,
     placeholderSlot: "menu-dulet.jpg",
-    imageUrl: "/images/ethiopian-wat.jpg",
+    imageUrl: "/images/16_Spiced_Minced_Meat.jpg",
     description: "Finely minced tripe, liver, and lean beef seasoned with mitmita, niter kibbeh, and green chili.",
   },
   {
@@ -832,7 +832,7 @@ export const initialMenuItems = [
     price: 4655,
     isAvailable: true,
     placeholderSlot: "menu-special-combo.jpg",
-    imageUrl: "/images/ethiopian-combo.jpg",
+    imageUrl: "/images/13_Injera_Wrap_with_Meat_and_Vegetables.jpg",
     description: "Grand banquet feast: Special kitfo, doro wot, sizzling beef tibs, gomen be-sega, and assorted sides on giant injera.",
   },
 
@@ -848,7 +848,7 @@ export const initialMenuItems = [
     price: 200,
     isAvailable: true,
     placeholderSlot: "menu-beet-root-soup.jpg",
-    imageUrl: "https://images.unsplash.com/photo-1547592166-23ac45744acd?auto=format&fit=crop&w=1200&q=85",
+    imageUrl: "/images/10_Beet_Soup.webp",
     description: "Vibrant ruby-magenta beetroot soup lightly seasoned and swirled with fresh cream.",
   },
   {
@@ -920,7 +920,7 @@ export const initialMenuItems = [
     price: 210,
     isAvailable: true,
     placeholderSlot: "menu-tomato-soup.jpg",
-    imageUrl: "https://images.unsplash.com/photo-1547592166-23ac45744acd?auto=format&fit=crop&w=1200&q=85",
+    imageUrl: "/images/02_Tomato_Soup_with_Basil.jpg",
     description: "Sweet sun-ripened roasted tomato soup topped with cream swirl and fresh basil.",
   },
   {
@@ -944,7 +944,7 @@ export const initialMenuItems = [
     price: 200,
     isAvailable: true,
     placeholderSlot: "menu-carrot-soup.jpg",
-    imageUrl: "https://images.unsplash.com/photo-1547592180-85f173990554?auto=format&fit=crop&w=1200&q=85",
+    imageUrl: "/images/03_Carrot_Soup_with_Cream_Swirl.jpg",
     description: "Smooth golden carrot soup simmered with ginger, coriander, and light coconut cream.",
   },
 
@@ -960,7 +960,7 @@ export const initialMenuItems = [
     price: 300,
     isAvailable: true,
     placeholderSlot: "menu-avocado-salad.jpg",
-    imageUrl: "https://images.unsplash.com/photo-1540420773420-3366772f4999?auto=format&fit=crop&w=1200&q=85",
+    imageUrl: "/images/01_Avocado_Tomato_Cucumber_Salad.jpg",
     description: "Ripe butter avocado slices laid over crisp mixed greens, tomatoes, red onion, and lime vinaigrette.",
   },
   {
@@ -972,7 +972,7 @@ export const initialMenuItems = [
     price: 450,
     isAvailable: true,
     placeholderSlot: "menu-chicken-salad.jpg",
-    imageUrl: "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?auto=format&fit=crop&w=1200&q=85",
+    imageUrl: "/images/05_Grilled_Chicken_Avocado_Corn_Salad.jpg",
     description: "Tender grilled chicken slices atop crunchy romaine lettuce, cucumber, and light house dressing.",
   },
   {
@@ -984,7 +984,7 @@ export const initialMenuItems = [
     price: 300,
     isAvailable: true,
     placeholderSlot: "menu-mixed-salad.jpg",
-    imageUrl: "/images/salad-mixed.jpg",
+    imageUrl: "/images/07_Mixed_Garden_Salad.jpg",
     description: "Fresh crisp mixed garden salad with crunchy greens, cucumber, ripe tomatoes, and light vinaigrette.",
   },
   {
@@ -996,7 +996,7 @@ export const initialMenuItems = [
     price: 250,
     isAvailable: true,
     placeholderSlot: "menu-roasted-salad.jpg",
-    imageUrl: "https://images.unsplash.com/photo-1540420773420-3366772f4999?auto=format&fit=crop&w=1200&q=85",
+    imageUrl: "/images/03_Roasted_Butternut_Squash_Quinoa_Salad.jpg",
     description: "Oven-roasted peppers, eggplants, and sweet onions tossed in balsamic vinaigrette.",
   },
   {
@@ -1008,7 +1008,7 @@ export const initialMenuItems = [
     price: 520,
     isAvailable: true,
     placeholderSlot: "menu-tuna-salad.jpg",
-    imageUrl: "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=1200&q=85",
+    imageUrl: "/images/04_Tuna_Apple_Salad.jpg",
     description: "Flaked ocean tuna over crisp garden leaves, sliced boiled eggs, olives, and fresh tomatoes.",
   },
 
@@ -1024,7 +1024,7 @@ export const initialMenuItems = [
     price: 500,
     isAvailable: true,
     placeholderSlot: "menu-fish-cotelet.jpg",
-    imageUrl: "https://images.unsplash.com/photo-1519708227418-c8fd9a32b7a2?auto=format&fit=crop&w=1200&q=85",
+    imageUrl: "/images/09_Breaded_Cutlets_with_Fries.jpg",
     description: "Golden breaded fried lake fish cutlet served with zesty tartar sauce and fresh lemon wedges.",
   },
   {
@@ -1036,7 +1036,7 @@ export const initialMenuItems = [
     price: 650,
     isAvailable: true,
     placeholderSlot: "menu-fish-chips.jpg",
-    imageUrl: "https://images.unsplash.com/photo-1534422298391-e4f8c172dddb?auto=format&fit=crop&w=1200&q=85",
+    imageUrl: "/images/14_Crispy_Whole_Fish_with_Pepper_Sauce.jpg",
     description: "Crispy battered fish fillets accompanied by a generous portion of seasoned french fries.",
   },
   {
@@ -1060,7 +1060,7 @@ export const initialMenuItems = [
     price: 585,
     isAvailable: true,
     placeholderSlot: "menu-grilled-fish.jpg",
-    imageUrl: "https://images.unsplash.com/photo-1519708227418-c8fd9a32b7a2?auto=format&fit=crop&w=1200&q=85",
+    imageUrl: "/images/11_Whole_Spicy_Fried_Fish_with_Salsa.jpg",
     description: "Whole fresh lake fish seasoned with herbs and flame-grilled, accompanied by lemon slices and steamed veggies.",
   },
   {
@@ -1148,7 +1148,7 @@ export const initialMenuItems = [
     price: 250,
     isAvailable: true,
     placeholderSlot: "menu-oats.jpg",
-    imageUrl: "https://images.unsplash.com/photo-1517673400267-0251440c45dc?auto=format&fit=crop&w=1200&q=85",
+    imageUrl: "/images/06_Spiced_Oatmeal_Porridge.jpg",
     description: "Warm wholesome oatmeal cooked with fresh milk, honey drizzle, and cinnamon dusting.",
   },
   {
@@ -1160,7 +1160,7 @@ export const initialMenuItems = [
     price: 250,
     isAvailable: true,
     placeholderSlot: "menu-omelet.jpg",
-    imageUrl: "https://images.unsplash.com/photo-1510693206972-df098062cb71?auto=format&fit=crop&w=1200&q=85",
+    imageUrl: "/images/02_Vegetable_Omelette.jpg",
     description: "Classic pan-fried egg omelet with finely chopped sweet onions and green peppers.",
   },
   {
@@ -1196,7 +1196,7 @@ export const initialMenuItems = [
     price: 250,
     isAvailable: true,
     placeholderSlot: "menu-scramble-egg.jpg",
-    imageUrl: "https://images.unsplash.com/photo-1525351484163-7529414344d8?auto=format&fit=crop&w=1200&q=85",
+    imageUrl: "/images/17_Beef_and_Egg_Scramble.jpg",
     description: "Freshly scrambled farm eggs seasoned with sea salt, butter, and black pepper.",
   },
   {
@@ -1208,7 +1208,7 @@ export const initialMenuItems = [
     price: 300,
     isAvailable: true,
     placeholderSlot: "menu-scramble-egg-meat.jpg",
-    imageUrl: "https://images.unsplash.com/photo-1525351484163-7529414344d8?auto=format&fit=crop&w=1200&q=85",
+    imageUrl: "/images/12_Minced_Meat_with_Injera_and_Eggs.jpg",
     description: "Hearty scrambled eggs sautéed with spiced minced beef, onions, and jalapeño pepper.",
   },
   {
@@ -1232,7 +1232,7 @@ export const initialMenuItems = [
     price: 450,
     isAvailable: true,
     placeholderSlot: "menu-tebs-firfir.jpg",
-    imageUrl: "/images/ethiopian-tibs-firfir.jpg",
+    imageUrl: "/images/13_Beef_Tibs_with_Injera_and_Wine.jpg",
     description: "Pan-sautéed succulent beef tibs combined with seasoned injera firfir and green chilies.",
   },
   {
@@ -1256,7 +1256,7 @@ export const initialMenuItems = [
     price: 300,
     isAvailable: true,
     placeholderSlot: "menu-fetira-honey.jpg",
-    imageUrl: "https://images.unsplash.com/photo-1528207776546-365bb710ee93?auto=format&fit=crop&w=1200&q=85",
+    imageUrl: "/images/07_Stuffed_Flatbread_with_Dipping_Sauce.jpg",
     description: "Flaky layered Ethiopian pancake pastry fried crisp and generously drizzled with pure highland honey.",
   },
 
@@ -1272,7 +1272,7 @@ export const initialMenuItems = [
     price: 150,
     isAvailable: true,
     placeholderSlot: "menu-avocado-juice.jpg",
-    imageUrl: "/images/juice-avocado.jpg",
+    imageUrl: "/images/10_Avocado_Smoothie.jpg",
     description: "Thick, silky smooth Ethiopian-style avocado purée served in a tall glass with a squeeze of fresh lime.",
   },
   {
@@ -1296,7 +1296,7 @@ export const initialMenuItems = [
     price: 200,
     isAvailable: true,
     placeholderSlot: "menu-fruit-punch.jpg",
-    imageUrl: "/images/juice-fruit-punch.jpg",
+    imageUrl: "/images/18_Fruit_Punch.jpg",
     description: "Vibrant tropical fruit punch cocktail made with fresh fruit extracts and citrus.",
   },
   {
@@ -1392,7 +1392,7 @@ export const initialMenuItems = [
     price: 180,
     isAvailable: true,
     placeholderSlot: "menu-watermelon-juice.jpg",
-    imageUrl: "/images/juice-watermelon.jpg",
+    imageUrl: "/images/15_Watermelon_Mint_Cooler.jpg",
     description: "Crisp, cooling ruby-red watermelon juice served chilled with fresh mint garnish.",
   },
 

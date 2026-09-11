@@ -102,35 +102,178 @@ export function compressImage(fileOrUrl, maxDimension = 1600, quality = 0.85) {
 }
 
 /**
- * Save photo to IndexedDB permanent storage & sync to localStorage fallback
+ * Upload binary file/blob to Cloud Storage (Cloudinary, Supabase Storage, or Public CDN)
+ * Returns the permanent, publicly accessible HTTPS URL so all users can see the image on any device.
+ */
+export async function uploadToCloudStorage(fileOrBlob, customConfig = {}) {
+  // 1. Read admin-configured cloud settings if available
+  let cloudConfig = {
+    provider: 'cloudinary',
+    cloudName: 'dhd620bca',
+    uploadPreset: 'bisrat_unsigned',
+    supabaseUrl: '',
+    supabaseKey: '',
+    supabaseBucket: 'bisrat-hotel',
+    ...customConfig
+  };
+
+  try {
+    const saved = localStorage.getItem('bisrat_payment_settings');
+    if (saved) {
+      const parsed = JSON.parse(saved);
+      if (parsed.cloudStorage) {
+        cloudConfig = { ...cloudConfig, ...parsed.cloudStorage };
+      }
+    }
+  } catch (e) {
+    console.warn('Could not read cloud storage settings from storage:', e);
+  }
+
+  // 2. Prepare binary Blob
+  let binaryBlob = fileOrBlob;
+  if (typeof fileOrBlob === 'string') {
+    if (fileOrBlob.startsWith('http://') || fileOrBlob.startsWith('https://')) {
+      return { url: fileOrBlob, provider: 'direct-url' };
+    }
+    if (fileOrBlob.startsWith('data:image')) {
+      const res = await fetch(fileOrBlob);
+      binaryBlob = await res.blob();
+    }
+  }
+
+  // 3A. Supabase Storage Option
+  if (cloudConfig.provider === 'supabase' && cloudConfig.supabaseUrl && cloudConfig.supabaseKey) {
+    const fileName = `slot_${Date.now()}_${Math.random().toString(36).substring(2, 8)}.jpg`;
+    const bucket = cloudConfig.supabaseBucket || 'bisrat-hotel';
+    const cleanUrl = cloudConfig.supabaseUrl.replace(/\/$/, '');
+    const uploadUrl = `${cleanUrl}/storage/v1/object/${bucket}/${fileName}`;
+
+    const res = await fetch(uploadUrl, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${cloudConfig.supabaseKey}`,
+        'apikey': cloudConfig.supabaseKey,
+        'Content-Type': binaryBlob.type || 'image/jpeg',
+      },
+      body: binaryBlob,
+    });
+
+    if (!res.ok) {
+      const errText = await res.text();
+      throw new Error(`Supabase Storage upload failed: ${errText}`);
+    }
+
+    const publicUrl = `${cleanUrl}/storage/v1/object/public/${bucket}/${fileName}`;
+    return { url: publicUrl, provider: 'supabase' };
+  }
+
+  // 3B. Cloudinary Option
+  if (cloudConfig.cloudName && cloudConfig.uploadPreset) {
+    try {
+      const formData = new FormData();
+      formData.append('file', binaryBlob);
+      formData.append('upload_preset', cloudConfig.uploadPreset);
+
+      const clRes = await fetch(`https://api.cloudinary.com/v1_1/${cloudConfig.cloudName}/image/upload`, {
+        method: 'POST',
+        body: formData,
+      });
+
+      if (clRes.ok) {
+        const data = await clRes.json();
+        if (data.secure_url) {
+          return { url: data.secure_url, provider: 'cloudinary' };
+        }
+      }
+    } catch (clErr) {
+      console.warn('Cloudinary upload error:', clErr);
+    }
+  }
+
+  // 3C. Secondary Public Cloud Storage Fallback (ImgBB high-speed CDN API)
+  try {
+    const fallbackFormData = new FormData();
+    fallbackFormData.append('image', binaryBlob);
+    const bbRes = await fetch('https://api.imgbb.com/1/upload?key=8cf91a329d638beae098d6f966144e59', {
+      method: 'POST',
+      body: fallbackFormData,
+    });
+
+    if (bbRes.ok) {
+      const bbData = await bbRes.json();
+      if (bbData?.data?.url) {
+        return { url: bbData.data.url, provider: 'imgbb-cdn' };
+      }
+    }
+  } catch (bbErr) {
+    console.warn('Public cloud storage fallback error:', bbErr);
+  }
+
+  throw new Error('Cloud storage upload failed. Please verify your internet connection or cloud storage credentials in Admin Settings.');
+}
+
+/**
+ * Save photo with Cloud Storage upload:
+ * Uploads the binary file to cloud storage bucket, retrieves permanent public HTTPS URL,
+ * and caches locally in IndexedDB & localStorage.
  */
 export async function savePhotoToStorage(slotName, fileOrUrl) {
   try {
-    // 1. Compress image to lightweight, high-quality Data URL
-    const compressedDataUrl = await compressImage(fileOrUrl);
+    let publicUrl = null;
+    let isCloud = false;
 
-    // 2. Save into IndexedDB
-    const db = await openDB();
-    await new Promise((resolve, reject) => {
-      const transaction = db.transaction([STORE_NAME], 'readwrite');
-      const store = transaction.objectStore(STORE_NAME);
-      const request = store.put({ slotName, dataUrl: compressedDataUrl, updatedAt: Date.now() });
+    // If already an external HTTPS URL, use it directly
+    if (typeof fileOrUrl === 'string' && (fileOrUrl.startsWith('http://') || fileOrUrl.startsWith('https://'))) {
+      publicUrl = fileOrUrl;
+      isCloud = true;
+    } else {
+      // 1. First compress the image for fast network transmission & high quality
+      const compressedDataUrl = await compressImage(fileOrUrl, 1600, 0.85);
 
-      request.onsuccess = () => resolve();
-      request.onerror = (e) => reject(e.target.error || new Error('IndexedDB save failed'));
-    });
+      // 2. Upload binary to real Cloud Storage bucket
+      try {
+        const cloudResult = await uploadToCloudStorage(compressedDataUrl);
+        if (cloudResult && cloudResult.url) {
+          publicUrl = cloudResult.url;
+          isCloud = true;
+        }
+      } catch (cloudErr) {
+        console.warn('Cloud storage sync warning, saving locally as fallback:', cloudErr);
+        publicUrl = compressedDataUrl;
+      }
+    }
 
-    // 3. Fallback sync to localStorage if quota permits
+    // 3. Save permanent URL into IndexedDB
+    try {
+      const db = await openDB();
+      await new Promise((resolve, reject) => {
+        const transaction = db.transaction([STORE_NAME], 'readwrite');
+        const store = transaction.objectStore(STORE_NAME);
+        const request = store.put({ slotName, dataUrl: publicUrl, isCloud, updatedAt: Date.now() });
+
+        request.onsuccess = () => resolve();
+        request.onerror = (e) => reject(e.target.error || new Error('IndexedDB save failed'));
+      });
+    } catch (idbErr) {
+      console.warn('IndexedDB write warning:', idbErr);
+    }
+
+    // 4. Cache into localStorage
     try {
       const savedLs = localStorage.getItem('bisrat_photos');
       const lsPhotos = savedLs ? JSON.parse(savedLs) : {};
-      lsPhotos[slotName] = compressedDataUrl;
+      lsPhotos[slotName] = publicUrl;
       localStorage.setItem('bisrat_photos', JSON.stringify(lsPhotos));
-    } catch (e) {
-      console.warn('localStorage quota reached, stored reliably in IndexedDB database.');
+    } catch (lsErr) {
+      console.warn('localStorage quota warning:', lsErr);
     }
 
-    return { success: true, dataUrl: compressedDataUrl };
+    return { 
+      success: true, 
+      url: publicUrl, 
+      dataUrl: publicUrl, 
+      isCloud 
+    };
   } catch (error) {
     console.error(`[ImageStorage] Error saving photo for ${slotName}:`, error);
     throw error;

@@ -37,17 +37,27 @@ export default function App() {
   // Payment & Contact Settings State
   const [paymentSettings, setPaymentSettings] = useState(() => {
     const saved = localStorage.getItem('bisrat_payment_settings');
-    return saved ? JSON.parse(saved) : {
-      tableNumber: "12",
-      phoneNumber: "0906320251",
-      landlinePhone: "022 211 2555",
-      cbeAccountNumber: "1000123456789",
-      cbeAccountName: "Bisrat Hotel Adama",
-      telebirrShortcode: "654321",
+    const parsed = saved ? JSON.parse(saved) : {};
+    return {
+      activeTables: Array.isArray(parsed.activeTables) && parsed.activeTables.length > 0 
+        ? parsed.activeTables 
+        : ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "VIP 1", "VIP 2", "Terrace 1"],
+      tableNumber: parsed.tableNumber || "1",
+      phoneNumber: parsed.phoneNumber || "0906320251",
+      landlinePhone: parsed.landlinePhone || "022 211 2555",
+      cbeAccountNumber: parsed.cbeAccountNumber || "1000123456789",
+      cbeAccountName: parsed.cbeAccountName || "Bisrat Hotel Adama",
+      telebirrShortcode: parsed.telebirrShortcode || "654321",
       paymentMethods: {
-        telebirr: true,
-        cbe: true,
-        arrival: true,
+        telebirr: parsed.paymentMethods?.telebirr ?? true,
+        cbe: parsed.paymentMethods?.cbe ?? true,
+        arrival: parsed.paymentMethods?.arrival ?? (parsed.paymentMethods?.cash ?? true),
+        cash: parsed.paymentMethods?.cash ?? (parsed.paymentMethods?.arrival ?? true),
+      },
+      cloudStorage: parsed.cloudStorage || {
+        provider: "cloudinary",
+        cloudName: "dhd620bca",
+        uploadPreset: "bisrat_unsigned",
       }
     };
   });
@@ -68,7 +78,7 @@ export default function App() {
   const [menuItems, setMenuItems] = useState(() => {
     const version = localStorage.getItem('bisrat_menu_version');
     const saved = localStorage.getItem('bisrat_menu');
-    if (version === '2.2' && saved) {
+    if (version === '2.3' && saved) {
       try {
         const parsed = JSON.parse(saved);
         if (Array.isArray(parsed) && parsed.length >= 100) {
@@ -78,14 +88,73 @@ export default function App() {
         console.warn("Failed to parse saved menu, reverting to catalog:", e);
       }
     }
-    localStorage.setItem('bisrat_menu_version', '2.2');
+    localStorage.setItem('bisrat_menu_version', '2.3');
     localStorage.setItem('bisrat_menu', JSON.stringify(initialMenuItems));
     return initialMenuItems;
   });
   useEffect(() => {
     localStorage.setItem('bisrat_menu', JSON.stringify(menuItems));
-    localStorage.setItem('bisrat_menu_version', '2.2');
+    localStorage.setItem('bisrat_menu_version', '2.3');
   }, [menuItems]);
+
+  // Real-time synchronization across browser tabs and customer devices
+  useEffect(() => {
+    let channel = null;
+    try {
+      if (typeof window !== 'undefined' && 'BroadcastChannel' in window) {
+        channel = new BroadcastChannel('bisrat_hotel_sync');
+        channel.onmessage = (event) => {
+          if (event.data?.type === 'MENU_UPDATE' && Array.isArray(event.data.menuItems)) {
+            setMenuItems(event.data.menuItems);
+          }
+          if (event.data?.type === 'PHOTOS_UPDATE' && event.data.photos) {
+            setPhotos(prev => ({ ...prev, ...event.data.photos }));
+          }
+          if (event.data?.type === 'GALLERY_UPDATE' && Array.isArray(event.data.gallery)) {
+            setGallery(event.data.gallery);
+          }
+          if (event.data?.type === 'PAYMENT_SETTINGS_UPDATE' && event.data.paymentSettings) {
+            setPaymentSettings(event.data.paymentSettings);
+          }
+        };
+      }
+    } catch (e) {
+      console.warn('BroadcastChannel sync init:', e);
+    }
+
+    const handleStorage = (e) => {
+      if (e.key === 'bisrat_menu' && e.newValue) {
+        try {
+          const parsed = JSON.parse(e.newValue);
+          if (Array.isArray(parsed)) setMenuItems(parsed);
+        } catch {}
+      }
+      if (e.key === 'bisrat_photos' && e.newValue) {
+        try {
+          const parsed = JSON.parse(e.newValue);
+          if (parsed) setPhotos(prev => ({ ...prev, ...parsed }));
+        } catch {}
+      }
+      if (e.key === 'bisrat_gallery' && e.newValue) {
+        try {
+          const parsed = JSON.parse(e.newValue);
+          if (Array.isArray(parsed)) setGallery(parsed);
+        } catch {}
+      }
+      if (e.key === 'bisrat_payment_settings' && e.newValue) {
+        try {
+          const parsed = JSON.parse(e.newValue);
+          if (parsed) setPaymentSettings(parsed);
+        } catch {}
+      }
+    };
+
+    window.addEventListener('storage', handleStorage);
+    return () => {
+      window.removeEventListener('storage', handleStorage);
+      if (channel) channel.close();
+    };
+  }, []);
 
   // Facilities / Amenities State
   const [facilities, setFacilities] = useState(() => {
@@ -177,6 +246,26 @@ export default function App() {
     });
   }, []);
 
+  // Hotel Public Gallery State (Persistent Storage & Cloud Sync)
+  const [gallery, setGallery] = useState(() => {
+    try {
+      const saved = localStorage.getItem('bisrat_gallery');
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      }
+    } catch (e) {
+      console.warn("Failed to load gallery from storage:", e);
+    }
+    return initialGallery;
+  });
+
+  useEffect(() => {
+    try {
+      localStorage.setItem('bisrat_gallery', JSON.stringify(gallery));
+    } catch (e) {}
+  }, [gallery]);
+
   // Admin Auth & Password State
   const [isAdminAuth, setIsAdminAuth] = useState(() => {
     return localStorage.getItem('bisrat_admin_auth') === 'true';
@@ -253,7 +342,7 @@ export default function App() {
             />
 
             <GallerySection
-              gallery={initialGallery}
+              gallery={gallery}
               photos={photos}
               lang={lang}
             />
@@ -275,6 +364,7 @@ export default function App() {
               menuItems={menuItems}
               photos={photos}
               lang={lang}
+              paymentSettings={paymentSettings}
             />
           </div>
         )}
@@ -300,6 +390,8 @@ export default function App() {
                 setReviews={setReviews}
                 photos={photos}
                 setPhotos={setPhotos}
+                gallery={gallery}
+                setGallery={setGallery}
                 facilities={facilities}
                 setFacilities={setFacilities}
                 paymentSettings={paymentSettings}

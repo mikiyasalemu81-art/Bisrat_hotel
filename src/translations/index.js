@@ -27,7 +27,7 @@ export const translations = {
     hero: {
       badge: "Hospitality in Adama",
       title: "Experience Comfort & Elegance in Adama",
-      subtitle: "Bisrat Hotel offers spacious accommodations, authentic Ethiopian & international dining, 24/7 power backup, and high-speed WiFi in the heart of Adama.",
+      subtitle: "Luxury hospitality, authentic Ethiopian dining, and unmatched relaxation in the heart of Adama.",
       ctaBook: "Reserve Your Stay",
       ctaMenu: "Explore Restaurant Menu",
       checkIn: "Check In",
@@ -236,7 +236,7 @@ export const translations = {
     hero: {
       badge: "እንግዳ ተቀባይነት በአዳማ",
       title: "በአዳማ ምቹ እና ዘመናዊ ማረፊያ በብስራት ሆቴል",
-      subtitle: "ብስራት ሆቴል ሰፋፊ ክፍሎችን፣ ጣፋጭ የሀገር ውስጥ እና የውጭ ሀገር ምግቦችን፣ የ24 ሰዓት መብራት እና ፈጣን ዋይፋይ ያቀርባል።",
+      subtitle: "ምርጥ እንግዳ ተቀባይነት፣ ባህላዊ እና ዓለም አቀፍ ምግቦች እና ምቹ እረፍት በአዳማ ከተማ።",
       ctaBook: "ክፍል አሁኑኑ ይዘዙ",
       ctaMenu: "የምግብ ዝርዝር ይመልከቱ",
       checkIn: "የመግቢያ ቀን",
@@ -445,7 +445,7 @@ export const translations = {
     hero: {
       badge: "Simannaa Gaarii Adaamaatti",
       title: "Adaamaatti Bashannana fi Simannaa Kabajamaa",
-      subtitle: "Hoteelli Bisrat kutaalee bal'aa, nyaata aadaa fi alaa, ibsaa sa'aatii 24 fi Intarneetii saffisaa dhiyeessa.",
+      subtitle: "Simannaa kabajamaa, nyaata aadaa Itoophiyaa fi boqonnaa qulqulluu handhuura Adaamaatti.",
       ctaBook: "Kutaa Qabadhaa",
       ctaMenu: "Menu Nyaataa Ilaalaa",
       checkIn: "Guyyaa Seensaa",
