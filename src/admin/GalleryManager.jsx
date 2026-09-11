@@ -16,6 +16,7 @@ import {
   Eye
 } from 'lucide-react';
 import { compressImage, uploadToCloudStorage } from '../utils/imageStorage';
+import { getOptimizedImageUrl, triggerGlobalImageRefresh } from '../utils/imageUrl';
 import { initialGallery } from '../data/galleryData';
 
 export default function GalleryManager({ 
@@ -54,8 +55,10 @@ export default function GalleryManager({
   const broadcastUpdate = (updatedList) => {
     try {
       if (typeof window !== 'undefined' && 'BroadcastChannel' in window) {
+        const now = Date.now();
         const channel = new BroadcastChannel('bisrat_hotel_sync');
-        channel.postMessage({ type: 'GALLERY_UPDATE', gallery: updatedList });
+        channel.postMessage({ type: 'GALLERY_UPDATE', gallery: updatedList, imgSyncTs: now });
+        channel.postMessage({ type: 'IMG_SYNC', timestamp: now });
         channel.close();
       }
     } catch (e) {
@@ -103,17 +106,22 @@ export default function GalleryManager({
       return;
     }
 
+    const now = Date.now();
+    const cleanUrl = imageUrl.trim();
+    const freshUrl = getOptimizedImageUrl(cleanUrl, now);
+
     const newRecord = {
-      id: `gal-${Date.now()}`,
+      id: `gal-${now}`,
       title: title.trim(),
       titleEn: title.trim(),
       titleAm: title.trim(),
       titleOr: title.trim(),
       description: description.trim(),
-      imageUrl: imageUrl.trim(),
-      image: imageUrl.trim(),
+      imageUrl: freshUrl,
+      image: freshUrl,
       category,
-      createdAt: new Date().toISOString()
+      createdAt: new Date(now).toISOString(),
+      updatedAt: now
     };
 
     const updated = [newRecord, ...gallery];
@@ -121,6 +129,7 @@ export default function GalleryManager({
     try {
       localStorage.setItem('bisrat_gallery', JSON.stringify(updated));
     } catch (err) {}
+    triggerGlobalImageRefresh();
     broadcastUpdate(updated);
 
     // Reset Form
@@ -322,7 +331,7 @@ export default function GalleryManager({
             <div className="flex items-center gap-3 pt-2">
               <div className="w-20 h-16 rounded-xl overflow-hidden border border-[#E8EFE9] shrink-0 shadow-2xs">
                 <img
-                  src={imageUrl}
+                  src={getOptimizedImageUrl(imageUrl)}
                   alt="Preview"
                   className="w-full h-full object-cover object-center"
                 />
@@ -397,7 +406,8 @@ export default function GalleryManager({
       {/* Current Gallery Items Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
         {filteredGallery.map((item) => {
-          const itemImg = item.imageUrl || item.image || item.customImage || '/images/exterior-building.jpg';
+          const raw = item.imageUrl || item.image || item.customImage || '/images/exterior-building.jpg';
+          const itemImg = getOptimizedImageUrl(raw, item?.updatedAt || item?.createdAt);
           const itemTitle = item.title || item.titleEn || item.titleAm || 'Bisrat Hotel Photo';
           const catLabel = categories.find(c => c.id === item.category)?.label || item.category;
 
@@ -486,7 +496,7 @@ export default function GalleryManager({
           >
             <div className="relative max-h-[65vh] overflow-hidden bg-stone-900 flex items-center justify-center">
               <img
-                src={previewItem.imageUrl || previewItem.image || previewItem.customImage}
+                src={getOptimizedImageUrl(previewItem.imageUrl || previewItem.image || previewItem.customImage, previewItem?.updatedAt || previewItem?.createdAt)}
                 alt={previewItem.title}
                 className="max-h-[65vh] w-full object-contain"
               />

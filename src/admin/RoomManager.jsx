@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Bed, Edit, Save, ToggleLeft, ToggleRight, CheckCircle2 } from 'lucide-react';
 import { translations } from '../translations';
+import { getOptimizedImageUrl } from '../utils/imageUrl';
 
 export default function RoomManager({ 
   rooms, 
@@ -26,27 +27,37 @@ export default function RoomManager({
     const updatedPrice = Number(editPrice);
     if (isNaN(updatedPrice) || updatedPrice <= 0) return;
 
-    setRooms(rooms.map(r => r.id === id ? { ...r, price: updatedPrice } : r));
+    const updatedRooms = rooms.map(r => r.id === id ? { ...r, price: updatedPrice } : r);
+    setRooms(updatedRooms);
+    try {
+      localStorage.setItem('bisrat_rooms', JSON.stringify(updatedRooms));
+      if (typeof window !== 'undefined' && 'BroadcastChannel' in window) {
+        const channel = new BroadcastChannel('bisrat_hotel_sync');
+        channel.postMessage({ type: 'ROOMS_UPDATE', rooms: updatedRooms });
+        channel.close();
+      }
+    } catch (e) {}
     setEditingId(null);
-    setSuccessMsg("Room price updated live! Changes are reflected immediately on the public site.");
+    setSuccessMsg('Price updated successfully!');
     setTimeout(() => setSuccessMsg(''), 3000);
   };
 
   return (
-    <div className="space-y-6">
-      
-      <div>
-        <h3 className="font-serif text-xl font-bold text-navybrand-900">
-          Rooms & Pricing Management
-        </h3>
-        <p className="text-xs text-slate-500">
-          Update prices and live availability for all room types (Standard, Semi Suite, Deluxe, Twin Bed)
-        </p>
+    <div>
+      <div className="flex items-center justify-between mb-6">
+        <div>
+          <h3 className="font-serif text-xl font-bold text-navybrand-900">
+            {t.admin.manageRooms}
+          </h3>
+          <p className="text-xs text-slate-500 mt-0.5">
+            Update real-time pricing and room availability for online guests.
+          </p>
+        </div>
       </div>
 
       {successMsg && (
-        <div className="p-3 bg-emerald-50 border border-emerald-200 text-emerald-800 rounded-xl text-xs font-bold flex items-center gap-2 animate-fade-in">
-          <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+        <div className="mb-4 p-3 bg-emerald-50 border border-emerald-200 text-emerald-800 rounded-xl text-xs flex items-center gap-2">
+          <CheckCircle2 className="w-4 h-4 text-emerald-600" />
           <span>{successMsg}</span>
         </div>
       )}
@@ -66,7 +77,7 @@ export default function RoomManager({
                   <div className="flex items-center gap-3">
                     <div className="w-14 h-10 rounded-lg overflow-hidden bg-slate-100 shrink-0 border border-slate-200">
                       <img 
-                        src={room.image || `/images/${room.placeholderSlot}`} 
+                        src={getOptimizedImageUrl(room.image || `/images/${room.placeholderSlot}`)} 
                         alt={roomName}
                         className="w-full h-full object-cover"
                       />

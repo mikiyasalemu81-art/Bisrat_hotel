@@ -4,6 +4,20 @@
  * Includes HTML5 Canvas compression to optimize uploaded high-res photos.
  */
 
+import { 
+  getOptimizedImageUrl, 
+  triggerGlobalImageRefresh, 
+  getImageSyncTimestamp, 
+  setImageSyncTimestamp 
+} from './imageUrl';
+
+export { 
+  getOptimizedImageUrl, 
+  triggerGlobalImageRefresh, 
+  getImageSyncTimestamp, 
+  setImageSyncTimestamp 
+};
+
 const DB_NAME = 'BisratHotelDB';
 const DB_VERSION = 1;
 const STORE_NAME = 'photos';
@@ -163,8 +177,9 @@ export async function uploadToCloudStorage(fileOrBlob, customConfig = {}) {
       throw new Error(`Supabase Storage upload failed: ${errText}`);
     }
 
-    const publicUrl = `${cleanUrl}/storage/v1/object/public/${bucket}/${fileName}`;
-    return { url: publicUrl, provider: 'supabase' };
+    const versionStamp = Date.now();
+    const publicUrl = getOptimizedImageUrl(`${cleanUrl}/storage/v1/object/public/${bucket}/${fileName}`, versionStamp);
+    return { url: publicUrl, version: versionStamp, provider: 'supabase' };
   }
 
   // 3B. Cloudinary Option
@@ -182,7 +197,9 @@ export async function uploadToCloudStorage(fileOrBlob, customConfig = {}) {
       if (clRes.ok) {
         const data = await clRes.json();
         if (data.secure_url) {
-          return { url: data.secure_url, provider: 'cloudinary' };
+          const versionStamp = data.version || Date.now();
+          const versionedUrl = getOptimizedImageUrl(data.secure_url, versionStamp);
+          return { url: versionedUrl, version: versionStamp, provider: 'cloudinary' };
         }
       }
     } catch (clErr) {
@@ -202,7 +219,9 @@ export async function uploadToCloudStorage(fileOrBlob, customConfig = {}) {
     if (bbRes.ok) {
       const bbData = await bbRes.json();
       if (bbData?.data?.url) {
-        return { url: bbData.data.url, provider: 'imgbb-cdn' };
+        const versionStamp = Date.now();
+        const bbUrl = getOptimizedImageUrl(bbData.data.url, versionStamp);
+        return { url: bbUrl, version: versionStamp, provider: 'imgbb-cdn' };
       }
     }
   } catch (bbErr) {
@@ -267,6 +286,9 @@ export async function savePhotoToStorage(slotName, fileOrUrl) {
     } catch (lsErr) {
       console.warn('localStorage quota warning:', lsErr);
     }
+
+    // 5. Trigger global cache refresh across all components
+    triggerGlobalImageRefresh();
 
     return { 
       success: true, 

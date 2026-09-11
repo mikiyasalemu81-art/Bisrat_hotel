@@ -23,6 +23,7 @@ import {
 import { translations } from '../translations';
 import { CATEGORY_CONFIG } from '../data/menuData';
 import { savePhotoToStorage, compressImage, uploadToCloudStorage } from '../utils/imageStorage';
+import { getOptimizedImageUrl, triggerGlobalImageRefresh } from '../utils/imageUrl';
 
 export default function MenuManager({ 
   menuItems = [], 
@@ -67,10 +68,11 @@ export default function MenuManager({
   const [addUploadError, setAddUploadError] = useState('');
   const [addUploadSuccess, setAddUploadSuccess] = useState('');
 
-  // Helper to get image URL for any item
+  // Helper to get image URL for any item with automatic cache-busting
   const getItemImage = (item) => {
     if (!item) return null;
-    return item.imageUrl || item.image_url || item.customImage || photos?.[item.placeholderSlot] || photos?.[item.id] || null;
+    const raw = item.imageUrl || item.image_url || item.customImage || photos?.[item.placeholderSlot] || photos?.[item.id] || null;
+    return getOptimizedImageUrl(raw, item?.updatedAt);
   };
 
   const showSuccess = (msg) => {
@@ -150,7 +152,11 @@ export default function MenuManager({
       return;
     }
 
-    const finalImageUrl = editImageUrl.trim() || getItemImage(editingItem) || null;
+    const now = Date.now();
+    const cleanImg = editImageUrl.trim();
+    const finalImageUrl = cleanImg 
+      ? getOptimizedImageUrl(cleanImg, now) 
+      : getItemImage(editingItem);
 
     const updatedItem = {
       ...editingItem,
@@ -163,6 +169,7 @@ export default function MenuManager({
       imageUrl: finalImageUrl,
       image_url: finalImageUrl,
       customImage: finalImageUrl,
+      updatedAt: now,
     };
 
     const updatedList = menuItems.map(item => item.id === editingItem.id ? updatedItem : item);
@@ -181,11 +188,15 @@ export default function MenuManager({
       }
     }
 
+    // Trigger global image cache-busting refresh
+    triggerGlobalImageRefresh();
+
     // Broadcast live across tabs and customer devices
     try {
       if (typeof window !== 'undefined' && 'BroadcastChannel' in window) {
         const channel = new BroadcastChannel('bisrat_hotel_sync');
-        channel.postMessage({ type: 'MENU_UPDATE', menuItems: updatedList });
+        channel.postMessage({ type: 'MENU_UPDATE', menuItems: updatedList, imgSyncTs: now });
+        channel.postMessage({ type: 'IMG_SYNC', timestamp: now });
         if (editingItem.placeholderSlot && finalImageUrl) {
           channel.postMessage({ type: 'PHOTOS_UPDATE', photos: { [editingItem.placeholderSlot]: finalImageUrl } });
         }
@@ -195,7 +206,7 @@ export default function MenuManager({
       console.warn('Broadcast sync notice:', e);
     }
 
-    showSuccess(`✓ Saved "${updatedItem.nameEn}"! Price: ${numericPrice} ETB, Stock: ${editIsAvailable ? 'In Stock' : 'Sold Out'}, Photo synced.`);
+    showSuccess(`✓ Saved "${updatedItem.nameEn}"! Price: ${numericPrice} ETB, Stock: ${editIsAvailable ? 'In Stock' : 'Sold Out'}, Photo synced across all devices.`);
     handleCloseEdit();
   };
 
@@ -256,11 +267,13 @@ export default function MenuManager({
     if (!nameEn || !price) return;
 
     const numericPrice = Number(price);
-    const slotKey = `menu-custom-${Date.now()}.jpg`;
-    const finalUrl = imageUrl.trim() || null;
+    const now = Date.now();
+    const slotKey = `menu-custom-${now}.jpg`;
+    const cleanImg = imageUrl.trim() || null;
+    const finalUrl = cleanImg ? getOptimizedImageUrl(cleanImg, now) : null;
 
     const newItem = {
-      id: `menu-${Date.now()}`,
+      id: `menu-${now}`,
       nameEn: nameEn.trim(),
       nameAm: nameAm.trim() || nameEn.trim(),
       nameOr: nameEn.trim(),
@@ -271,6 +284,7 @@ export default function MenuManager({
       imageUrl: finalUrl,
       image_url: finalUrl,
       customImage: finalUrl,
+      updatedAt: now,
       description: description.trim() || "Freshly prepared dish at Bisrat Hotel Restaurant & Bar."
     };
 
@@ -285,12 +299,14 @@ export default function MenuManager({
           setPhotos(prev => ({ ...prev, [slotKey]: finalUrl }));
         }
       } catch (err) {}
+      triggerGlobalImageRefresh();
     }
 
     try {
       if (typeof window !== 'undefined' && 'BroadcastChannel' in window) {
         const channel = new BroadcastChannel('bisrat_hotel_sync');
-        channel.postMessage({ type: 'MENU_UPDATE', menuItems: updatedList });
+        channel.postMessage({ type: 'MENU_UPDATE', menuItems: updatedList, imgSyncTs: now });
+        channel.postMessage({ type: 'IMG_SYNC', timestamp: now });
         channel.close();
       }
     } catch (e) {}

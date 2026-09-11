@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Calendar, UtensilsCrossed, MapPin, PhoneCall } from 'lucide-react';
 import { translations } from '../translations';
+import { getOptimizedImageUrl } from '../utils/imageUrl';
 
 export default function HeroSection({ 
   lang, 
@@ -16,25 +17,25 @@ export default function HeroSection({
   const slides = [
     {
       id: 'exterior',
-      src: photos?.['hero-exterior.jpg'] || photos?.['exterior-building.jpg'] || "/images/exterior-building.jpg",
+      src: getOptimizedImageUrl(photos?.['hero-exterior.jpg'] || photos?.['exterior-building.jpg'] || "/images/exterior-building.jpg"),
       alt: "Bisrat Luxury Hotel Exterior Adama",
       caption: "Grand Hotel Exterior"
     },
     {
       id: 'dining',
-      src: photos?.['restaurant-table-setting.jpg'] || "/images/restaurant-table-setting.jpg",
+      src: getOptimizedImageUrl(photos?.['restaurant-table-setting.jpg'] || "/images/restaurant-table-setting.jpg"),
       alt: "Bisrat Hotel Dining & Fine Restaurant Setting",
       caption: "Dining & Restaurant"
     },
     {
       id: 'suite',
-      src: photos?.['room-deluxe.webp'] || "/images/room-deluxe.webp",
+      src: getOptimizedImageUrl(photos?.['room-deluxe.webp'] || "/images/room-deluxe.webp"),
       alt: "Bisrat Hotel Deluxe Room Accommodations",
       caption: "Deluxe Suite Accommodations"
     },
     {
       id: 'cuisine',
-      src: photos?.['ethiopian-combo.jpg'] || "/images/ethiopian-combo.jpg",
+      src: getOptimizedImageUrl(photos?.['ethiopian-combo.jpg'] || "/images/ethiopian-combo.jpg"),
       alt: "Authentic Ethiopian Traditional Cuisine at Bisrat Hotel",
       caption: "Traditional Ethiopian Dining"
     }

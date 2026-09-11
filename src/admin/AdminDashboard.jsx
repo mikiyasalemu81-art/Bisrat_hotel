@@ -9,6 +9,7 @@ import GalleryManager from './GalleryManager';
 import FacilityManager from './FacilityManager';
 import PaymentSettingsManager from './PaymentSettingsManager';
 import { translations } from '../translations';
+import { getOptimizedImageUrl } from '../utils/imageUrl';
 
 export default function AdminDashboard({ 
   rooms, 
@@ -54,7 +55,7 @@ export default function AdminDashboard({
         <div className="flex items-center gap-4">
           <div className="w-14 h-14 rounded-2xl overflow-hidden border-2 border-[#C5A059] bg-[#13382D] p-0.5 shadow-md shrink-0">
             <img 
-              src="/logo.png" 
+              src={getOptimizedImageUrl("/logo.png")} 
               onError={(e) => { e.currentTarget.src = "/images/logo.jpg"; }}
               alt="Bisrat Hotel Logo" 
               className="w-full h-full object-cover rounded-xl"

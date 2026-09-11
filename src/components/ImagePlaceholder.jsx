@@ -1,5 +1,6 @@
 import React from 'react';
 import { Camera, Image as ImageIcon } from 'lucide-react';
+import { getOptimizedImageUrl } from '../utils/imageUrl';
 
 export default function ImagePlaceholder({ 
   slotName = "photo.jpg", 
@@ -15,7 +16,7 @@ export default function ImagePlaceholder({
     return (
       <div className={`relative overflow-hidden rounded-2xl bg-stone-100 ${aspectRatio} ${className}`}>
         <img 
-          src={activeImage} 
+          src={getOptimizedImageUrl(activeImage)} 
           alt={alt} 
           className="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
           onError={(e) => {

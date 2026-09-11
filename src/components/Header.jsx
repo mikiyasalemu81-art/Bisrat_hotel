@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Home, UtensilsCrossed, ShieldCheck, Globe, PhoneCall, Calendar } from 'lucide-react';
 import { translations } from '../translations';
+import { getOptimizedImageUrl } from '../utils/imageUrl';
 
 // Simple SVG TikTok Icon
 const TikTokIcon = ({ className = "w-4 h-4" }) => (
@@ -47,7 +48,7 @@ export default function Header({
           >
             <div className="w-10 h-10 rounded-full overflow-hidden shadow-md border-2 border-[#C5A059] bg-[#13382D] p-0.5 group-hover:scale-105 transition-transform shrink-0">
               <img 
-                src="/logo.png" 
+                src={getOptimizedImageUrl("/logo.png")} 
                 onError={(e) => { e.currentTarget.src = "/images/logo.jpg"; }}
                 alt="Bisrat Hotel Logo Crest" 
                 className="w-full h-full object-cover rounded-full"

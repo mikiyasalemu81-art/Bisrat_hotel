@@ -18,8 +18,8 @@ import { initialRooms } from './data/roomsData';
 import { initialMenuItems } from './data/menuData';
 import { initialGallery } from './data/galleryData';
 import { initialReviews } from './data/reviewsData';
-
 import { loadAllPhotosFromStorage } from './utils/imageStorage';
+import { setImageSyncTimestamp } from './utils/imageUrl';
 
 export default function App() {
   // Trilingual Language State (remembers choice)
@@ -104,6 +104,9 @@ export default function App() {
       if (typeof window !== 'undefined' && 'BroadcastChannel' in window) {
         channel = new BroadcastChannel('bisrat_hotel_sync');
         channel.onmessage = (event) => {
+          if (event.data?.imgSyncTs) {
+            setImageSyncTimestamp(event.data.imgSyncTs);
+          }
           if (event.data?.type === 'MENU_UPDATE' && Array.isArray(event.data.menuItems)) {
             setMenuItems(event.data.menuItems);
           }
@@ -112,6 +115,12 @@ export default function App() {
           }
           if (event.data?.type === 'GALLERY_UPDATE' && Array.isArray(event.data.gallery)) {
             setGallery(event.data.gallery);
+          }
+          if (event.data?.type === 'ROOMS_UPDATE' && Array.isArray(event.data.rooms)) {
+            setRooms(event.data.rooms);
+          }
+          if (event.data?.type === 'IMG_SYNC' && event.data.timestamp) {
+            setImageSyncTimestamp(event.data.timestamp);
           }
           if (event.data?.type === 'PAYMENT_SETTINGS_UPDATE' && event.data.paymentSettings) {
             setPaymentSettings(event.data.paymentSettings);
@@ -140,6 +149,9 @@ export default function App() {
           const parsed = JSON.parse(e.newValue);
           if (Array.isArray(parsed)) setGallery(parsed);
         } catch {}
+      }
+      if (e.key === 'bisrat_img_sync_ts' && e.newValue) {
+        setImageSyncTimestamp(e.newValue);
       }
       if (e.key === 'bisrat_payment_settings' && e.newValue) {
         try {
@@ -307,7 +319,7 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-softbg text-slate-800 selection:bg-skybrand-100 selection:text-skybrand-800 pb-16 sm:pb-20">
+    <div className="w-full max-w-[100vw] overflow-x-hidden min-h-screen flex flex-col bg-[#FDFCF7] text-[#1A1C19] selection:bg-[#C5A059] selection:text-[#1B4D3E] pb-16 sm:pb-20">
       
       {/* Sticky Header with Logo, Trilingual Switcher, Reception Phone, and Book Button */}
       <Header
@@ -319,7 +331,7 @@ export default function App() {
       />
 
       {/* Main Content Area based on 3-Tab Bar */}
-      <main className="flex-1">
+      <main className="flex-1 w-full max-w-[100vw] overflow-x-hidden">
         
         {/* TAB 1: HOME */}
         {activeTab === 'home' && (

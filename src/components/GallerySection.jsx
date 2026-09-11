@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { createPortal } from 'react-dom';
 import { X, ZoomIn, ChevronLeft, ChevronRight, Sparkles } from 'lucide-react';
 import { translations } from '../translations';
+import { getOptimizedImageUrl } from '../utils/imageUrl';
 
 export default function GallerySection({ 
   gallery = [], 
@@ -29,7 +30,8 @@ export default function GallerySection({
 
   const getItemImage = (item) => {
     if (!item) return '/images/exterior-building.jpg';
-    return item.imageUrl || item.image || item.customImage || photos?.[item.placeholderSlot] || '/images/exterior-building.jpg';
+    const raw = item.imageUrl || item.image || item.customImage || photos?.[item.placeholderSlot] || photos?.[item.id] || '/images/exterior-building.jpg';
+    return getOptimizedImageUrl(raw, item?.updatedAt || item?.createdAt);
   };
 
   const getItemTitle = (item) => {

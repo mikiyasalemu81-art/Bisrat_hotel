@@ -33,6 +33,7 @@ import {
 import { CATEGORY_CONFIG } from '../data/menuData';
 import { translations } from '../translations';
 import CustomerPaymentDrawer from './CustomerPaymentDrawer';
+import { getOptimizedImageUrl } from '../utils/imageUrl';
 
 // Map category icons safely
 const ICON_MAP = {
@@ -218,10 +219,11 @@ export default function MenuSection({
     }
   }, []);
 
-  // Helper to get image URL for an item
+  // Helper to get image URL for an item with automatic cache-busting
   const getItemImage = useCallback((item) => {
     if (!item) return null;
-    return item.imageUrl || item.image_url || item.customImage || photos?.[item.placeholderSlot] || photos?.[item.id] || null;
+    const raw = item.imageUrl || item.image_url || item.customImage || photos?.[item.placeholderSlot] || photos?.[item.id] || null;
+    return getOptimizedImageUrl(raw, item?.updatedAt);
   }, [photos]);
 
   // Open Lightbox Modal
@@ -366,7 +368,7 @@ export default function MenuSection({
         </div>
 
         {/* Sticky Controls: Search, Layout Toggle & Category Navigation Bar */}
-        <div className="sticky top-16 sm:top-20 z-20 bg-[#FDFCF7]/95 backdrop-blur-md py-3 mb-6 border-y border-[#E8EFE9] -mx-3 px-3 sm:mx-0 sm:px-0">
+        <div className="sticky top-16 sm:top-20 z-20 bg-[#FDFCF7]/95 backdrop-blur-md py-3 mb-6 border-y border-[#E8EFE9] w-full max-w-full">
           <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
             
             {/* Real-Time Search Bar */}

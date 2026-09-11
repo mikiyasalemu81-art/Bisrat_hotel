@@ -1,21 +1,23 @@
 import React from 'react';
-import { MapPin, Phone, Mail, Globe, ArrowUp } from 'lucide-react';
+import { Phone, Mail, MapPin, Globe, ArrowUp, Heart, Shield, Clock, Award, Sparkles } from 'lucide-react';
 import { translations } from '../translations';
+import { getOptimizedImageUrl } from '../utils/imageUrl';
 
-// Simple SVG TikTok Icon
-const TikTokIcon = ({ className = "w-4 h-4" }) => (
+// Simple SVG TikTok Icon for Footer
+const TikTokFooterIcon = ({ className = "w-5 h-5" }) => (
   <svg className={className} viewBox="0 0 24 24" fill="currentColor">
     <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 1 1-2.89-2.89c.28 0 .56.04.83.12V9.41a6.34 6.34 0 0 0-.83-.05A6.33 6.33 0 1 0 15.82 15.7V8.5a8.28 8.28 0 0 0 4.77 1.51V6.56a4.84 4.84 0 0 1-1-.13z"/>
   </svg>
 );
 
 export default function Footer({ 
-  lang, 
-  setLang, 
-  setActiveTab 
+  lang = 'en', 
+  setLang,
+  setActiveTab, 
+  paymentSettings = {} 
 }) {
   const t = translations[lang] || translations.en;
-
+  
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
@@ -31,7 +33,7 @@ export default function Footer({
             <div className="flex items-center gap-3">
               <div className="w-12 h-12 rounded-full overflow-hidden shadow-md shrink-0 border-2 border-[#C5A059] bg-[#13382D] p-0.5">
                 <img 
-                  src="/logo.png" 
+                  src={getOptimizedImageUrl("/logo.png")} 
                   onError={(e) => { e.currentTarget.src = "/images/logo.jpg"; }}
                   alt="Bisrat Hotel Logo" 
                   className="w-full h-full object-cover rounded-full" 
