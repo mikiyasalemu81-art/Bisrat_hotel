@@ -4,7 +4,7 @@ import { translations } from '../translations';
 import { getOptimizedImageUrl } from '../utils/imageUrl';
 
 // Simple SVG TikTok Icon for Footer
-const TikTokFooterIcon = ({ className = "w-5 h-5" }) => (
+const TikTokIcon = ({ className = "w-4 h-4" }) => (
   <svg className={className} viewBox="0 0 24 24" fill="currentColor">
     <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 1 1-2.89-2.89c.28 0 .56.04.83.12V9.41a6.34 6.34 0 0 0-.83-.05A6.33 6.33 0 1 0 15.82 15.7V8.5a8.28 8.28 0 0 0 4.77 1.51V6.56a4.84 4.84 0 0 1-1-.13z"/>
   </svg>
