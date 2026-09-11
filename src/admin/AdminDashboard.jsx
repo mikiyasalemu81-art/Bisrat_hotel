@@ -124,6 +124,7 @@ export default function AdminDashboard({
           <RoomManager 
             rooms={rooms} 
             setRooms={setRooms} 
+            paymentSettings={paymentSettings}
             lang={lang} 
           />
         )}

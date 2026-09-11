@@ -10,6 +10,7 @@ import {
   getImageSyncTimestamp, 
   setImageSyncTimestamp 
 } from './imageUrl';
+import { saveCloudAppState } from './cloudSync';
 
 export { 
   getOptimizedImageUrl, 
@@ -116,18 +117,19 @@ export function compressImage(fileOrUrl, maxDimension = 1600, quality = 0.85) {
 }
 
 /**
- * Upload binary file/blob to Cloud Storage (Cloudinary, Supabase Storage, or Public CDN)
+ * Upload binary file/blob to Cloud Storage (Supabase Storage, Cloudinary, or ImgBB)
  * Returns the permanent, publicly accessible HTTPS URL so all users can see the image on any device.
  */
 export async function uploadToCloudStorage(fileOrBlob, customConfig = {}) {
   // 1. Read admin-configured cloud settings if available
   let cloudConfig = {
-    provider: 'cloudinary',
-    cloudName: 'dhd620bca',
-    uploadPreset: 'bisrat_unsigned',
+    provider: 'supabase',
     supabaseUrl: '',
     supabaseKey: '',
     supabaseBucket: 'bisrat-hotel',
+    cloudName: '',
+    uploadPreset: '',
+    imgbbApiKey: '',
     ...customConfig
   };
 
@@ -136,7 +138,7 @@ export async function uploadToCloudStorage(fileOrBlob, customConfig = {}) {
     if (saved) {
       const parsed = JSON.parse(saved);
       if (parsed.cloudStorage) {
-        cloudConfig = { ...cloudConfig, ...parsed.cloudStorage };
+        cloudConfig = { ...cloudConfig, ...parsed.cloudStorage, ...customConfig };
       }
     }
   } catch (e) {
@@ -155,31 +157,41 @@ export async function uploadToCloudStorage(fileOrBlob, customConfig = {}) {
     }
   }
 
-  // 3A. Supabase Storage Option
-  if (cloudConfig.provider === 'supabase' && cloudConfig.supabaseUrl && cloudConfig.supabaseKey) {
-    const fileName = `slot_${Date.now()}_${Math.random().toString(36).substring(2, 8)}.jpg`;
-    const bucket = cloudConfig.supabaseBucket || 'bisrat-hotel';
+  // 3A. Supabase Storage Option (Recommended: Database + Image Storage all-in-one)
+  if (cloudConfig.supabaseUrl && cloudConfig.supabaseKey) {
     const cleanUrl = cloudConfig.supabaseUrl.replace(/\/$/, '');
+    const bucket = cloudConfig.supabaseBucket || 'bisrat-hotel';
+    const extension = binaryBlob.type === 'image/png' ? 'png' : (binaryBlob.type === 'image/webp' ? 'webp' : 'jpg');
+    const fileName = `img_${Date.now()}_${Math.random().toString(36).substring(2, 8)}.${extension}`;
     const uploadUrl = `${cleanUrl}/storage/v1/object/${bucket}/${fileName}`;
 
-    const res = await fetch(uploadUrl, {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${cloudConfig.supabaseKey}`,
-        'apikey': cloudConfig.supabaseKey,
-        'Content-Type': binaryBlob.type || 'image/jpeg',
-      },
-      body: binaryBlob,
-    });
+    try {
+      const res = await fetch(uploadUrl, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${cloudConfig.supabaseKey}`,
+          'apikey': cloudConfig.supabaseKey,
+          'Content-Type': binaryBlob.type || 'image/jpeg',
+          'x-upsert': 'true',
+        },
+        body: binaryBlob,
+      });
 
-    if (!res.ok) {
-      const errText = await res.text();
-      throw new Error(`Supabase Storage upload failed: ${errText}`);
+      if (res.ok) {
+        const versionStamp = Date.now();
+        const publicUrl = getOptimizedImageUrl(`${cleanUrl}/storage/v1/object/public/${bucket}/${fileName}`, versionStamp);
+        return { url: publicUrl, version: versionStamp, provider: 'supabase' };
+      } else {
+        const errText = await res.text();
+        console.warn(`Supabase Storage upload warning (${res.status}):`, errText);
+        // If not Cloudinary as fallback, throw error
+        if (!cloudConfig.cloudName) {
+          throw new Error(`Supabase upload failed (${res.status}): ${errText}. Please check bucket "${bucket}" permissions.`);
+        }
+      }
+    } catch (sbErr) {
+      if (!cloudConfig.cloudName) throw sbErr;
     }
-
-    const versionStamp = Date.now();
-    const publicUrl = getOptimizedImageUrl(`${cleanUrl}/storage/v1/object/public/${bucket}/${fileName}`, versionStamp);
-    return { url: publicUrl, version: versionStamp, provider: 'supabase' };
   }
 
   // 3B. Cloudinary Option
@@ -201,34 +213,40 @@ export async function uploadToCloudStorage(fileOrBlob, customConfig = {}) {
           const versionedUrl = getOptimizedImageUrl(data.secure_url, versionStamp);
           return { url: versionedUrl, version: versionStamp, provider: 'cloudinary' };
         }
+      } else {
+        const errData = await clRes.json().catch(() => ({}));
+        console.warn('Cloudinary upload warning:', errData);
       }
     } catch (clErr) {
       console.warn('Cloudinary upload error:', clErr);
     }
   }
 
-  // 3C. Secondary Public Cloud Storage Fallback (ImgBB high-speed CDN API)
-  try {
-    const fallbackFormData = new FormData();
-    fallbackFormData.append('image', binaryBlob);
-    const bbRes = await fetch('https://api.imgbb.com/1/upload?key=8cf91a329d638beae098d6f966144e59', {
-      method: 'POST',
-      body: fallbackFormData,
-    });
+  // 3C. ImgBB Option
+  if (cloudConfig.imgbbApiKey) {
+    try {
+      const bbFormData = new FormData();
+      bbFormData.append('image', binaryBlob);
+      const bbRes = await fetch(`https://api.imgbb.com/1/upload?key=${cloudConfig.imgbbApiKey}`, {
+        method: 'POST',
+        body: bbFormData,
+      });
 
-    if (bbRes.ok) {
-      const bbData = await bbRes.json();
-      if (bbData?.data?.url) {
-        const versionStamp = Date.now();
-        const bbUrl = getOptimizedImageUrl(bbData.data.url, versionStamp);
-        return { url: bbUrl, version: versionStamp, provider: 'imgbb-cdn' };
+      if (bbRes.ok) {
+        const bbData = await bbRes.json();
+        if (bbData?.data?.url) {
+          const versionStamp = Date.now();
+          const bbUrl = getOptimizedImageUrl(bbData.data.url, versionStamp);
+          return { url: bbUrl, version: versionStamp, provider: 'imgbb' };
+        }
       }
+    } catch (bbErr) {
+      console.warn('ImgBB upload error:', bbErr);
     }
-  } catch (bbErr) {
-    console.warn('Public cloud storage fallback error:', bbErr);
   }
 
-  throw new Error('Cloud storage upload failed. Please verify your internet connection or cloud storage credentials in Admin Settings.');
+  // If cloud upload could not be performed, throw an informative error
+  throw new Error('Cloud storage is not configured yet. To make images visible on all devices, connect your free Supabase or Cloudinary account in Admin Settings.');
 }
 
 /**
@@ -283,6 +301,11 @@ export async function savePhotoToStorage(slotName, fileOrUrl) {
       const lsPhotos = savedLs ? JSON.parse(savedLs) : {};
       lsPhotos[slotName] = publicUrl;
       localStorage.setItem('bisrat_photos', JSON.stringify(lsPhotos));
+
+      // Sync photo mapping to cloud network
+      if (isCloud) {
+        saveCloudAppState('photos', lsPhotos).catch(() => {});
+      }
     } catch (lsErr) {
       console.warn('localStorage quota warning:', lsErr);
     }

@@ -1,6 +1,17 @@
 import React, { useState } from 'react';
-import { CreditCard, Phone, Hash, Save, CheckCircle, Smartphone, Building2, Utensils, Lock, KeyRound, Plus, X, Cloud, RefreshCw, Layers } from 'lucide-react';
+import { 
+  CreditCard, Phone, Hash, Save, CheckCircle, Smartphone, Building2, Utensils, 
+  Lock, KeyRound, Plus, X, Cloud, RefreshCw, Layers, UploadCloud, DownloadCloud,
+  CheckCircle2, AlertCircle, Info, ExternalLink, HelpCircle, Globe, ShieldCheck
+} from 'lucide-react';
 import { uploadToCloudStorage } from '../utils/imageStorage';
+import { 
+  testCloudConnection, 
+  pushAllLocalDataToCloud, 
+  fetchCloudAppState, 
+  saveCloudAppState,
+  isCloudConfigured 
+} from '../utils/cloudSync';
 
 export default function PaymentSettingsManager({ 
   paymentSettings, 
@@ -23,19 +34,25 @@ export default function PaymentSettingsManager({
     enableTelebirr: paymentSettings?.paymentMethods?.telebirr ?? true,
     enableCbe: paymentSettings?.paymentMethods?.cbe ?? true,
     enableArrival: paymentSettings?.paymentMethods?.arrival ?? (paymentSettings?.paymentMethods?.cash ?? true),
-    // Cloud storage bucket settings
-    cloudProvider: paymentSettings?.cloudStorage?.provider || 'cloudinary',
-    cloudName: paymentSettings?.cloudStorage?.cloudName || 'dhd620bca',
-    uploadPreset: paymentSettings?.cloudStorage?.uploadPreset || 'bisrat_unsigned',
+    // Cloud storage & internet sync settings
+    cloudProvider: paymentSettings?.cloudStorage?.provider || 'supabase',
+    cloudName: paymentSettings?.cloudStorage?.cloudName || '',
+    uploadPreset: paymentSettings?.cloudStorage?.uploadPreset || '',
     supabaseUrl: paymentSettings?.cloudStorage?.supabaseUrl || '',
     supabaseKey: paymentSettings?.cloudStorage?.supabaseKey || '',
     supabaseBucket: paymentSettings?.cloudStorage?.supabaseBucket || 'bisrat-hotel',
+    imgbbApiKey: paymentSettings?.cloudStorage?.imgbbApiKey || '',
   });
 
   const [newTableInput, setNewTableInput] = useState('');
   const [savedSuccess, setSavedSuccess] = useState(false);
   const [testingCloud, setTestingCloud] = useState(false);
-  const [cloudTestMsg, setCloudTestMsg] = useState('');
+  const [cloudTestMsg, setCloudTestMsg] = useState(null);
+  const [pushingToCloud, setPushingToCloud] = useState(false);
+  const [pushCloudMsg, setPushCloudMsg] = useState(null);
+  const [pullingFromCloud, setPullingFromCloud] = useState(false);
+  const [pullCloudMsg, setPullCloudMsg] = useState(null);
+  const [showGuide, setShowGuide] = useState(false);
 
   // Change Password state
   const [currentPwd, setCurrentPwd] = useState('');
@@ -82,27 +99,130 @@ export default function PaymentSettingsManager({
 
   const handleTestCloud = async () => {
     setTestingCloud(true);
-    setCloudTestMsg('');
+    setCloudTestMsg(null);
     try {
-      // Test dummy tiny 1x1 transparent PNG binary
-      const testBlob = new Blob(
-        [new Uint8Array([137, 80, 78, 71, 13, 10, 26, 10, 0, 0, 0, 13, 73, 72, 68, 82, 0, 0, 0, 1, 0, 0, 0, 1, 8, 6, 0, 0, 0, 31, 21, 196, 137, 0, 0, 0, 11, 73, 68, 65, 84, 120, 156, 99, 96, 0, 0, 0, 2, 0, 1, 229, 39, 222, 252, 0, 0, 0, 0, 73, 69, 78, 68, 174, 66, 96, 130])],
-        { type: 'image/png' }
-      );
-      const res = await uploadToCloudStorage(testBlob, {
-        provider: formData.cloudProvider,
-        cloudName: formData.cloudName,
-        uploadPreset: formData.uploadPreset,
+      if (formData.cloudProvider === 'supabase') {
+        const result = await testCloudConnection({
+          supabaseUrl: formData.supabaseUrl,
+          supabaseKey: formData.supabaseKey,
+          supabaseBucket: formData.supabaseBucket,
+        });
+        setCloudTestMsg({
+          type: 'success',
+          text: `✓ Supabase Cloud Storage & Database Connected! Bucket "${formData.supabaseBucket}" is public and verified for permanent cross-device sync.`
+        });
+      } else if (formData.cloudProvider === 'cloudinary') {
+        if (!formData.cloudName || !formData.uploadPreset) {
+          throw new Error('Please enter both Cloud Name and Unsigned Upload Preset.');
+        }
+        const testBlob = new Blob(
+          [new Uint8Array([137, 80, 78, 71, 13, 10, 26, 10, 0, 0, 0, 13, 73, 72, 68, 82, 0, 0, 0, 1, 0, 0, 0, 1, 8, 6, 0, 0, 0, 31, 21, 196, 137, 0, 0, 0, 11, 73, 68, 65, 84, 120, 156, 99, 96, 0, 0, 0, 2, 0, 1, 229, 39, 222, 252, 0, 0, 0, 0, 73, 69, 78, 68, 174, 66, 96, 130])],
+          { type: 'image/png' }
+        );
+        const res = await uploadToCloudStorage(testBlob, {
+          provider: 'cloudinary',
+          cloudName: formData.cloudName,
+          uploadPreset: formData.uploadPreset,
+        });
+        setCloudTestMsg({
+          type: 'success',
+          text: `✓ Cloudinary Connected! Verified public HTTPS photo URL: ${res.url}`
+        });
+      } else if (formData.cloudProvider === 'imgbb') {
+        if (!formData.imgbbApiKey) {
+          throw new Error('Please enter your ImgBB API key.');
+        }
+        const testBlob = new Blob(
+          [new Uint8Array([137, 80, 78, 71, 13, 10, 26, 10, 0, 0, 0, 13, 73, 72, 68, 82, 0, 0, 0, 1, 0, 0, 0, 1, 8, 6, 0, 0, 0, 31, 21, 196, 137, 0, 0, 0, 11, 73, 68, 65, 84, 120, 156, 99, 96, 0, 0, 0, 2, 0, 1, 229, 39, 222, 252, 0, 0, 0, 0, 73, 69, 78, 68, 174, 66, 96, 130])],
+          { type: 'image/png' }
+        );
+        const res = await uploadToCloudStorage(testBlob, {
+          provider: 'imgbb',
+          imgbbApiKey: formData.imgbbApiKey,
+        });
+        setCloudTestMsg({
+          type: 'success',
+          text: `✓ ImgBB Connected! Verified public HTTPS photo URL: ${res.url}`
+        });
+      }
+    } catch (err) {
+      setCloudTestMsg({
+        type: 'error',
+        text: `Connection failed: ${err.message}`
+      });
+    } finally {
+      setTestingCloud(false);
+    }
+  };
+
+  const handlePushToCloud = async () => {
+    setPushingToCloud(true);
+    setPushCloudMsg(null);
+    try {
+      const res = await pushAllLocalDataToCloud({
         supabaseUrl: formData.supabaseUrl,
         supabaseKey: formData.supabaseKey,
         supabaseBucket: formData.supabaseBucket,
       });
-
-      setCloudTestMsg(`✓ Cloud Storage Connected! Verified public HTTPS URL: ${res.url}`);
+      if (res.success) {
+        setPushCloudMsg({
+          type: 'success',
+          text: `✓ Successfully synced all current menu dishes, photos, prices, and settings from this phone to the cloud! All other devices will see these changes immediately.`
+        });
+      } else {
+        setPushCloudMsg({
+          type: 'error',
+          text: `Sync notice: ${res.error}`
+        });
+      }
     } catch (err) {
-      setCloudTestMsg(`Cloud connection notice: ${err.message}. (Public CDN fallback remains active)`);
+      setPushCloudMsg({
+        type: 'error',
+        text: `Failed to push to cloud: ${err.message}`
+      });
     } finally {
-      setTestingCloud(false);
+      setPushingToCloud(false);
+    }
+  };
+
+  const handlePullFromCloud = async () => {
+    setPullingFromCloud(true);
+    setPullCloudMsg(null);
+    try {
+      const res = await fetchCloudAppState({
+        supabaseUrl: formData.supabaseUrl,
+        supabaseKey: formData.supabaseKey,
+        supabaseBucket: formData.supabaseBucket,
+      });
+      if (res.success && res.data) {
+        if (res.data.paymentSettings) {
+          setPaymentSettings(res.data.paymentSettings);
+          setFormData(prev => ({
+            ...prev,
+            ...res.data.paymentSettings,
+            ...res.data.paymentSettings?.cloudStorage
+          }));
+        }
+        setPullCloudMsg({
+          type: 'success',
+          text: `✓ Downloaded latest cloud state! Source: ${res.source}. Refreshing to apply updates.`
+        });
+        setTimeout(() => {
+          window.location.reload();
+        }, 1200);
+      } else {
+        setPullCloudMsg({
+          type: 'error',
+          text: `Could not pull cloud state: ${res.error || 'No remote state file found on cloud yet.'}`
+        });
+      }
+    } catch (err) {
+      setPullCloudMsg({
+        type: 'error',
+        text: `Failed to pull from cloud: ${err.message}`
+      });
+    } finally {
+      setPullingFromCloud(false);
     }
   };
 
@@ -170,9 +290,17 @@ export default function PaymentSettingsManager({
         supabaseUrl: formData.supabaseUrl,
         supabaseKey: formData.supabaseKey,
         supabaseBucket: formData.supabaseBucket,
+        imgbbApiKey: formData.imgbbApiKey,
       }
     };
     setPaymentSettings(updated);
+    try {
+      localStorage.setItem('bisrat_payment_settings', JSON.stringify(updated));
+      if (formData.supabaseUrl && formData.supabaseKey) {
+        saveCloudAppState('paymentSettings', updated, updated.cloudStorage).catch(() => {});
+      }
+    } catch (err) {}
+
     setSavedSuccess(true);
     setTimeout(() => setSavedSuccess(false), 3500);
   };
@@ -461,100 +589,154 @@ export default function PaymentSettingsManager({
           </div>
         </div>
 
-        {/* Section 4: Cloud Storage Bucket & Image Sync */}
-        <div className="bg-white p-5 sm:p-6 rounded-2xl border border-[#E8EFE9] shadow-sm space-y-4">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-stone-100 pb-3">
+        {/* Section 4: Internet Cloud Storage & Cross-Device Sync */}
+        <div className="bg-white p-5 sm:p-7 rounded-2xl border border-[#E8EFE9] shadow-sm space-y-5">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-stone-100 pb-4">
             <div>
-              <h4 className="font-bold text-sm text-[#1A1C19] flex items-center gap-2">
-                <Cloud className="w-4 h-4 text-[#1B4D3E]" />
-                <span>Cloud Storage Bucket & Sync Configuration</span>
+              <div className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-[#1B4D3E] bg-[#1B4D3E]/10 border border-[#1B4D3E]/20 px-3 py-0.5 rounded-full mb-1">
+                <Globe className="w-3.5 h-3.5 text-[#1B4D3E]" />
+                <span>Permanent Cloud Network Storage</span>
+              </div>
+              <h4 className="font-serif text-lg font-bold text-[#1A1C19] flex items-center gap-2">
+                <Cloud className="w-5 h-5 text-[#1B4D3E]" />
+                <span>Internet Cloud Storage & Cross-Device Synchronization</span>
               </h4>
-              <p className="text-xs text-slate-500 mt-0.5">
-                Photos uploaded by admins are transmitted directly to a cloud bucket, returning permanent public HTTPS URLs accessible by all users on any device.
+              <p className="text-xs text-slate-500 mt-1 max-w-2xl">
+                Upload culinary photos and store menu edits in the cloud so changes appear on all phones, computers, and customer devices across the internet.
               </p>
             </div>
-            <button
-              type="button"
-              onClick={handleTestCloud}
-              disabled={testingCloud}
-              className="bg-[#1B4D3E]/10 hover:bg-[#1B4D3E]/20 text-[#1B4D3E] text-xs font-bold px-3 py-1.5 rounded-xl flex items-center gap-1.5 transition-colors shrink-0"
-            >
-              <RefreshCw className={`w-3.5 h-3.5 ${testingCloud ? 'animate-spin' : ''}`} />
-              <span>{testingCloud ? 'Testing...' : 'Test Cloud Connection'}</span>
-            </button>
+
+            {/* Quick Status Badges */}
+            <div className="flex flex-wrap items-center gap-2">
+              <span className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold border ${
+                (formData.cloudProvider === 'supabase' && formData.supabaseUrl && formData.supabaseKey) ||
+                (formData.cloudProvider === 'cloudinary' && formData.cloudName && formData.uploadPreset) ||
+                (formData.cloudProvider === 'imgbb' && formData.imgbbApiKey)
+                  ? 'bg-emerald-50 text-emerald-800 border-emerald-200'
+                  : 'bg-amber-50 text-amber-800 border-amber-200'
+              }`}>
+                <span className={`w-2 h-2 rounded-full ${
+                  (formData.cloudProvider === 'supabase' && formData.supabaseUrl && formData.supabaseKey) ||
+                  (formData.cloudProvider === 'cloudinary' && formData.cloudName && formData.uploadPreset) ||
+                  (formData.cloudProvider === 'imgbb' && formData.imgbbApiKey)
+                    ? 'bg-emerald-500 animate-pulse'
+                    : 'bg-amber-500'
+                }`} />
+                <span>
+                  {(formData.cloudProvider === 'supabase' && formData.supabaseUrl && formData.supabaseKey) ||
+                   (formData.cloudProvider === 'cloudinary' && formData.cloudName && formData.uploadPreset) ||
+                   (formData.cloudProvider === 'imgbb' && formData.imgbbApiKey)
+                    ? `Cloud Storage: ${formData.cloudProvider.toUpperCase()}`
+                    : 'Cloud Storage: Local Only'}
+                </span>
+              </span>
+
+              <button
+                type="button"
+                onClick={() => setShowGuide(!showGuide)}
+                className="text-xs font-bold text-[#1B4D3E] hover:underline flex items-center gap-1 bg-[#1B4D3E]/5 px-2.5 py-1.5 rounded-xl transition-colors cursor-pointer"
+              >
+                <HelpCircle className="w-3.5 h-3.5" />
+                <span>{showGuide ? 'Hide Setup Guide' : 'Setup Guide'}</span>
+              </button>
+            </div>
           </div>
 
+          {/* Action Notification Messages */}
           {cloudTestMsg && (
-            <div className="p-3 bg-emerald-50 border border-emerald-200 text-emerald-900 rounded-xl text-xs font-medium break-all">
-              {cloudTestMsg}
+            <div className={`p-3.5 rounded-xl text-xs font-semibold flex items-start gap-2.5 ${
+              cloudTestMsg.type === 'success' 
+                ? 'bg-emerald-50 border border-emerald-200 text-emerald-900' 
+                : 'bg-rose-50 border border-rose-200 text-rose-800'
+            }`}>
+              {cloudTestMsg.type === 'success' ? (
+                <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
+              ) : (
+                <AlertCircle className="w-4 h-4 text-rose-600 shrink-0 mt-0.5" />
+              )}
+              <span className="break-all leading-relaxed">{cloudTestMsg.text}</span>
             </div>
           )}
 
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            <div>
-              <label className="block text-xs font-bold text-slate-700 mb-1">
-                Cloud Provider
-              </label>
-              <select
-                name="cloudProvider"
-                value={formData.cloudProvider}
-                onChange={handleChange}
-                className="w-full bg-[#FDFCF7] border border-stone-300 rounded-xl px-3 py-2 text-xs font-semibold text-stone-800 focus:ring-2 focus:ring-[#1B4D3E]"
-              >
-                <option value="cloudinary">Cloudinary (Unsigned Upload)</option>
-                <option value="supabase">Supabase Storage</option>
-              </select>
+          {pushCloudMsg && (
+            <div className={`p-3.5 rounded-xl text-xs font-semibold flex items-start gap-2.5 ${
+              pushCloudMsg.type === 'success' 
+                ? 'bg-emerald-50 border border-emerald-200 text-emerald-900' 
+                : 'bg-rose-50 border border-rose-200 text-rose-800'
+            }`}>
+              {pushCloudMsg.type === 'success' ? (
+                <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
+              ) : (
+                <AlertCircle className="w-4 h-4 text-rose-600 shrink-0 mt-0.5" />
+              )}
+              <span className="leading-relaxed">{pushCloudMsg.text}</span>
             </div>
+          )}
 
-            {formData.cloudProvider === 'cloudinary' ? (
-              <>
-                <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1">
-                    Cloudinary Cloud Name
-                  </label>
-                  <input
-                    type="text"
-                    name="cloudName"
-                    value={formData.cloudName}
-                    onChange={handleChange}
-                    placeholder="e.g. bisrat-hotel"
-                    className="w-full bg-[#FDFCF7] border border-stone-300 rounded-xl px-3 py-2 text-xs font-mono text-stone-800 focus:ring-2 focus:ring-[#1B4D3E]"
-                  />
-                </div>
+          {pullCloudMsg && (
+            <div className={`p-3.5 rounded-xl text-xs font-semibold flex items-start gap-2.5 ${
+              pullCloudMsg.type === 'success' 
+                ? 'bg-emerald-50 border border-emerald-200 text-emerald-900' 
+                : 'bg-rose-50 border border-rose-200 text-rose-800'
+            }`}>
+              {pullCloudMsg.type === 'success' ? (
+                <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
+              ) : (
+                <AlertCircle className="w-4 h-4 text-rose-600 shrink-0 mt-0.5" />
+              )}
+              <span className="leading-relaxed">{pullCloudMsg.text}</span>
+            </div>
+          )}
 
-                <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1">
-                    Upload Preset (Unsigned)
-                  </label>
-                  <input
-                    type="text"
-                    name="uploadPreset"
-                    value={formData.uploadPreset}
-                    onChange={handleChange}
-                    placeholder="e.g. bisrat_unsigned"
-                    className="w-full bg-[#FDFCF7] border border-stone-300 rounded-xl px-3 py-2 text-xs font-mono text-stone-800 focus:ring-2 focus:ring-[#1B4D3E]"
-                  />
-                </div>
-              </>
-            ) : (
-              <>
-                <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1">
-                    Supabase URL
-                  </label>
-                  <input
-                    type="text"
-                    name="supabaseUrl"
-                    value={formData.supabaseUrl}
-                    onChange={handleChange}
-                    placeholder="https://xyz.supabase.co"
-                    className="w-full bg-[#FDFCF7] border border-stone-300 rounded-xl px-3 py-2 text-xs font-mono text-stone-800 focus:ring-2 focus:ring-[#1B4D3E]"
-                  />
-                </div>
+          {/* Quick Setup Instructions (Accordion) */}
+          {showGuide && (
+            <div className="bg-[#FDFCF7] border border-[#C5A059]/40 p-4 sm:p-5 rounded-2xl space-y-3 text-xs text-stone-700 animate-fade-in">
+              <h5 className="font-bold text-[#1B4D3E] flex items-center gap-1.5 text-sm">
+                <Info className="w-4 h-4 text-[#C5A059]" />
+                <span>How to enable 100% Free Permanent Cloud Storage in 2 Minutes:</span>
+              </h5>
 
+              <div className="space-y-2 text-stone-600 leading-relaxed pl-1">
+                <p>
+                  <strong>Recommended Option (Supabase - Database + Photo Storage all-in-one):</strong>
+                </p>
+                <ol className="list-decimal list-inside space-y-1 pl-2">
+                  <li>Visit <a href="https://supabase.com" target="_blank" rel="noreferrer" className="text-[#1B4D3E] font-bold underline inline-flex items-center gap-0.5">supabase.com <ExternalLink className="w-3 h-3" /></a> and sign up for free.</li>
+                  <li>Click <strong>New Project</strong> (e.g. name it <code>bisrat-hotel</code>).</li>
+                  <li>Go to <strong>Storage</strong> in the left sidebar &rarr; click <strong>New Bucket</strong> &rarr; name it <code>bisrat-hotel</code> &rarr; toggle <strong className="text-emerald-700">"Public bucket" ON</strong> &rarr; Save.</li>
+                  <li>Go to <strong>Project Settings</strong> (gear icon) &rarr; <strong>API</strong> &rarr; copy your <strong>Project URL</strong> and <strong>anon public key</strong>.</li>
+                  <li>Paste them below, click <strong>"Test Cloud Connection"</strong>, and then click <strong>"Push Local Changes to Internet Now"</strong>!</li>
+                </ol>
+                <p className="pt-1 text-[11px] text-stone-500">
+                  Alternative: You can also use <strong>Cloudinary</strong> (Settings &rarr; Upload &rarr; Add unsigned upload preset) or <strong>ImgBB</strong> (from api.imgbb.com) for image hosting.
+                </p>
+              </div>
+            </div>
+          )}
+
+          {/* Cloud Storage Configuration Fields */}
+          <div className="space-y-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-xs font-bold text-slate-700 mb-1">
+                  Cloud Storage & Database Provider
+                </label>
+                <select
+                  name="cloudProvider"
+                  value={formData.cloudProvider}
+                  onChange={handleChange}
+                  className="w-full bg-[#FDFCF7] border border-stone-300 rounded-xl px-3.5 py-2.5 text-xs font-bold text-[#1B4D3E] focus:ring-2 focus:ring-[#1B4D3E]"
+                >
+                  <option value="supabase">Supabase (Recommended: Images + Cross-Device Sync)</option>
+                  <option value="cloudinary">Cloudinary (Image Storage via Unsigned Preset)</option>
+                  <option value="imgbb">ImgBB (Fast Image CDN API)</option>
+                </select>
+              </div>
+
+              {formData.cloudProvider === 'supabase' && (
                 <div>
                   <label className="block text-xs font-bold text-slate-700 mb-1">
-                    Supabase Bucket Name
+                    Supabase Public Storage Bucket Name
                   </label>
                   <input
                     type="text"
@@ -562,11 +744,131 @@ export default function PaymentSettingsManager({
                     value={formData.supabaseBucket}
                     onChange={handleChange}
                     placeholder="bisrat-hotel"
-                    className="w-full bg-[#FDFCF7] border border-stone-300 rounded-xl px-3 py-2 text-xs font-mono text-stone-800 focus:ring-2 focus:ring-[#1B4D3E]"
+                    className="w-full bg-[#FDFCF7] border border-stone-300 rounded-xl px-3.5 py-2.5 text-xs font-mono font-semibold text-stone-800 focus:ring-2 focus:ring-[#1B4D3E]"
                   />
                 </div>
-              </>
+              )}
+            </div>
+
+            {/* Provider-Specific Fields */}
+            {formData.cloudProvider === 'supabase' && (
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-1">
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 mb-1">
+                    Supabase Project URL *
+                  </label>
+                  <input
+                    type="url"
+                    name="supabaseUrl"
+                    value={formData.supabaseUrl}
+                    onChange={handleChange}
+                    placeholder="https://xyzabcdefg.supabase.co"
+                    className="w-full bg-[#FDFCF7] border border-stone-300 rounded-xl px-3.5 py-2.5 text-xs font-mono text-stone-800 focus:ring-2 focus:ring-[#1B4D3E]"
+                  />
+                  <p className="text-[10px] text-stone-400 mt-1">Found in Project Settings &rarr; API &rarr; Project URL</p>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 mb-1">
+                    Supabase Public Anon Key *
+                  </label>
+                  <input
+                    type="password"
+                    name="supabaseKey"
+                    value={formData.supabaseKey}
+                    onChange={handleChange}
+                    placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+                    className="w-full bg-[#FDFCF7] border border-stone-300 rounded-xl px-3.5 py-2.5 text-xs font-mono text-stone-800 focus:ring-2 focus:ring-[#1B4D3E]"
+                  />
+                  <p className="text-[10px] text-stone-400 mt-1">Found in Project Settings &rarr; API &rarr; Project API keys (anon public)</p>
+                </div>
+              </div>
             )}
+
+            {formData.cloudProvider === 'cloudinary' && (
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-1">
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 mb-1">
+                    Cloudinary Cloud Name *
+                  </label>
+                  <input
+                    type="text"
+                    name="cloudName"
+                    value={formData.cloudName}
+                    onChange={handleChange}
+                    placeholder="e.g. your-cloud-name"
+                    className="w-full bg-[#FDFCF7] border border-stone-300 rounded-xl px-3.5 py-2.5 text-xs font-mono text-stone-800 focus:ring-2 focus:ring-[#1B4D3E]"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 mb-1">
+                    Upload Preset (Unsigned) *
+                  </label>
+                  <input
+                    type="text"
+                    name="uploadPreset"
+                    value={formData.uploadPreset}
+                    onChange={handleChange}
+                    placeholder="e.g. bisrat_preset"
+                    className="w-full bg-[#FDFCF7] border border-stone-300 rounded-xl px-3.5 py-2.5 text-xs font-mono text-stone-800 focus:ring-2 focus:ring-[#1B4D3E]"
+                  />
+                </div>
+              </div>
+            )}
+
+            {formData.cloudProvider === 'imgbb' && (
+              <div className="pt-1">
+                <label className="block text-xs font-bold text-slate-700 mb-1">
+                  ImgBB Free API Key *
+                </label>
+                <input
+                  type="text"
+                  name="imgbbApiKey"
+                  value={formData.imgbbApiKey}
+                  onChange={handleChange}
+                  placeholder="e.g. 32-character API key from api.imgbb.com"
+                  className="w-full bg-[#FDFCF7] border border-stone-300 rounded-xl px-3.5 py-2.5 text-xs font-mono text-stone-800 focus:ring-2 focus:ring-[#1B4D3E]"
+                />
+              </div>
+            )}
+          </div>
+
+          {/* Interactive Cloud Sync Action Toolbar */}
+          <div className="flex flex-wrap items-center justify-between gap-3 pt-4 border-t border-stone-100">
+            <button
+              type="button"
+              onClick={handleTestCloud}
+              disabled={testingCloud}
+              className="bg-[#1B4D3E]/10 hover:bg-[#1B4D3E]/20 text-[#1B4D3E] text-xs font-bold px-4 py-2.5 rounded-xl flex items-center gap-2 transition-colors cursor-pointer"
+            >
+              <RefreshCw className={`w-3.5 h-3.5 ${testingCloud ? 'animate-spin' : ''}`} />
+              <span>{testingCloud ? 'Testing Connection...' : 'Test Cloud Connection'}</span>
+            </button>
+
+            <div className="flex items-center gap-2.5">
+              <button
+                type="button"
+                onClick={handlePullFromCloud}
+                disabled={pullingFromCloud}
+                className="bg-stone-100 hover:bg-stone-200 text-stone-800 text-xs font-bold px-4 py-2.5 rounded-xl flex items-center gap-2 transition-colors cursor-pointer"
+                title="Download latest data from the cloud onto this device"
+              >
+                <DownloadCloud className={`w-3.5 h-3.5 text-stone-600 ${pullingFromCloud ? 'animate-bounce' : ''}`} />
+                <span>{pullingFromCloud ? 'Pulling...' : 'Pull Latest from Cloud'}</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={handlePushToCloud}
+                disabled={pushingToCloud}
+                className="bg-[#1B4D3E] hover:bg-[#163E32] text-white text-xs font-bold px-5 py-2.5 rounded-xl flex items-center gap-2 shadow-xs transition-all active:scale-95 cursor-pointer"
+                title="Upload all current menu dishes, photos, prices, and settings from this phone to the cloud"
+              >
+                <UploadCloud className={`w-4 h-4 text-[#C5A059] ${pushingToCloud ? 'animate-bounce' : ''}`} />
+                <span>{pushingToCloud ? 'Syncing to Cloud...' : 'Push Local Changes to Internet Now'}</span>
+              </button>
+            </div>
           </div>
         </div>
 

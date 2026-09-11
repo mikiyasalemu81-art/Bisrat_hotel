@@ -24,6 +24,7 @@ import { translations } from '../translations';
 import { CATEGORY_CONFIG } from '../data/menuData';
 import { savePhotoToStorage, compressImage, uploadToCloudStorage } from '../utils/imageStorage';
 import { getOptimizedImageUrl, triggerGlobalImageRefresh } from '../utils/imageUrl';
+import { saveCloudAppState } from '../utils/cloudSync';
 
 export default function MenuManager({ 
   menuItems = [], 
@@ -174,7 +175,10 @@ export default function MenuManager({
 
     const updatedList = menuItems.map(item => item.id === editingItem.id ? updatedItem : item);
     setMenuItems(updatedList);
-    localStorage.setItem('bisrat_menu', JSON.stringify(updatedList));
+    try {
+      localStorage.setItem('bisrat_menu', JSON.stringify(updatedList));
+      saveCloudAppState('menuItems', updatedList, paymentSettings?.cloudStorage).catch(() => {});
+    } catch (e) {}
 
     // Update photo cache if placeholderSlot exists
     if (editingItem.placeholderSlot && finalImageUrl) {
@@ -223,7 +227,10 @@ export default function MenuManager({
       return item;
     });
     setMenuItems(updated);
-    localStorage.setItem('bisrat_menu', JSON.stringify(updated));
+    try {
+      localStorage.setItem('bisrat_menu', JSON.stringify(updated));
+      saveCloudAppState('menuItems', updated, paymentSettings?.cloudStorage).catch(() => {});
+    } catch (e) {}
 
     try {
       if (typeof window !== 'undefined' && 'BroadcastChannel' in window) {
@@ -290,7 +297,10 @@ export default function MenuManager({
 
     const updatedList = [newItem, ...menuItems];
     setMenuItems(updatedList);
-    localStorage.setItem('bisrat_menu', JSON.stringify(updatedList));
+    try {
+      localStorage.setItem('bisrat_menu', JSON.stringify(updatedList));
+      saveCloudAppState('menuItems', updatedList, paymentSettings?.cloudStorage).catch(() => {});
+    } catch (e) {}
 
     if (finalUrl) {
       try {
@@ -333,7 +343,10 @@ export default function MenuManager({
     if (window.confirm(`Are you sure you want to delete "${name}" from the menu?`)) {
       const updated = menuItems.filter(item => item.id !== id);
       setMenuItems(updated);
-      localStorage.setItem('bisrat_menu', JSON.stringify(updated));
+      try {
+        localStorage.setItem('bisrat_menu', JSON.stringify(updated));
+        saveCloudAppState('menuItems', updated, paymentSettings?.cloudStorage).catch(() => {});
+      } catch (e) {}
 
       try {
         if (typeof window !== 'undefined' && 'BroadcastChannel' in window) {

@@ -18,6 +18,7 @@ import {
 import { compressImage, uploadToCloudStorage } from '../utils/imageStorage';
 import { getOptimizedImageUrl, triggerGlobalImageRefresh } from '../utils/imageUrl';
 import { initialGallery } from '../data/galleryData';
+import { saveCloudAppState } from '../utils/cloudSync';
 
 export default function GalleryManager({ 
   gallery = [], 
@@ -128,6 +129,7 @@ export default function GalleryManager({
     if (setGallery) setGallery(updated);
     try {
       localStorage.setItem('bisrat_gallery', JSON.stringify(updated));
+      saveCloudAppState('gallery', updated, paymentSettings?.cloudStorage).catch(() => {});
     } catch (err) {}
     triggerGlobalImageRefresh();
     broadcastUpdate(updated);
@@ -152,6 +154,7 @@ export default function GalleryManager({
     if (setGallery) setGallery(updated);
     try {
       localStorage.setItem('bisrat_gallery', JSON.stringify(updated));
+      saveCloudAppState('gallery', updated, paymentSettings?.cloudStorage).catch(() => {});
     } catch (err) {}
     broadcastUpdate(updated);
     showNotification(`✓ Removed "${photoTitle}" from gallery.`);
@@ -164,6 +167,7 @@ export default function GalleryManager({
     if (setGallery) setGallery(initialGallery);
     try {
       localStorage.setItem('bisrat_gallery', JSON.stringify(initialGallery));
+      saveCloudAppState('gallery', initialGallery, paymentSettings?.cloudStorage).catch(() => {});
     } catch (err) {}
     broadcastUpdate(initialGallery);
     showNotification("✓ Reset gallery to default showcase.");

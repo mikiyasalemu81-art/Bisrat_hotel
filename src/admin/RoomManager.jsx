@@ -2,10 +2,12 @@ import React, { useState } from 'react';
 import { Bed, Edit, Save, ToggleLeft, ToggleRight, CheckCircle2 } from 'lucide-react';
 import { translations } from '../translations';
 import { getOptimizedImageUrl } from '../utils/imageUrl';
+import { saveCloudAppState } from '../utils/cloudSync';
 
 export default function RoomManager({ 
   rooms, 
   setRooms, 
+  paymentSettings = {},
   lang 
 }) {
   const t = translations[lang] || translations.en;
@@ -15,7 +17,17 @@ export default function RoomManager({
   const [successMsg, setSuccessMsg] = useState('');
 
   const toggleRoomAvailability = (id) => {
-    setRooms(rooms.map(r => r.id === id ? { ...r, isAvailable: !r.isAvailable } : r));
+    const updatedRooms = rooms.map(r => r.id === id ? { ...r, isAvailable: !r.isAvailable } : r);
+    setRooms(updatedRooms);
+    try {
+      localStorage.setItem('bisrat_rooms', JSON.stringify(updatedRooms));
+      saveCloudAppState('rooms', updatedRooms, paymentSettings?.cloudStorage).catch(() => {});
+      if (typeof window !== 'undefined' && 'BroadcastChannel' in window) {
+        const channel = new BroadcastChannel('bisrat_hotel_sync');
+        channel.postMessage({ type: 'ROOMS_UPDATE', rooms: updatedRooms });
+        channel.close();
+      }
+    } catch (e) {}
   };
 
   const startEditPrice = (room) => {
@@ -31,6 +43,7 @@ export default function RoomManager({
     setRooms(updatedRooms);
     try {
       localStorage.setItem('bisrat_rooms', JSON.stringify(updatedRooms));
+      saveCloudAppState('rooms', updatedRooms, paymentSettings?.cloudStorage).catch(() => {});
       if (typeof window !== 'undefined' && 'BroadcastChannel' in window) {
         const channel = new BroadcastChannel('bisrat_hotel_sync');
         channel.postMessage({ type: 'ROOMS_UPDATE', rooms: updatedRooms });
@@ -38,7 +51,7 @@ export default function RoomManager({
       }
     } catch (e) {}
     setEditingId(null);
-    setSuccessMsg('Price updated successfully!');
+    setSuccessMsg('Price updated successfully and synced across all devices!');
     setTimeout(() => setSuccessMsg(''), 3000);
   };
 

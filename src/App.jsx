@@ -20,6 +20,7 @@ import { initialGallery } from './data/galleryData';
 import { initialReviews } from './data/reviewsData';
 import { loadAllPhotosFromStorage } from './utils/imageStorage';
 import { setImageSyncTimestamp } from './utils/imageUrl';
+import { fetchCloudAppState } from './utils/cloudSync';
 
 export default function App() {
   // Trilingual Language State (remembers choice)
@@ -55,9 +56,13 @@ export default function App() {
         cash: parsed.paymentMethods?.cash ?? (parsed.paymentMethods?.arrival ?? true),
       },
       cloudStorage: parsed.cloudStorage || {
-        provider: "cloudinary",
-        cloudName: "dhd620bca",
-        uploadPreset: "bisrat_unsigned",
+        provider: "supabase",
+        supabaseUrl: "",
+        supabaseKey: "",
+        supabaseBucket: "bisrat-hotel",
+        cloudName: "",
+        uploadPreset: "",
+        imgbbApiKey: "",
       }
     };
   });
@@ -277,6 +282,71 @@ export default function App() {
       localStorage.setItem('bisrat_gallery', JSON.stringify(gallery));
     } catch (e) {}
   }, [gallery]);
+
+  // Automatic Cloud Network Sync across all devices (phones, computers, customers)
+  useEffect(() => {
+    let isMounted = true;
+
+    const syncWithCloud = async () => {
+      try {
+        const cloudRes = await fetchCloudAppState(paymentSettings?.cloudStorage);
+        if (isMounted && cloudRes.success && cloudRes.data) {
+          const remote = cloudRes.data;
+
+          if (Array.isArray(remote.menuItems) && remote.menuItems.length > 0) {
+            setMenuItems(remote.menuItems);
+            try { localStorage.setItem('bisrat_menu', JSON.stringify(remote.menuItems)); } catch (e) {}
+          }
+          if (remote.photos && typeof remote.photos === 'object' && Object.keys(remote.photos).length > 0) {
+            setPhotos(prev => ({ ...prev, ...remote.photos }));
+            try { localStorage.setItem('bisrat_photos', JSON.stringify(remote.photos)); } catch (e) {}
+          }
+          if (Array.isArray(remote.gallery) && remote.gallery.length > 0) {
+            setGallery(remote.gallery);
+            try { localStorage.setItem('bisrat_gallery', JSON.stringify(remote.gallery)); } catch (e) {}
+          }
+          if (Array.isArray(remote.rooms) && remote.rooms.length > 0) {
+            setRooms(remote.rooms);
+            try { localStorage.setItem('bisrat_rooms', JSON.stringify(remote.rooms)); } catch (e) {}
+          }
+          if (Array.isArray(remote.facilities) && remote.facilities.length > 0) {
+            setFacilities(remote.facilities);
+            try { localStorage.setItem('bisrat_facilities', JSON.stringify(remote.facilities)); } catch (e) {}
+          }
+          if (remote.paymentSettings && typeof remote.paymentSettings === 'object') {
+            setPaymentSettings(prev => ({
+              ...prev,
+              ...remote.paymentSettings,
+              cloudStorage: prev.cloudStorage?.supabaseUrl ? prev.cloudStorage : (remote.paymentSettings.cloudStorage || prev.cloudStorage)
+            }));
+          }
+          if (remote.updatedAt) {
+            setImageSyncTimestamp(remote.updatedAt);
+          }
+        }
+      } catch (err) {
+        console.warn('[App] Remote cloud synchronization notice:', err);
+      }
+    };
+
+    // 1. Initial cloud sync on mount
+    syncWithCloud();
+
+    // 2. Poll cloud periodically (every 45s) for live cross-device updates
+    const interval = setInterval(syncWithCloud, 45000);
+
+    // 3. Sync on tab focus or visibility change (e.g. user opens phone or switches back to tab)
+    const handleFocus = () => syncWithCloud();
+    window.addEventListener('focus', handleFocus);
+    document.addEventListener('visibilitychange', handleFocus);
+
+    return () => {
+      isMounted = false;
+      clearInterval(interval);
+      window.removeEventListener('focus', handleFocus);
+      document.removeEventListener('visibilitychange', handleFocus);
+    };
+  }, [paymentSettings?.cloudStorage?.supabaseUrl, paymentSettings?.cloudStorage?.supabaseKey]);
 
   // Admin Auth & Password State
   const [isAdminAuth, setIsAdminAuth] = useState(() => {
