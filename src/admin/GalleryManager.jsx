@@ -13,9 +13,11 @@ import {
   Loader2,
   X,
   Check,
-  Eye
+  Eye,
+  Sliders,
+  RefreshCw
 } from 'lucide-react';
-import { compressImage, uploadToCloudStorage } from '../utils/imageStorage';
+import { compressImage, uploadToCloudStorage, savePhotoToStorage, deletePhotoFromStorage } from '../utils/imageStorage';
 import { getOptimizedImageUrl, triggerGlobalImageRefresh } from '../utils/imageUrl';
 import { initialGallery } from '../data/galleryData';
 import { saveCloudAppState } from '../utils/cloudSync';
@@ -23,6 +25,8 @@ import { saveCloudAppState } from '../utils/cloudSync';
 export default function GalleryManager({ 
   gallery = [], 
   setGallery, 
+  photos = {},
+  setPhotos,
   paymentSettings = {}, 
   lang = 'en' 
 }) {
@@ -37,6 +41,41 @@ export default function GalleryManager({
   const [filterCategory, setFilterCategory] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [previewItem, setPreviewItem] = useState(null);
+  const [activeSection, setActiveSection] = useState('hero'); // 'hero' | 'gallery'
+  const [uploadingHeroSlot, setUploadingHeroSlot] = useState(null);
+
+  const heroSlideSlots = [
+    {
+      slotKey: 'hero-bg-hotel-exterior.jpg',
+      fallback: '/images/hero-bg-hotel-exterior.jpg',
+      title: 'Slide 1: Grand Hotel Exterior',
+      desc: 'Main hotel facade and entrance building in Adama'
+    },
+    {
+      slotKey: 'gallery-hotel-lounge.jpg',
+      fallback: '/images/gallery-hotel-lounge.jpg',
+      title: 'Slide 2: Comfortable Guest Lounge',
+      desc: 'Elegant guest lounge and seating area'
+    },
+    {
+      slotKey: 'gallery-banquet-hall.jpg',
+      fallback: '/images/gallery-banquet-hall.jpg',
+      title: 'Slide 3: Elegant Banquet & Event Hall',
+      desc: 'Spacious banquet hall decorated for celebrations and weddings'
+    },
+    {
+      slotKey: 'gallery-reception-desk-1.jpg',
+      fallback: '/images/gallery-reception-desk-1.jpg',
+      title: 'Slide 4: 24/7 Front Desk & Concierge',
+      desc: 'Main front desk with world clocks and welcome reception'
+    },
+    {
+      slotKey: 'gallery-catering-service.jpg',
+      fallback: '/images/gallery-catering-service.jpg',
+      title: 'Slide 5: Gourmet Catering & Dining',
+      desc: 'Culinary team preparing fresh dishes and catering spread'
+    }
+  ];
 
   const fileInputRef = useRef(null);
 
@@ -67,7 +106,75 @@ export default function GalleryManager({
     }
   };
 
-  // Direct Cloud Storage Upload
+  // Hero Carousel Slide Upload Handler (Cloudinary)
+  const handleHeroSlideUpload = async (slotKey, file) => {
+    if (!file) return;
+    setUploadingHeroSlot(slotKey);
+    try {
+      const compressed = await compressImage(file, 1920, 0.88);
+      const cloudRes = await uploadToCloudStorage(compressed, paymentSettings?.cloudStorage);
+      const secureUrl = cloudRes.secureUrl || cloudRes.url;
+
+      if (!secureUrl || secureUrl.startsWith('data:')) {
+        throw new Error("No public Cloudinary URL returned from upload.");
+      }
+
+      await savePhotoToStorage(slotKey, secureUrl);
+      const updatedPhotos = { ...photos, [slotKey]: secureUrl };
+      if (setPhotos) setPhotos(updatedPhotos);
+
+      try {
+        localStorage.setItem('bisrat_photos', JSON.stringify(updatedPhotos));
+        await saveCloudAppState('photos', updatedPhotos, paymentSettings?.cloudStorage);
+      } catch (e) {}
+
+      triggerGlobalImageRefresh();
+
+      if (typeof window !== 'undefined' && 'BroadcastChannel' in window) {
+        const channel = new BroadcastChannel('bisrat_hotel_sync');
+        channel.postMessage({ type: 'PHOTOS_UPDATE', photos: { [slotKey]: secureUrl } });
+        channel.postMessage({ type: 'IMG_SYNC', timestamp: Date.now() });
+        channel.close();
+      }
+
+      showNotification(`✓ Successfully updated ${slotKey} via Cloudinary! Live on homepage hero carousel.`);
+    } catch (err) {
+      alert(`Hero slide upload failed: ${err.message}`);
+    } finally {
+      setUploadingHeroSlot(null);
+    }
+  };
+
+  // Hero Carousel Reset to Default
+  const handleHeroSlideReset = async (slotKey) => {
+    if (!window.confirm(`Reset "${slotKey}" back to original hotel photograph?`)) return;
+    try {
+      await deletePhotoFromStorage(slotKey);
+      const updatedPhotos = { ...photos };
+      delete updatedPhotos[slotKey];
+      if (setPhotos) setPhotos(updatedPhotos);
+
+      try {
+        localStorage.setItem('bisrat_photos', JSON.stringify(updatedPhotos));
+        await saveCloudAppState('photos', updatedPhotos, paymentSettings?.cloudStorage);
+      } catch (e) {}
+
+      triggerGlobalImageRefresh();
+
+      if (typeof window !== 'undefined' && 'BroadcastChannel' in window) {
+        const channel = new BroadcastChannel('bisrat_hotel_sync');
+        channel.postMessage({ type: 'PHOTOS_UPDATE', photos: updatedPhotos });
+        channel.postMessage({ type: 'IMG_SYNC', timestamp: Date.now() });
+        channel.close();
+      }
+
+      showNotification(`✓ Reset "${slotKey}" back to original photo.`);
+    } catch (err) {
+      alert(`Failed to reset photo: ${err.message}`);
+    }
+  };
+
+  // Direct Cloud Storage Upload for Gallery
   const handleFileUpload = async (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -79,14 +186,14 @@ export default function GalleryManager({
     try {
       const compressed = await compressImage(file, 1600, 0.85);
       const cloudRes = await uploadToCloudStorage(compressed, paymentSettings?.cloudStorage);
-      const publicUrl = cloudRes.url;
+      const publicUrl = cloudRes.secureUrl || cloudRes.url;
 
-      if (!publicUrl) {
-        throw new Error("No public image URL returned from cloud storage.");
+      if (!publicUrl || publicUrl.startsWith('data:')) {
+        throw new Error("No public Cloudinary URL returned from cloud storage.");
       }
 
       setImageUrl(publicUrl);
-      setUploadSuccess(`✓ Photo uploaded to cloud (${cloudRes.provider})! Permanent public HTTPS URL active.`);
+      setUploadSuccess(`✓ Photo uploaded to Cloudinary (${cloudRes.provider})! Secure URL active.`);
     } catch (err) {
       console.error('Gallery image upload error:', err);
       setUploadError(err.message || 'Failed to upload photo to cloud storage.');
@@ -225,8 +332,148 @@ export default function GalleryManager({
         </div>
       )}
 
-      {/* Add New Gallery Photo Form Card */}
-      <form onSubmit={handleAddPhoto} className="bg-white p-6 sm:p-7 rounded-3xl border border-[#E8EFE9] shadow-sm space-y-5">
+      {/* Sub-Tabs: Hero Carousel (5 Slides) vs Hotel Gallery */}
+      <div className="flex flex-wrap items-center gap-2 p-1.5 bg-stone-100/90 rounded-2xl w-fit border border-[#E8EFE9]">
+        <button
+          type="button"
+          onClick={() => setActiveSection('hero')}
+          className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+            activeSection === 'hero'
+              ? 'bg-[#1B4D3E] text-white shadow-xs'
+              : 'text-stone-600 hover:text-stone-900 hover:bg-white/60'
+          }`}
+        >
+          <Camera className="w-3.5 h-3.5 text-[#C5A059]" />
+          <span>Homepage Hero Carousel (5 Live Photos)</span>
+        </button>
+
+        <button
+          type="button"
+          onClick={() => setActiveSection('gallery')}
+          className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+            activeSection === 'gallery'
+              ? 'bg-[#1B4D3E] text-white shadow-xs'
+              : 'text-stone-600 hover:text-stone-900 hover:bg-white/60'
+          }`}
+        >
+          <ImageIcon className="w-3.5 h-3.5 text-[#C5A059]" />
+          <span>Hotel Tour Gallery Showcase ({gallery.length})</span>
+        </button>
+      </div>
+
+      {/* SECTION 1: HOMEPAGE HERO CAROUSEL (5 SLIDES) */}
+      {activeSection === 'hero' && (
+        <div className="space-y-6 animate-fade-in">
+          <div className="bg-white p-5 sm:p-6 rounded-3xl border border-[#E8EFE9] flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div>
+              <h4 className="font-serif text-lg font-bold text-[#1A1C19] flex items-center gap-2">
+                <Camera className="w-5 h-5 text-[#1B4D3E]" />
+                <span>Homepage Hero Background Carousel (5 Slides)</span>
+              </h4>
+              <p className="text-xs text-stone-500 mt-1 max-w-2xl">
+                These 5 photos rotate automatically every 4 seconds on the homepage background in exact order. Replace any slide with a new photo uploaded directly to Cloudinary — changes go live instantly on all customer devices.
+              </p>
+            </div>
+            <div className="flex items-center gap-2 text-xs font-mono font-bold text-emerald-700 bg-emerald-50 px-3 py-1.5 rounded-xl border border-emerald-200 shrink-0">
+              <Check className="w-3.5 h-3.5" />
+              <span>5 / 5 Slides Active</span>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {heroSlideSlots.map((slide, idx) => {
+              const customUrl = photos?.[slide.slotKey];
+              const currentImg = getOptimizedImageUrl(customUrl || slide.fallback);
+              const isCustom = Boolean(customUrl);
+              const isCurrentUploading = uploadingHeroSlot === slide.slotKey;
+
+              return (
+                <div 
+                  key={slide.slotKey} 
+                  className="bg-white rounded-3xl border border-[#E8EFE9] overflow-hidden shadow-2xs hover:shadow-md transition-all flex flex-col justify-between"
+                >
+                  <div className="relative w-full h-48 overflow-hidden bg-stone-900 group">
+                    <img 
+                      src={currentImg} 
+                      alt={slide.title} 
+                      className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-500" 
+                    />
+                    <div className="absolute top-3 left-3 bg-black/70 backdrop-blur-md text-[#C5A059] border border-[#C5A059]/40 text-xs font-bold px-3 py-1 rounded-full flex items-center gap-1.5">
+                      <Camera className="w-3.5 h-3.5" />
+                      <span>Slide {idx + 1} of 5</span>
+                    </div>
+                    <div className="absolute bottom-3 right-3">
+                      <span className={`text-[10px] font-bold px-2.5 py-1 rounded-lg backdrop-blur-md ${
+                        isCustom 
+                          ? 'bg-emerald-600/90 text-white border border-emerald-400/50' 
+                          : 'bg-stone-800/80 text-stone-300'
+                      }`}>
+                        {isCustom ? '✓ Custom Cloudinary' : 'Default Hotel Photo'}
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="p-5 flex-1 flex flex-col justify-between space-y-4">
+                    <div>
+                      <h4 className="font-serif font-bold text-base text-[#1A1C19]">
+                        {slide.title}
+                      </h4>
+                      <p className="text-xs text-stone-500 mt-1">
+                        {slide.desc}
+                      </p>
+                      <p className="text-[10px] font-mono text-stone-400 mt-1 truncate">
+                        File: {slide.slotKey}
+                      </p>
+                    </div>
+
+                    <div className="space-y-2 pt-2 border-t border-[#E8EFE9]">
+                      <label className={`w-full bg-[#1B4D3E] hover:bg-[#163E32] text-white font-bold py-2.5 px-4 rounded-xl text-xs flex items-center justify-center gap-2 transition-all cursor-pointer shadow-xs ${
+                        isCurrentUploading ? 'opacity-60 pointer-events-none' : ''
+                      }`}>
+                        {isCurrentUploading ? (
+                          <>
+                            <Loader2 className="w-4 h-4 text-[#C5A059] animate-spin" />
+                            <span>Uploading to Cloudinary...</span>
+                          </>
+                        ) : (
+                          <>
+                            <Upload className="w-4 h-4 text-[#C5A059]" />
+                            <span>{isCustom ? 'Replace Slide Photo' : 'Upload New Photo (Cloudinary)'}</span>
+                          </>
+                        )}
+                        <input 
+                          type="file" 
+                          accept="image/*" 
+                          disabled={isCurrentUploading}
+                          onChange={(e) => handleHeroSlideUpload(slide.slotKey, e.target.files?.[0])}
+                          className="hidden" 
+                        />
+                      </label>
+
+                      {isCustom && (
+                        <button
+                          type="button"
+                          onClick={() => handleHeroSlideReset(slide.slotKey)}
+                          className="w-full text-xs font-semibold text-rose-600 hover:text-rose-700 hover:bg-rose-50 py-2 rounded-xl transition-colors flex items-center justify-center gap-1.5 cursor-pointer"
+                        >
+                          <RefreshCw className="w-3.5 h-3.5" />
+                          <span>Reset to Original Photo</span>
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
+      {/* SECTION 2: PUBLIC HOTEL GALLERY SHOWCASE */}
+      {activeSection === 'gallery' && (
+        <div className="space-y-8 animate-fade-in">
+          {/* Add New Gallery Photo Form Card */}
+          <form onSubmit={handleAddPhoto} className="bg-white p-6 sm:p-7 rounded-3xl border border-[#E8EFE9] shadow-sm space-y-5">
         <div className="flex items-center justify-between border-b border-[#E8EFE9] pb-3">
           <h4 className="font-serif text-lg font-bold text-[#1A1C19] flex items-center gap-2">
             <Plus className="w-5 h-5 text-[#1B4D3E]" />
@@ -485,6 +732,8 @@ export default function GalleryManager({
           <ImageIcon className="w-10 h-10 text-stone-300 mx-auto mb-2" />
           <p className="font-bold text-stone-700 text-sm">No photos match your filter</p>
           <p className="text-xs text-stone-500 mt-1">Try clearing search or selecting "All"</p>
+        </div>
+      )}
         </div>
       )}
 

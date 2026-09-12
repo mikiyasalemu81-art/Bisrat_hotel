@@ -44,7 +44,7 @@ export default function AdminDashboard({
     { id: 'bookings', label: t.admin.tabBookings, icon: Calendar },
     { id: 'paymentSettings', label: "Payment & Contact Settings", icon: CreditCard },
     { id: 'reviews', label: t.admin.tabReviews, icon: Star },
-    { id: 'photos', label: "Gallery Manager", icon: Camera },
+    { id: 'photos', label: "Hero Carousel & Gallery", icon: Camera },
   ];
 
   return (

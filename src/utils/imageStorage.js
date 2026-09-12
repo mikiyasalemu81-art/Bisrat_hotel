@@ -11,6 +11,7 @@ import {
   setImageSyncTimestamp 
 } from './imageUrl';
 import { saveCloudAppState } from './cloudSync';
+import { uploadToCloudinary, getCloudinaryConfig } from './cloudinary';
 
 export { 
   getOptimizedImageUrl, 
@@ -121,14 +122,43 @@ export function compressImage(fileOrUrl, maxDimension = 1600, quality = 0.85) {
  * Returns the permanent, publicly accessible HTTPS URL so all users can see the image on any device.
  */
 export async function uploadToCloudStorage(fileOrBlob, customConfig = {}) {
-  // 1. Read admin-configured cloud settings if available
+  // If already an external HTTPS URL, return directly
+  if (typeof fileOrBlob === 'string' && (fileOrBlob.startsWith('http://') || fileOrBlob.startsWith('https://'))) {
+    return { url: fileOrBlob, secureUrl: fileOrBlob, provider: 'direct-url' };
+  }
+
+  // 1. Prioritize Cloudinary using environment variables or settings
+  const clConfig = getCloudinaryConfig(customConfig);
+  if (clConfig.isConfigured) {
+    try {
+      const result = await uploadToCloudinary(fileOrBlob, { customConfig });
+      if (result?.secureUrl) {
+        const versionStamp = result.version || Date.now();
+        const optimizedUrl = getOptimizedImageUrl(result.secureUrl, versionStamp);
+        return {
+          url: optimizedUrl,
+          secureUrl: result.secureUrl,
+          version: versionStamp,
+          provider: 'cloudinary'
+        };
+      }
+    } catch (clErr) {
+      console.warn('[ImageStorage] Cloudinary direct upload failed, attempting fallbacks:', clErr);
+      // If no other provider is configured, rethrow the Cloudinary error
+      if (!customConfig.supabaseUrl && !customConfig.imgbbApiKey) {
+        throw clErr;
+      }
+    }
+  }
+
+  // 2. Fallback to Supabase or ImgBB if configured in paymentSettings
   let cloudConfig = {
     provider: 'supabase',
     supabaseUrl: '',
     supabaseKey: '',
     supabaseBucket: 'bisrat-hotel',
-    cloudName: '',
-    uploadPreset: '',
+    cloudName: clConfig.cloudName,
+    uploadPreset: clConfig.uploadPreset,
     imgbbApiKey: '',
     ...customConfig
   };
@@ -141,23 +171,15 @@ export async function uploadToCloudStorage(fileOrBlob, customConfig = {}) {
         cloudConfig = { ...cloudConfig, ...parsed.cloudStorage, ...customConfig };
       }
     }
-  } catch (e) {
-    console.warn('Could not read cloud storage settings from storage:', e);
-  }
+  } catch (e) {}
 
-  // 2. Prepare binary Blob
   let binaryBlob = fileOrBlob;
-  if (typeof fileOrBlob === 'string') {
-    if (fileOrBlob.startsWith('http://') || fileOrBlob.startsWith('https://')) {
-      return { url: fileOrBlob, provider: 'direct-url' };
-    }
-    if (fileOrBlob.startsWith('data:image')) {
-      const res = await fetch(fileOrBlob);
-      binaryBlob = await res.blob();
-    }
+  if (typeof fileOrBlob === 'string' && fileOrBlob.startsWith('data:image')) {
+    const res = await fetch(fileOrBlob);
+    binaryBlob = await res.blob();
   }
 
-  // 3A. Supabase Storage Option (Recommended: Database + Image Storage all-in-one)
+  // Supabase Storage Option
   if (cloudConfig.supabaseUrl && cloudConfig.supabaseKey) {
     const cleanUrl = cloudConfig.supabaseUrl.replace(/\/$/, '');
     const bucket = cloudConfig.supabaseBucket || 'bisrat-hotel';
@@ -180,49 +202,14 @@ export async function uploadToCloudStorage(fileOrBlob, customConfig = {}) {
       if (res.ok) {
         const versionStamp = Date.now();
         const publicUrl = getOptimizedImageUrl(`${cleanUrl}/storage/v1/object/public/${bucket}/${fileName}`, versionStamp);
-        return { url: publicUrl, version: versionStamp, provider: 'supabase' };
-      } else {
-        const errText = await res.text();
-        console.warn(`Supabase Storage upload warning (${res.status}):`, errText);
-        // If not Cloudinary as fallback, throw error
-        if (!cloudConfig.cloudName) {
-          throw new Error(`Supabase upload failed (${res.status}): ${errText}. Please check bucket "${bucket}" permissions.`);
-        }
+        return { url: publicUrl, secureUrl: publicUrl, version: versionStamp, provider: 'supabase' };
       }
     } catch (sbErr) {
-      if (!cloudConfig.cloudName) throw sbErr;
+      console.warn('Supabase upload fallback error:', sbErr);
     }
   }
 
-  // 3B. Cloudinary Option
-  if (cloudConfig.cloudName && cloudConfig.uploadPreset) {
-    try {
-      const formData = new FormData();
-      formData.append('file', binaryBlob);
-      formData.append('upload_preset', cloudConfig.uploadPreset);
-
-      const clRes = await fetch(`https://api.cloudinary.com/v1_1/${cloudConfig.cloudName}/image/upload`, {
-        method: 'POST',
-        body: formData,
-      });
-
-      if (clRes.ok) {
-        const data = await clRes.json();
-        if (data.secure_url) {
-          const versionStamp = data.version || Date.now();
-          const versionedUrl = getOptimizedImageUrl(data.secure_url, versionStamp);
-          return { url: versionedUrl, version: versionStamp, provider: 'cloudinary' };
-        }
-      } else {
-        const errData = await clRes.json().catch(() => ({}));
-        console.warn('Cloudinary upload warning:', errData);
-      }
-    } catch (clErr) {
-      console.warn('Cloudinary upload error:', clErr);
-    }
-  }
-
-  // 3C. ImgBB Option
+  // ImgBB Option
   if (cloudConfig.imgbbApiKey) {
     try {
       const bbFormData = new FormData();
@@ -237,16 +224,13 @@ export async function uploadToCloudStorage(fileOrBlob, customConfig = {}) {
         if (bbData?.data?.url) {
           const versionStamp = Date.now();
           const bbUrl = getOptimizedImageUrl(bbData.data.url, versionStamp);
-          return { url: bbUrl, version: versionStamp, provider: 'imgbb' };
+          return { url: bbUrl, secureUrl: bbData.data.url, version: versionStamp, provider: 'imgbb' };
         }
       }
-    } catch (bbErr) {
-      console.warn('ImgBB upload error:', bbErr);
-    }
+    } catch (bbErr) {}
   }
 
-  // If cloud upload could not be performed, throw an informative error
-  throw new Error('Cloud storage is not configured yet. To make images visible on all devices, connect your free Supabase or Cloudinary account in Admin Settings.');
+  throw new Error('Cloud storage is not configured yet. Set NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME and NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET to enable live image synchronization.');
 }
 
 /**

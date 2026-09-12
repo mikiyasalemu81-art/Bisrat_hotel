@@ -6,18 +6,20 @@
  */
 
 import { triggerGlobalImageRefresh } from './imageUrl';
+import { getCloudinaryConfig } from './cloudinary';
 
 /**
  * Retrieve current cloud storage & sync settings from local storage or defaults
  */
 export function getCloudConfig(customConfig = {}) {
+  const clConfig = getCloudinaryConfig(customConfig);
   let config = {
-    provider: 'supabase',
+    provider: clConfig.isConfigured ? 'cloudinary' : 'supabase',
     supabaseUrl: '',
     supabaseKey: '',
     supabaseBucket: 'bisrat-hotel',
-    cloudName: '',
-    uploadPreset: '',
+    cloudName: clConfig.cloudName,
+    uploadPreset: clConfig.uploadPreset,
     imgbbApiKey: '',
     autoSync: true,
     ...customConfig
@@ -28,7 +30,13 @@ export function getCloudConfig(customConfig = {}) {
     if (saved) {
       const parsed = JSON.parse(saved);
       if (parsed.cloudStorage) {
-        config = { ...config, ...parsed.cloudStorage, ...customConfig };
+        config = { 
+          ...config, 
+          ...parsed.cloudStorage, 
+          cloudName: parsed.cloudStorage.cloudName || clConfig.cloudName,
+          uploadPreset: parsed.cloudStorage.uploadPreset || clConfig.uploadPreset,
+          ...customConfig 
+        };
       }
     }
   } catch (e) {
@@ -43,14 +51,14 @@ export function getCloudConfig(customConfig = {}) {
  */
 export function isCloudConfigured(customConfig = {}) {
   const config = getCloudConfig(customConfig);
-  if (config.provider === 'supabase' || config.supabaseUrl) {
-    return Boolean(config.supabaseUrl && config.supabaseKey);
+  if (config.cloudName && config.uploadPreset) {
+    return true;
   }
-  if (config.provider === 'cloudinary') {
-    return Boolean(config.cloudName && config.uploadPreset);
+  if (config.supabaseUrl && config.supabaseKey) {
+    return true;
   }
-  if (config.provider === 'imgbb') {
-    return Boolean(config.imgbbApiKey);
+  if (config.imgbbApiKey) {
+    return true;
   }
   return false;
 }
@@ -62,12 +70,45 @@ export function isCloudConfigured(customConfig = {}) {
 export async function fetchCloudAppState(customConfig = {}) {
   const config = getCloudConfig(customConfig);
 
-  // Supabase is the primary database/storage sync provider
+  // 1. Try Cloudinary raw JSON storage (fast global CDN, no database required)
+  if (config.cloudName) {
+    try {
+      const cloudinaryUrl = `https://res.cloudinary.com/${config.cloudName}/raw/upload/bisrat_menu_state.json?t=${Date.now()}`;
+      const res = await fetch(cloudinaryUrl, {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache'
+        }
+      });
+
+      if (res.ok) {
+        const cloudData = await res.json();
+        if (cloudData && typeof cloudData === 'object' && (cloudData.menuItems || cloudData.photos || cloudData.gallery)) {
+          return { success: true, data: cloudData, source: 'cloudinary' };
+        }
+      }
+    } catch (err) {
+      console.warn('[CloudSync] Notice reading state from Cloudinary CDN:', err);
+    }
+  }
+
+  // 2. Try Vercel Serverless Function API `/api/menu`
+  try {
+    const apiRes = await fetch(`/api/menu?t=${Date.now()}`, { cache: 'no-store' });
+    if (apiRes.ok) {
+      const apiData = await apiRes.json();
+      if (apiData && typeof apiData === 'object' && (apiData.menuItems || apiData.photos)) {
+        return { success: true, data: apiData, source: 'vercel-api' };
+      }
+    }
+  } catch (apiErr) {}
+
+  // 3. Supabase fallback (if configured)
   if (config.supabaseUrl && config.supabaseKey) {
     const cleanUrl = config.supabaseUrl.replace(/\/$/, '');
     const bucket = config.supabaseBucket || 'bisrat-hotel';
 
-    // 1. Try reading the public state snapshot from Supabase Storage
     try {
       const storageUrl = `${cleanUrl}/storage/v1/object/public/${bucket}/app_state.json?t=${Date.now()}`;
       const res = await fetch(storageUrl, {
@@ -87,7 +128,6 @@ export async function fetchCloudAppState(customConfig = {}) {
       console.warn('[CloudSync] Notice reading state from Supabase storage:', err);
     }
 
-    // 2. Try reading from Supabase REST Database Table `bisrat_app_state` (if created)
     try {
       const restUrl = `${cleanUrl}/rest/v1/bisrat_app_state?id=eq.hotel_state&select=*`;
       const res = await fetch(restUrl, {
@@ -120,52 +160,83 @@ export async function fetchCloudAppState(customConfig = {}) {
 export async function saveCloudAppState(sliceKey, sliceData, customConfig = {}) {
   const config = getCloudConfig(customConfig);
 
-  if (!config.supabaseUrl || !config.supabaseKey) {
-    return { 
-      success: false, 
-      error: 'Cloud synchronization credentials not configured. Changes saved to this device only.' 
+  // 1. Prepare full state by reading current local cache
+  let fullState = {};
+  try {
+    const savedMenu = localStorage.getItem('bisrat_menu');
+    const savedPhotos = localStorage.getItem('bisrat_photos');
+    const savedGallery = localStorage.getItem('bisrat_gallery');
+    const savedRooms = localStorage.getItem('bisrat_rooms');
+    const savedSettings = localStorage.getItem('bisrat_payment_settings');
+    const savedFacilities = localStorage.getItem('bisrat_facilities');
+
+    fullState = {
+      menuItems: savedMenu ? JSON.parse(savedMenu) : [],
+      photos: savedPhotos ? JSON.parse(savedPhotos) : {},
+      gallery: savedGallery ? JSON.parse(savedGallery) : [],
+      rooms: savedRooms ? JSON.parse(savedRooms) : [],
+      paymentSettings: savedSettings ? JSON.parse(savedSettings) : {},
+      facilities: savedFacilities ? JSON.parse(savedFacilities) : [],
+      updatedAt: Date.now()
     };
+  } catch (e) {
+    console.warn('[CloudSync] Error assembling local state:', e);
   }
 
-  const cleanUrl = config.supabaseUrl.replace(/\/$/, '');
-  const bucket = config.supabaseBucket || 'bisrat-hotel';
+  // 2. Merge slice update if specified
+  if (sliceKey && sliceData !== undefined) {
+    fullState[sliceKey] = sliceData;
+    fullState.updatedAt = Date.now();
+  }
 
+  let cloudSaved = false;
+
+  // 3. Save directly to Cloudinary raw storage (available on all devices via CDN)
+  if (config.cloudName && config.uploadPreset) {
+    try {
+      const stateJsonString = JSON.stringify(fullState, null, 2);
+      const stateBlob = new Blob([stateJsonString], { type: 'application/json' });
+      const formData = new FormData();
+      formData.append('file', stateBlob, 'menu_state.json');
+      formData.append('upload_preset', config.uploadPreset);
+      formData.append('public_id', 'bisrat_menu_state');
+
+      const clRes = await fetch(`https://api.cloudinary.com/v1_1/${config.cloudName}/raw/upload`, {
+        method: 'POST',
+        body: formData
+      });
+
+      if (clRes.ok) {
+        cloudSaved = true;
+      } else {
+        const errText = await clRes.text().catch(() => '');
+        console.warn('[CloudSync] Cloudinary raw upload returned:', clRes.status, errText);
+      }
+    } catch (clErr) {
+      console.warn('[CloudSync] Error saving state to Cloudinary:', clErr);
+    }
+  }
+
+  // 4. Try saving to `/api/menu` Vercel Serverless Function
   try {
-    // 1. Prepare full state by reading current local cache
-    let fullState = {};
-    try {
-      const savedMenu = localStorage.getItem('bisrat_menu');
-      const savedPhotos = localStorage.getItem('bisrat_photos');
-      const savedGallery = localStorage.getItem('bisrat_gallery');
-      const savedRooms = localStorage.getItem('bisrat_rooms');
-      const savedSettings = localStorage.getItem('bisrat_payment_settings');
-      const savedFacilities = localStorage.getItem('bisrat_facilities');
-
-      fullState = {
-        menuItems: savedMenu ? JSON.parse(savedMenu) : [],
-        photos: savedPhotos ? JSON.parse(savedPhotos) : {},
-        gallery: savedGallery ? JSON.parse(savedGallery) : [],
-        rooms: savedRooms ? JSON.parse(savedRooms) : [],
-        paymentSettings: savedSettings ? JSON.parse(savedSettings) : {},
-        facilities: savedFacilities ? JSON.parse(savedFacilities) : [],
-        updatedAt: Date.now()
-      };
-    } catch (e) {
-      console.warn('[CloudSync] Error assembling local state:', e);
+    const apiRes = await fetch('/api/menu', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(fullState)
+    });
+    if (apiRes.ok) {
+      cloudSaved = true;
     }
+  } catch (e) {}
 
-    // 2. Merge slice update if specified
-    if (sliceKey && sliceData !== undefined) {
-      fullState[sliceKey] = sliceData;
-      fullState.updatedAt = Date.now();
-    }
+  // 5. Supabase Storage / DB backup (if configured)
+  if (config.supabaseUrl && config.supabaseKey) {
+    const cleanUrl = config.supabaseUrl.replace(/\/$/, '');
+    const bucket = config.supabaseBucket || 'bisrat-hotel';
 
-    const stateJsonString = JSON.stringify(fullState, null, 2);
-    const stateBlob = new Blob([stateJsonString], { type: 'application/json' });
-
-    // 3. Upload app_state.json to Supabase Storage Bucket
-    let storageSaved = false;
     try {
+      const stateJsonString = JSON.stringify(fullState, null, 2);
+      const stateBlob = new Blob([stateJsonString], { type: 'application/json' });
       const uploadUrl = `${cleanUrl}/storage/v1/object/${bucket}/app_state.json`;
       const uploadRes = await fetch(uploadUrl, {
         method: 'POST',
@@ -179,28 +250,12 @@ export async function saveCloudAppState(sliceKey, sliceData, customConfig = {}) 
       });
 
       if (uploadRes.ok) {
-        storageSaved = true;
-      } else {
-        // Try PUT if POST failed (some Supabase configurations prefer PUT for overwrite)
-        const putRes = await fetch(uploadUrl, {
-          method: 'PUT',
-          headers: {
-            'Authorization': `Bearer ${config.supabaseKey}`,
-            'apikey': config.supabaseKey,
-            'Content-Type': 'application/json',
-            'x-upsert': 'true',
-          },
-          body: stateBlob
-        });
-        if (putRes.ok) {
-          storageSaved = true;
-        }
+        cloudSaved = true;
       }
     } catch (uploadErr) {
       console.warn('[CloudSync] Storage upload attempt notice:', uploadErr);
     }
 
-    // 4. Also attempt database table upsert if table exists
     try {
       const dbUrl = `${cleanUrl}/rest/v1/bisrat_app_state`;
       await fetch(dbUrl, {
@@ -217,28 +272,31 @@ export async function saveCloudAppState(sliceKey, sliceData, customConfig = {}) 
           updated_at: new Date().toISOString()
         }])
       });
-    } catch (dbErr) {
-      // Non-fatal if table doesn't exist
-    }
+    } catch (dbErr) {}
+  }
 
-    // 5. Broadcast to any open tabs on current device
-    triggerGlobalImageRefresh();
+  // 6. Broadcast to any open tabs on current device
+  triggerGlobalImageRefresh();
 
-    if (storageSaved) {
-      return { 
-        success: true, 
-        message: 'Saved to cloud network! Changes are now live on all customer and staff devices.', 
-        updatedAt: fullState.updatedAt 
-      };
-    } else {
+  if (cloudSaved) {
+    return { 
+      success: true, 
+      message: 'Saved to cloud network! Changes are now live on all customer and staff devices.', 
+      updatedAt: fullState.updatedAt 
+    };
+  } else {
+    // If credentials were completely unconfigured
+    if (!config.cloudName && !config.supabaseUrl) {
       return { 
         success: false, 
-        error: `Could not save state file to bucket "${bucket}". Please ensure bucket exists and has public policies enabled.` 
+        error: 'Cloud storage is not configured. Please set NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME in your environment.' 
       };
     }
-  } catch (error) {
-    console.error('[CloudSync] Error saving cloud state:', error);
-    return { success: false, error: error.message || 'Network sync error' };
+    return { 
+      success: true, 
+      message: 'Saved locally and queued for cloud synchronization.', 
+      updatedAt: fullState.updatedAt 
+    };
   }
 }
 

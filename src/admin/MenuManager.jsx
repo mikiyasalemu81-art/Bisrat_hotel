@@ -18,7 +18,8 @@ import {
   DollarSign,
   Check,
   Sparkles,
-  RefreshCw
+  RefreshCw,
+  Loader2
 } from 'lucide-react';
 import { translations } from '../translations';
 import { CATEGORY_CONFIG } from '../data/menuData';
@@ -127,16 +128,16 @@ export default function MenuManager({
     try {
       const compressed = await compressImage(file, 1600, 0.85);
       const cloudRes = await uploadToCloudStorage(compressed, paymentSettings?.cloudStorage);
-      const publicHttpsUrl = cloudRes.url;
+      const publicHttpsUrl = cloudRes.secureUrl || cloudRes.url;
 
-      if (!publicHttpsUrl) {
-        throw new Error("No public URL returned from cloud storage.");
+      if (!publicHttpsUrl || publicHttpsUrl.startsWith('data:')) {
+        throw new Error("No public Cloudinary URL returned from cloud storage.");
       }
 
       setEditImageUrl(publicHttpsUrl);
-      setEditUploadSuccess(`✓ Photo uploaded to cloud (${cloudRes.provider})! Permanent public HTTPS URL active.`);
+      setEditUploadSuccess(`✓ Photo uploaded to Cloudinary (${cloudRes.provider})! Secure URL active.`);
     } catch (err) {
-      setEditUploadError(err.message || 'Failed to upload photo to cloud storage.');
+      setEditUploadError(err.message || 'Failed to upload photo to Cloudinary.');
     } finally {
       setIsEditUploading(false);
     }
@@ -253,16 +254,16 @@ export default function MenuManager({
     try {
       const compressed = await compressImage(file, 1600, 0.85);
       const cloudRes = await uploadToCloudStorage(compressed, paymentSettings?.cloudStorage);
-      const publicHttpsUrl = cloudRes.url;
+      const publicHttpsUrl = cloudRes.secureUrl || cloudRes.url;
 
-      if (!publicHttpsUrl) {
-        throw new Error("No public URL returned from cloud storage.");
+      if (!publicHttpsUrl || publicHttpsUrl.startsWith('data:')) {
+        throw new Error("No public Cloudinary URL returned from cloud storage.");
       }
 
       setImageUrl(publicHttpsUrl);
-      setAddUploadSuccess(`✓ Photo uploaded to cloud (${cloudRes.provider})! Permanent public HTTPS URL active.`);
+      setAddUploadSuccess(`✓ Photo uploaded to Cloudinary (${cloudRes.provider})! Secure URL active.`);
     } catch (err) {
-      setAddUploadError(err.message || 'Failed to upload photo to cloud storage.');
+      setAddUploadError(err.message || 'Failed to upload photo to Cloudinary.');
     } finally {
       setIsAddUploading(false);
     }
@@ -530,8 +531,18 @@ export default function MenuManager({
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div>
-                <label className={`bg-[#1B4D3E] hover:bg-[#163E32] text-white font-bold px-4 py-2.5 rounded-xl text-xs cursor-pointer block text-center transition-all shadow-xs ${isAddUploading ? 'opacity-50 pointer-events-none' : ''}`}>
-                  {isAddUploading ? 'Uploading to Cloud Storage...' : 'Upload Image File (Cloud CDN)'}
+                <label className={`bg-[#1B4D3E] hover:bg-[#163E32] text-white font-bold px-4 py-2.5 rounded-xl text-xs cursor-pointer block text-center transition-all shadow-xs flex items-center justify-center gap-2 ${isAddUploading ? 'opacity-60 pointer-events-none' : ''}`}>
+                  {isAddUploading ? (
+                    <>
+                      <Loader2 className="w-4 h-4 text-[#C5A059] animate-spin" />
+                      <span>Uploading to Cloudinary...</span>
+                    </>
+                  ) : (
+                    <>
+                      <Upload className="w-3.5 h-3.5 text-[#C5A059]" />
+                      <span>Upload Image File (Cloudinary)</span>
+                    </>
+                  )}
                   <input type="file" accept="image/*" onChange={handleAddFileUpload} disabled={isAddUploading} className="hidden" />
                 </label>
               </div>
@@ -966,9 +977,18 @@ export default function MenuManager({
                 {/* Upload & Replace Controls */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
                   <div>
-                    <label className={`bg-[#1B4D3E] hover:bg-[#163E32] text-white font-bold px-4 py-2.5 rounded-xl text-xs cursor-pointer block text-center transition-all shadow-xs flex items-center justify-center gap-1.5 ${isEditUploading ? 'opacity-50 pointer-events-none' : ''}`}>
-                      <Upload className="w-3.5 h-3.5 text-[#C5A059]" />
-                      <span>{isEditUploading ? 'Uploading to Cloud...' : 'Upload New Photo (Cloud Sync)'}</span>
+                    <label className={`bg-[#1B4D3E] hover:bg-[#163E32] text-white font-bold px-4 py-2.5 rounded-xl text-xs cursor-pointer block text-center transition-all shadow-xs flex items-center justify-center gap-2 ${isEditUploading ? 'opacity-60 pointer-events-none' : ''}`}>
+                      {isEditUploading ? (
+                        <>
+                          <Loader2 className="w-4 h-4 text-[#C5A059] animate-spin" />
+                          <span>Uploading to Cloudinary...</span>
+                        </>
+                      ) : (
+                        <>
+                          <Upload className="w-3.5 h-3.5 text-[#C5A059]" />
+                          <span>Upload New Photo (Cloudinary)</span>
+                        </>
+                      )}
                       <input 
                         type="file" 
                         accept="image/*" 

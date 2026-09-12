@@ -357,8 +357,8 @@ export default function App() {
     // 1. Initial cloud sync on mount
     syncWithCloud();
 
-    // 2. Poll cloud periodically (every 45s) for live cross-device updates
-    const interval = setInterval(syncWithCloud, 45000);
+    // 2. Poll cloud periodically (every 30s) for live cross-device updates
+    const interval = setInterval(syncWithCloud, 30000);
 
     // 3. Sync on tab focus or visibility change (e.g. user opens phone or switches back to tab)
     const handleFocus = () => syncWithCloud();
@@ -371,7 +371,12 @@ export default function App() {
       window.removeEventListener('focus', handleFocus);
       document.removeEventListener('visibilitychange', handleFocus);
     };
-  }, [paymentSettings?.cloudStorage?.supabaseUrl, paymentSettings?.cloudStorage?.supabaseKey]);
+  }, [
+    paymentSettings?.cloudStorage?.supabaseUrl, 
+    paymentSettings?.cloudStorage?.supabaseKey,
+    paymentSettings?.cloudStorage?.cloudName,
+    paymentSettings?.cloudStorage?.uploadPreset
+  ]);
 
   // Admin Auth & Password State
   const [isAdminAuth, setIsAdminAuth] = useState(() => {

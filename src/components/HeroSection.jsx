@@ -18,27 +18,38 @@ export default function HeroSection({
   const slides = [
     {
       id: 'exterior',
-      src: getOptimizedImageUrl(photos?.['hero-exterior.jpg'] || photos?.['exterior-building.jpg'] || "/images/exterior-building.jpg"),
+      slotKey: 'hero-bg-hotel-exterior.jpg',
+      src: getOptimizedImageUrl(photos?.['hero-bg-hotel-exterior.jpg'] || photos?.['hero-slide-1.jpg'] || "/images/hero-bg-hotel-exterior.jpg"),
       alt: "Bisrat Luxury Hotel Exterior Adama",
       caption: "Grand Hotel Exterior"
     },
     {
-      id: 'dining',
-      src: getOptimizedImageUrl(photos?.['restaurant-table-setting.jpg'] || "/images/restaurant-table-setting.jpg"),
-      alt: "Bisrat Hotel Dining & Fine Restaurant Setting",
-      caption: "Dining & Restaurant"
+      id: 'lounge',
+      slotKey: 'gallery-hotel-lounge.jpg',
+      src: getOptimizedImageUrl(photos?.['gallery-hotel-lounge.jpg'] || photos?.['hero-slide-2.jpg'] || "/images/gallery-hotel-lounge.jpg"),
+      alt: "Bisrat Hotel Luxury Guest Lounge",
+      caption: "Comfortable Guest Lounge"
     },
     {
-      id: 'suite',
-      src: getOptimizedImageUrl(photos?.['room-deluxe.webp'] || "/images/room-deluxe.webp"),
-      alt: "Bisrat Hotel Deluxe Room Accommodations",
-      caption: "Deluxe Suite Accommodations"
+      id: 'banquet',
+      slotKey: 'gallery-banquet-hall.jpg',
+      src: getOptimizedImageUrl(photos?.['gallery-banquet-hall.jpg'] || photos?.['hero-slide-3.jpg'] || "/images/gallery-banquet-hall.jpg"),
+      alt: "Bisrat Hotel Elegant Banquet & Event Hall",
+      caption: "Elegant Banquet & Event Hall"
     },
     {
-      id: 'cuisine',
-      src: getOptimizedImageUrl(photos?.['ethiopian-combo.jpg'] || "/images/ethiopian-combo.jpg"),
-      alt: "Authentic Ethiopian Traditional Cuisine at Bisrat Hotel",
-      caption: "Traditional Ethiopian Dining"
+      id: 'reception',
+      slotKey: 'gallery-reception-desk-1.jpg',
+      src: getOptimizedImageUrl(photos?.['gallery-reception-desk-1.jpg'] || photos?.['hero-slide-4.jpg'] || "/images/gallery-reception-desk-1.jpg"),
+      alt: "Bisrat Hotel 24/7 Front Desk & Concierge",
+      caption: "24/7 Front Desk & Concierge"
+    },
+    {
+      id: 'catering',
+      slotKey: 'gallery-catering-service.jpg',
+      src: getOptimizedImageUrl(photos?.['gallery-catering-service.jpg'] || photos?.['hero-slide-5.jpg'] || "/images/gallery-catering-service.jpg"),
+      alt: "Bisrat Hotel Gourmet Catering & Dining",
+      caption: "Gourmet Catering & Dining"
     }
   ];
 
