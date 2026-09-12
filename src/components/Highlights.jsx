@@ -1,6 +1,7 @@
 import React from 'react';
 import { Wifi, Utensils, Car, Zap, Coffee, Building2, Shield, CheckCircle2 } from 'lucide-react';
 import { translations } from '../translations';
+import ScrollReveal from './ScrollReveal';
 
 const iconMap = {
   Wifi: Wifi,
@@ -53,41 +54,50 @@ export default function Highlights({ lang, facilities = [] }) {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         <div className="text-center max-w-2xl mx-auto mb-12">
-          <h2 className="fluid-section-title font-serif font-bold text-[#1A1C19] mb-3">
-            {t.highlights.title}
-          </h2>
-          <p className="text-stone-600 text-sm sm:text-base">
-            {t.highlights.subtitle}
-          </p>
+          <ScrollReveal delay={0} direction="up">
+            <h2 className="fluid-section-title font-serif font-bold text-[#1A1C19] mb-3">
+              {t.highlights.title}
+            </h2>
+          </ScrollReveal>
+          <ScrollReveal delay={120} direction="up">
+            <p className="text-stone-600 text-sm sm:text-base">
+              {t.highlights.subtitle}
+            </p>
+          </ScrollReveal>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {displayList.map((f, i) => {
             const Icon = iconMap[f.iconType] || Wifi;
             return (
-              <div 
+              <ScrollReveal 
                 key={f.id || i}
-                className="card-hover-effect rounded-2xl p-6 border border-[#E8EFE9] bg-white shadow-soft flex flex-col justify-between group"
+                delay={200 + i * 100}
+                direction="up"
+                distance={30}
+                className="h-full"
               >
-                <div>
-                  <div className="w-12 h-12 rounded-2xl bg-[#1B4D3E]/10 text-[#1B4D3E] border border-[#1B4D3E]/20 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
-                    <Icon className="w-6 h-6 text-[#1B4D3E]" />
+                <div className="card-hover-effect rounded-2xl p-6 border border-[#E8EFE9] bg-white shadow-soft flex flex-col justify-between group h-full">
+                  <div>
+                    <div className="w-12 h-12 rounded-2xl bg-[#1B4D3E]/10 text-[#1B4D3E] border border-[#1B4D3E]/20 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                      <Icon className="w-6 h-6 text-[#1B4D3E]" />
+                    </div>
+
+                    <h3 className="font-serif text-lg font-bold text-[#1A1C19] mb-2">
+                      {f.title}
+                    </h3>
+
+                    <p className="text-xs sm:text-sm text-stone-700 leading-relaxed">
+                      {f.desc}
+                    </p>
                   </div>
 
-                  <h3 className="font-serif text-lg font-bold text-[#1A1C19] mb-2">
-                    {f.title}
-                  </h3>
-
-                  <p className="text-xs sm:text-sm text-stone-700 leading-relaxed">
-                    {f.desc}
-                  </p>
+                  <div className="mt-4 pt-3 border-t border-stone-100 flex items-center gap-1.5 text-[11px] font-bold text-[#1B4D3E]">
+                    <CheckCircle2 className="w-3.5 h-3.5 text-[#1B4D3E]" />
+                    <span>Verified Hotel Amenity</span>
+                  </div>
                 </div>
-
-                <div className="mt-4 pt-3 border-t border-stone-100 flex items-center gap-1.5 text-[11px] font-bold text-[#1B4D3E]">
-                  <CheckCircle2 className="w-3.5 h-3.5 text-[#1B4D3E]" />
-                  <span>Verified Hotel Amenity</span>
-                </div>
-              </div>
+              </ScrollReveal>
             );
           })}
         </div>

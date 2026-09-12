@@ -2,9 +2,10 @@ import React, { useState } from 'react';
 import { MapPin, Phone, MessageSquare, Send, CheckCircle2, PhoneCall, Building2 } from 'lucide-react';
 import LocalGuide from './LocalGuide';
 import { translations } from '../translations';
+import ScrollReveal from './ScrollReveal';
 
 // Simple SVG TikTok Icon
-const TikTokIcon = ({ className = "w-4 h-4" }) => (
+const TikTokIcon = ({ className = "w-5 h-5" }) => (
   <svg className={className} viewBox="0 0 24 24" fill="currentColor">
     <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 1 1-2.89-2.89c.28 0 .56.04.83.12V9.41a6.34 6.34 0 0 0-.83-.05A6.33 6.33 0 1 0 15.82 15.7V8.5a8.28 8.28 0 0 0 4.77 1.51V6.56a4.84 4.84 0 0 1-1-.13z"/>
   </svg>
@@ -37,21 +38,27 @@ export default function ContactSection({ lang }) {
         
         {/* Section Header */}
         <div className="text-center max-w-3xl mx-auto mb-12">
-          <span className="inline-block text-xs font-bold uppercase tracking-wider text-[#C8A24A] bg-[#FAF2E1] border border-[#C8A24A]/40 px-3 py-1 rounded-full mb-3">
-            Reach Out to Bisrat Hotel
-          </span>
-          <h2 className="fluid-section-title font-serif font-bold text-[#1A1A1A] mb-3">
-            {t.contact.title}
-          </h2>
-          <p className="text-slate-600 text-sm sm:text-base">
-            {t.contact.subtitle}
-          </p>
+          <ScrollReveal delay={0} direction="up">
+            <span className="inline-block text-xs font-bold uppercase tracking-wider text-[#C8A24A] bg-[#FAF2E1] border border-[#C8A24A]/40 px-3 py-1 rounded-full mb-3">
+              Reach Out to Bisrat Hotel
+            </span>
+          </ScrollReveal>
+          <ScrollReveal delay={120} direction="up">
+            <h2 className="fluid-section-title font-serif font-bold text-[#1A1A1A] mb-3">
+              {t.contact.title}
+            </h2>
+          </ScrollReveal>
+          <ScrollReveal delay={240} direction="up">
+            <p className="text-slate-600 text-sm sm:text-base">
+              {t.contact.subtitle}
+            </p>
+          </ScrollReveal>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
           
           {/* Left Column: Contact Cards, TikTok, WhatsApp & Form */}
-          <div className="lg:col-span-7 space-y-6">
+          <ScrollReveal delay={200} direction="up" distance={30} className="lg:col-span-7 space-y-6">
             
             {/* Info Cards Grid */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
@@ -189,7 +196,7 @@ export default function ContactSection({ lang }) {
 
                   <button
                     type="submit"
-                    className="w-full bg-[#C8A24A] hover:bg-[#B58E38] text-[#1A1A1A] font-bold py-3 px-4 rounded-xl shadow-md transition-all text-sm flex items-center justify-center gap-2 border border-[#D8B96D]"
+                    className="w-full bg-[#C8A24A] hover:bg-[#B58E38] text-[#1A1A1A] font-bold py-3 px-4 rounded-xl shadow-md transition-all text-sm flex items-center justify-center gap-2 border border-[#D8B96D] cursor-pointer"
                   >
                     <Send className="w-4 h-4 text-[#1A1A1A]" />
                     <span>{t.contact.sendMessage}</span>
@@ -198,10 +205,10 @@ export default function ContactSection({ lang }) {
               )}
             </div>
 
-          </div>
+          </ScrollReveal>
 
           {/* Right Column: Embedded Map & Local Guide */}
-          <div className="lg:col-span-5 space-y-6">
+          <ScrollReveal delay={350} direction="up" distance={30} className="lg:col-span-5 space-y-6">
             
             <div className="bg-[#F4EFE6] p-2 rounded-3xl border border-[#E8E0D2] shadow-soft overflow-hidden">
               <div className="relative w-full h-64 rounded-2xl overflow-hidden bg-slate-100">
@@ -229,7 +236,7 @@ export default function ContactSection({ lang }) {
 
             <LocalGuide lang={lang} />
 
-          </div>
+          </ScrollReveal>
 
         </div>
 

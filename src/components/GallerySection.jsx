@@ -3,6 +3,7 @@ import { createPortal } from 'react-dom';
 import { X, ZoomIn, ChevronLeft, ChevronRight, Sparkles } from 'lucide-react';
 import { translations } from '../translations';
 import { getOptimizedImageUrl } from '../utils/imageUrl';
+import ScrollReveal from './ScrollReveal';
 
 export default function GallerySection({ 
   gallery = [], 
@@ -86,38 +87,46 @@ export default function GallerySection({
         
         {/* Header */}
         <div className="text-center max-w-3xl mx-auto mb-10">
-          <div className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-[#1B4D3E] bg-[#1B4D3E]/10 border border-[#1B4D3E]/25 px-3.5 py-1 rounded-full mb-3 shadow-2xs">
-            <Sparkles className="w-3.5 h-3.5 text-[#1B4D3E]" />
-            <span>Bisrat Hotel Tour</span>
-          </div>
-          <h2 className="fluid-section-title font-serif font-bold text-[#1A1C19] mb-3">
-            {t.gallery.title}
-          </h2>
-          <p className="text-stone-600 text-sm sm:text-base leading-relaxed">
-            {t.gallery.subtitle}
-          </p>
+          <ScrollReveal delay={0} direction="up">
+            <div className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-[#1B4D3E] bg-[#1B4D3E]/10 border border-[#1B4D3E]/25 px-3.5 py-1 rounded-full mb-3 shadow-2xs">
+              <Sparkles className="w-3.5 h-3.5 text-[#1B4D3E]" />
+              <span>Bisrat Hotel Tour</span>
+            </div>
+          </ScrollReveal>
+          <ScrollReveal delay={120} direction="up">
+            <h2 className="fluid-section-title font-serif font-bold text-[#1A1C19] mb-3">
+              {t.gallery.title}
+            </h2>
+          </ScrollReveal>
+          <ScrollReveal delay={240} direction="up">
+            <p className="text-stone-600 text-sm sm:text-base leading-relaxed">
+              {t.gallery.subtitle}
+            </p>
+          </ScrollReveal>
         </div>
 
         {/* Categories Tabs */}
-        <div className="flex flex-wrap items-center justify-center gap-2 mb-10">
-          {categories.map((cat) => {
-            const isSelected = activeCategory === cat.id;
-            return (
-              <button
-                key={cat.id}
-                type="button"
-                onClick={() => setActiveCategory(cat.id)}
-                className={`px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all cursor-pointer ${
-                  isSelected
-                    ? 'bg-[#1B4D3E] text-white shadow-md border border-[#13382D]'
-                    : 'bg-white text-stone-700 hover:bg-stone-100 border border-[#E8EFE9]'
-                }`}
-              >
-                {cat.label}
-              </button>
-            );
-          })}
-        </div>
+        <ScrollReveal delay={300} direction="up">
+          <div className="flex flex-wrap items-center justify-center gap-2 mb-10">
+            {categories.map((cat) => {
+              const isSelected = activeCategory === cat.id;
+              return (
+                <button
+                  key={cat.id}
+                  type="button"
+                  onClick={() => setActiveCategory(cat.id)}
+                  className={`px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all cursor-pointer ${
+                    isSelected
+                      ? 'bg-[#1B4D3E] text-white shadow-md border border-[#13382D]'
+                      : 'bg-white text-stone-700 hover:bg-stone-100 border border-[#E8EFE9]'
+                  }`}
+                >
+                  {cat.label}
+                </button>
+              );
+            })}
+          </div>
+        </ScrollReveal>
 
         {/* Gallery Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -126,11 +135,17 @@ export default function GallerySection({
             const title = getItemTitle(item);
 
             return (
-              <div
+              <ScrollReveal
                 key={item.id || index}
-                onClick={() => handleOpenLightbox(index)}
-                className="group relative cursor-pointer bg-white rounded-2xl overflow-hidden shadow-xs hover:shadow-xl transition-all duration-300 border border-[#E8EFE9] flex flex-col justify-between"
+                delay={100 + (index % 6) * 80}
+                direction="up"
+                distance={25}
+                className="h-full"
               >
+                <div
+                  onClick={() => handleOpenLightbox(index)}
+                  className="group relative cursor-pointer bg-white rounded-2xl overflow-hidden shadow-xs hover:shadow-xl transition-all duration-300 border border-[#E8EFE9] flex flex-col justify-between h-full"
+                >
                 {/* Image Container with fixed 4:3 aspect ratio and smooth zoom */}
                 <div className="relative w-full aspect-[4/3] overflow-hidden bg-stone-100">
                   <img
@@ -172,7 +187,8 @@ export default function GallerySection({
                     </p>
                   )}
                 </div>
-              </div>
+                </div>
+              </ScrollReveal>
             );
           })}
         </div>

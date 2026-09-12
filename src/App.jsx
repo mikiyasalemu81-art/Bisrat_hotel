@@ -83,7 +83,7 @@ export default function App() {
   const [menuItems, setMenuItems] = useState(() => {
     const version = localStorage.getItem('bisrat_menu_version');
     const saved = localStorage.getItem('bisrat_menu');
-    if (version === '2.3' && saved) {
+    if (version === '2.4' && saved) {
       try {
         const parsed = JSON.parse(saved);
         if (Array.isArray(parsed) && parsed.length >= 100) {
@@ -93,13 +93,34 @@ export default function App() {
         console.warn("Failed to parse saved menu, reverting to catalog:", e);
       }
     }
-    localStorage.setItem('bisrat_menu_version', '2.3');
-    localStorage.setItem('bisrat_menu', JSON.stringify(initialMenuItems));
-    return initialMenuItems;
+    // Migrate or initialize to 2.4 with real Kinche and Dulet photos
+    let updatedCatalog = initialMenuItems;
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed) && parsed.length >= 100) {
+          updatedCatalog = parsed.map(item => {
+            if (item.id === 'bf-5' || item.nameEn === 'Kinche') {
+              return { ...item, imageUrl: '/images/menu-kinche.jpg', placeholderSlot: 'menu-kinche.jpg' };
+            }
+            if (item.id === 'trad-9' || item.nameEn === 'Dulet') {
+              return { ...item, imageUrl: '/images/menu-dulet.jpg', placeholderSlot: 'menu-dulet.jpg' };
+            }
+            if (item.id === 'bf-14' || item.nameEn === 'Dulet (breakfast)') {
+              return { ...item, imageUrl: '/images/menu-dulet.jpg', placeholderSlot: 'menu-dulet-bf.jpg' };
+            }
+            return item;
+          });
+        }
+      } catch (e) {}
+    }
+    localStorage.setItem('bisrat_menu_version', '2.4');
+    localStorage.setItem('bisrat_menu', JSON.stringify(updatedCatalog));
+    return updatedCatalog;
   });
   useEffect(() => {
     localStorage.setItem('bisrat_menu', JSON.stringify(menuItems));
-    localStorage.setItem('bisrat_menu_version', '2.3');
+    localStorage.setItem('bisrat_menu_version', '2.4');
   }, [menuItems]);
 
   // Real-time synchronization across browser tabs and customer devices
@@ -266,20 +287,24 @@ export default function App() {
   // Hotel Public Gallery State (Persistent Storage & Cloud Sync)
   const [gallery, setGallery] = useState(() => {
     try {
+      const version = localStorage.getItem('bisrat_gallery_version');
       const saved = localStorage.getItem('bisrat_gallery');
-      if (saved) {
+      if (version === '2.0' && saved) {
         const parsed = JSON.parse(saved);
         if (Array.isArray(parsed) && parsed.length > 0) return parsed;
       }
     } catch (e) {
       console.warn("Failed to load gallery from storage:", e);
     }
+    localStorage.setItem('bisrat_gallery_version', '2.0');
+    localStorage.setItem('bisrat_gallery', JSON.stringify(initialGallery));
     return initialGallery;
   });
 
   useEffect(() => {
     try {
       localStorage.setItem('bisrat_gallery', JSON.stringify(gallery));
+      localStorage.setItem('bisrat_gallery_version', '2.0');
     } catch (e) {}
   }, [gallery]);
 

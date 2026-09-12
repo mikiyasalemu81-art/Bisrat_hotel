@@ -2,6 +2,7 @@ import React from 'react';
 import { Users, Bed, Check, Calendar, ArrowRight, ShieldCheck } from 'lucide-react';
 import ImagePlaceholder from './ImagePlaceholder';
 import { translations } from '../translations';
+import ScrollReveal from './ScrollReveal';
 
 export default function RoomsSection({ 
   rooms, 
@@ -17,29 +18,41 @@ export default function RoomsSection({
         
         {/* Section Header */}
         <div className="text-center max-w-3xl mx-auto mb-14">
-          <span className="inline-block text-xs font-extrabold uppercase tracking-wider text-[#C5A059] bg-[#1B4D3E] border border-[#C5A059]/40 px-4 py-1.5 rounded-full mb-3 shadow-sm">
-            Bisrat Hotel Accommodations
-          </span>
-          <h2 className="fluid-section-title font-serif font-bold text-white mb-4">
-            {t.rooms.title}
-          </h2>
-          <p className="text-[#E8EFE9] text-sm sm:text-base">
-            {t.rooms.subtitle}
-          </p>
+          <ScrollReveal delay={0} direction="up">
+            <span className="inline-block text-xs font-extrabold uppercase tracking-wider text-[#C5A059] bg-[#1B4D3E] border border-[#C5A059]/40 px-4 py-1.5 rounded-full mb-3 shadow-sm">
+              Bisrat Hotel Accommodations
+            </span>
+          </ScrollReveal>
+          <ScrollReveal delay={120} direction="up">
+            <h2 className="fluid-section-title font-serif font-bold text-white mb-4">
+              {t.rooms.title}
+            </h2>
+          </ScrollReveal>
+          <ScrollReveal delay={240} direction="up">
+            <p className="text-[#E8EFE9] text-sm sm:text-base">
+              {t.rooms.subtitle}
+            </p>
+          </ScrollReveal>
         </div>
 
         {/* Rooms Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          {rooms.map((room) => {
+          {rooms.map((room, index) => {
             const name = t.rooms[room.nameKey] || room.nameKey;
             const desc = t.rooms[room.descKey] || room.descKey;
             const customImg = photos?.[room.placeholderSlot] || room.customImage || room.image;
 
             return (
-              <div 
+              <ScrollReveal
                 key={room.id}
-                className="bg-[#232622] rounded-2xl overflow-hidden border border-[#1B4D3E]/50 flex flex-col justify-between group shadow-xl hover:border-[#C5A059] transition-all"
+                delay={200 + index * 120}
+                direction="up"
+                distance={30}
+                className="h-full"
               >
+                <div 
+                  className="bg-[#232622] rounded-2xl overflow-hidden border border-[#1B4D3E]/50 flex flex-col justify-between group shadow-xl hover:border-[#C5A059] transition-all h-full"
+                >
                 <div>
                   {/* Room Image Placeholder Slot or Real Photo */}
                   <div className="relative">
@@ -129,9 +142,10 @@ export default function RoomsSection({
                 </div>
 
               </div>
-            );
-          })}
-        </div>
+            </ScrollReveal>
+          );
+        })}
+      </div>
 
       </div>
     </section>

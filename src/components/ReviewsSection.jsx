@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Star, ShieldCheck, MessageSquarePlus, UserCheck, CheckCircle2 } from 'lucide-react';
 import { translations } from '../translations';
+import ScrollReveal from './ScrollReveal';
 
 export default function ReviewsSection({ 
   reviews = [], 
@@ -48,36 +49,40 @@ export default function ReviewsSection({
         
         {/* Section Header */}
         <div className="flex flex-col md:flex-row items-center justify-between gap-6 mb-12">
-          <div>
-            <span className="inline-block text-xs font-bold uppercase tracking-wider text-[#C8A24A] bg-[#C8A24A]/20 border border-[#C8A24A]/40 px-3 py-1 rounded-full mb-3">
-              Bisrat Hotel Guest Experience
-            </span>
-            <h2 className="fluid-section-title font-serif font-bold text-white mb-2">
-              {t.reviews.title}
-            </h2>
-            <p className="text-slate-300 text-sm">
-              {t.reviews.subtitle}
-            </p>
-          </div>
+          <ScrollReveal delay={0} direction="up">
+            <div>
+              <span className="inline-block text-xs font-bold uppercase tracking-wider text-[#C8A24A] bg-[#C8A24A]/20 border border-[#C8A24A]/40 px-3 py-1 rounded-full mb-3">
+                Bisrat Hotel Guest Experience
+              </span>
+              <h2 className="fluid-section-title font-serif font-bold text-white mb-2">
+                {t.reviews.title}
+              </h2>
+              <p className="text-slate-300 text-sm">
+                {t.reviews.subtitle}
+              </p>
+            </div>
+          </ScrollReveal>
 
           {/* Rating Badge & Leave Review Trigger */}
-          <div className="flex items-center gap-4 bg-[#242424] p-4 rounded-2xl border border-[#C8A24A]/30 shadow-lg">
-            <div className="text-center pr-4 border-r border-[#333333]">
-              <span className="font-serif text-3xl font-bold text-[#C8A24A]">4.9</span>
-              <div className="flex text-[#C8A24A] text-xs mt-0.5">
-                {'★'.repeat(5)}
+          <ScrollReveal delay={150} direction="up">
+            <div className="flex items-center gap-4 bg-[#242424] p-4 rounded-2xl border border-[#C8A24A]/30 shadow-lg">
+              <div className="text-center pr-4 border-r border-[#333333]">
+                <span className="font-serif text-3xl font-bold text-[#C8A24A]">4.9</span>
+                <div className="flex text-[#C8A24A] text-xs mt-0.5">
+                  {'★'.repeat(5)}
+                </div>
+                <p className="text-[10px] text-slate-400 mt-0.5">Overall Rating</p>
               </div>
-              <p className="text-[10px] text-slate-400 mt-0.5">Overall Rating</p>
-            </div>
 
-            <button
-              onClick={() => setShowForm(!showForm)}
-              className="flex items-center gap-2 bg-[#C8A24A] hover:bg-[#B58E38] text-[#1A1A1A] font-bold text-xs sm:text-sm px-4 py-2.5 rounded-xl shadow-md transition-colors border border-[#D8B96D]"
-            >
-              <MessageSquarePlus className="w-4 h-4 text-[#1A1A1A]" />
-              <span>{t.reviews.leaveReview}</span>
-            </button>
-          </div>
+              <button
+                onClick={() => setShowForm(!showForm)}
+                className="flex items-center gap-2 bg-[#C8A24A] hover:bg-[#B58E38] text-[#1A1A1A] font-bold text-xs sm:text-sm px-4 py-2.5 rounded-xl shadow-md transition-colors border border-[#D8B96D]"
+              >
+                <MessageSquarePlus className="w-4 h-4 text-[#1A1A1A]" />
+                <span>{t.reviews.leaveReview}</span>
+              </button>
+            </div>
+          </ScrollReveal>
         </div>
 
         {/* Leave Review Form Modal / Drawer */}
@@ -162,41 +167,48 @@ export default function ReviewsSection({
 
         {/* Reviews Cards Grid */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {approvedReviews.map((rev) => (
-            <div
+          {approvedReviews.map((rev, index) => (
+            <ScrollReveal
               key={rev.id}
-              className="bg-[#242424] rounded-2xl p-6 border border-[#C8A24A]/20 shadow-xl hover:border-[#C8A24A]/50 transition-all flex flex-col justify-between"
+              delay={200 + index * 120}
+              direction="up"
+              distance={30}
+              className="h-full"
             >
-              <div>
-                {/* Stars & Verified Badge */}
-                <div className="flex items-center justify-between mb-3">
-                  <div className="flex text-[#C8A24A] text-sm">
-                    {Array.from({ length: rev.rating }).map((_, i) => (
-                      <Star key={i} className="w-4 h-4 fill-[#C8A24A] text-[#C8A24A]" />
-                    ))}
+              <div
+                className="bg-[#242424] rounded-2xl p-6 border border-[#C8A24A]/20 shadow-xl hover:border-[#C8A24A]/50 transition-all flex flex-col justify-between h-full"
+              >
+                <div>
+                  {/* Stars & Verified Badge */}
+                  <div className="flex items-center justify-between mb-3">
+                    <div className="flex text-[#C8A24A] text-sm">
+                      {Array.from({ length: rev.rating }).map((_, i) => (
+                        <Star key={i} className="w-4 h-4 fill-[#C8A24A] text-[#C8A24A]" />
+                      ))}
+                    </div>
+
+                    {rev.isVerified && (
+                      <span className="inline-flex items-center gap-1 text-[10px] font-bold text-emerald-400 bg-emerald-950/80 border border-emerald-500/30 px-2 py-0.5 rounded-full">
+                        <UserCheck className="w-3 h-3 text-emerald-400" />
+                        <span>{t.reviews.verifiedBadge}</span>
+                      </span>
+                    )}
                   </div>
 
-                  {rev.isVerified && (
-                    <span className="inline-flex items-center gap-1 text-[10px] font-bold text-emerald-400 bg-emerald-950/80 border border-emerald-500/30 px-2 py-0.5 rounded-full">
-                      <UserCheck className="w-3 h-3 text-emerald-400" />
-                      <span>{t.reviews.verifiedBadge}</span>
-                    </span>
-                  )}
+                  <p className="text-xs sm:text-sm text-slate-300 leading-relaxed italic mb-4">
+                    "{rev.comment}"
+                  </p>
                 </div>
 
-                <p className="text-xs sm:text-sm text-slate-300 leading-relaxed italic mb-4">
-                  "{rev.comment}"
-                </p>
-              </div>
-
-              <div className="pt-3 border-t border-[#333333] flex items-center justify-between text-xs">
-                <div>
-                  <p className="font-bold text-white">{rev.author}</p>
-                  <p className="text-[10px] text-slate-400">{rev.location}</p>
+                <div className="pt-3 border-t border-[#333333] flex items-center justify-between text-xs">
+                  <div>
+                    <p className="font-bold text-white">{rev.author}</p>
+                    <p className="text-[10px] text-slate-400">{rev.location}</p>
+                  </div>
+                  <span className="text-[10px] text-slate-400">{rev.date}</span>
                 </div>
-                <span className="text-[10px] text-slate-400">{rev.date}</span>
               </div>
-            </div>
+            </ScrollReveal>
           ))}
         </div>
 

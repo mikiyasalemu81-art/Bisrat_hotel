@@ -808,7 +808,7 @@ export const initialMenuItems = [
     price: 450,
     isAvailable: true,
     placeholderSlot: "menu-dulet.jpg",
-    imageUrl: "/images/16_Spiced_Minced_Meat.jpg",
+    imageUrl: "/images/menu-dulet.jpg",
     description: "Finely minced tripe, liver, and lean beef seasoned with mitmita, niter kibbeh, and green chili.",
   },
   {
@@ -1136,7 +1136,7 @@ export const initialMenuItems = [
     price: 200,
     isAvailable: true,
     placeholderSlot: "menu-kinche.jpg",
-    imageUrl: "https://images.unsplash.com/photo-1586444248902-2f64eddc13df?auto=format&fit=crop&w=1200&q=85",
+    imageUrl: "/images/menu-kinche.jpg",
     description: "Traditional cracked wheat porridge gently simmered and flavored with Ethiopian spiced butter or oil.",
   },
   {
@@ -1244,7 +1244,7 @@ export const initialMenuItems = [
     price: 450,
     isAvailable: true,
     placeholderSlot: "menu-dulet-bf.jpg",
-    imageUrl: "/images/ethiopian-wat.jpg",
+    imageUrl: "/images/menu-dulet.jpg",
     description: "Morning specialty dulet: minced liver, tripe, and lean meat spiced with mitmita and served with hot injera.",
   },
   {
