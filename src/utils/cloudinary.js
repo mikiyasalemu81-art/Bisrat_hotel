@@ -45,14 +45,14 @@ export function getCloudinaryConfig(customSettings = {}) {
     customSettings.cloudName || 
     savedStorage.cloudName || 
     envCloudName || 
-    ''
+    'trkihe9m'
   ).trim();
 
   const uploadPreset = (
     customSettings.uploadPreset || 
     savedStorage.uploadPreset || 
     envUploadPreset || 
-    ''
+    'bisrat_unsigned'
   ).trim();
 
   return {

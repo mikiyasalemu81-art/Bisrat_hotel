@@ -28,7 +28,8 @@ import {
   Minus,
   LayoutGrid,
   List,
-  PhoneCall
+  PhoneCall,
+  Ban
 } from 'lucide-react';
 import { CATEGORY_CONFIG } from '../data/menuData';
 import { translations } from '../translations';
@@ -100,9 +101,9 @@ export default function MenuSection({
     } catch (e) {}
   }, [orderItems]);
 
-  // Available items (only show isAvailable !== false items on public menu)
+  // All catalog items (both available and marked sold-out are displayed on the menu)
   const availableItems = useMemo(() => {
-    return menuItems.filter(item => item && item.isAvailable !== false);
+    return (menuItems || []).filter(item => Boolean(item && item.id));
   }, [menuItems]);
 
   // Group available items by category
@@ -304,6 +305,7 @@ export default function MenuSection({
       e.preventDefault();
       e.stopPropagation();
     }
+    if (!item || item.isAvailable === false) return;
     const displayName = lang === 'am' ? item.nameAm : lang === 'or' ? item.nameOr : item.nameEn;
     const thumb = getItemImage(item);
 
@@ -594,11 +596,12 @@ export default function MenuSection({
                               const itemThumb = getItemImage(item);
                               const inCartItem = orderItems.find(o => o.id === item.id);
                               const cartQty = inCartItem?.quantity || 0;
+                              const isSoldOut = item.isAvailable === false;
 
                               return (
                                 <div
                                   key={item.id}
-                                  className="group bg-white rounded-2xl border border-[#E8EFE9] overflow-hidden shadow-2xs hover:shadow-md transition-all flex flex-col justify-between"
+                                  className={`group bg-white rounded-2xl border border-[#E8EFE9] overflow-hidden shadow-2xs hover:shadow-md transition-all flex flex-col justify-between ${isSoldOut ? 'opacity-90 bg-stone-50/50' : ''}`}
                                 >
                                   {/* Dish Image Container (Uniform 180px height & centered crop fix) */}
                                   <div 
@@ -612,12 +615,22 @@ export default function MenuSection({
                                         alt={displayName}
                                         loading="lazy"
                                         decoding="async"
-                                        className="transition-transform duration-500 group-hover:scale-105"
+                                        className={`transition-transform duration-500 group-hover:scale-105 ${isSoldOut ? 'grayscale-[35%]' : ''}`}
                                       />
                                     ) : (
                                       <div className="w-full h-full flex flex-col items-center justify-center bg-stone-100 text-stone-400 p-4 text-center">
                                         <Utensils className="w-8 h-8 text-[#1B4D3E] mb-1 opacity-40" />
                                         <span className="text-[11px] font-semibold text-stone-400">Bisrat Signature Dish</span>
+                                      </div>
+                                    )}
+
+                                    {/* Sold Out Overlay Badge */}
+                                    {isSoldOut && (
+                                      <div className="absolute inset-0 bg-black/60 backdrop-blur-[1.5px] flex flex-col items-center justify-center z-10">
+                                        <span className="bg-rose-600 text-white text-[11px] font-bold px-3 py-1 rounded-full uppercase tracking-wider shadow-md flex items-center gap-1.5">
+                                          <Ban className="w-3.5 h-3.5 text-white" />
+                                          <span>{lang === 'am' ? 'አልቋል' : lang === 'or' ? 'Dhumee' : 'Sold Out'}</span>
+                                        </span>
                                       </div>
                                     )}
 
@@ -639,10 +652,15 @@ export default function MenuSection({
                                       <div className="flex items-start justify-between gap-2">
                                         <h3 
                                           onClick={(e) => openLightbox(item, e)}
-                                          className="font-serif font-bold text-base text-[#1A1C19] group-hover:text-[#1B4D3E] transition-colors line-clamp-1 cursor-pointer"
+                                          className={`font-serif font-bold text-base transition-colors line-clamp-1 cursor-pointer ${isSoldOut ? 'text-stone-500 line-through decoration-rose-400' : 'text-[#1A1C19] group-hover:text-[#1B4D3E]'}`}
                                         >
                                           {displayName}
                                         </h3>
+                                        {isSoldOut && (
+                                          <span className="bg-rose-50 text-rose-700 border border-rose-200 text-[10px] font-bold px-2 py-0.5 rounded-full shrink-0">
+                                            {lang === 'am' ? 'አልቋል' : 'Sold Out'}
+                                          </span>
+                                        )}
                                       </div>
                                       {secondaryName && secondaryName !== displayName && (
                                         <p className="text-xs text-stone-700 font-semibold truncate mt-0.5">
@@ -662,16 +680,28 @@ export default function MenuSection({
                                         {item.price} <span className="text-[10px] font-sans font-bold text-[#1A1C19]">ETB</span>
                                       </span>
 
-                                      {/* Order Now CTA Button in Warm Champagne Gold #C5A059 with #1A1C19 text */}
-                                      <button
-                                        type="button"
-                                        onClick={(e) => handleAddToOrder(item, e)}
-                                        className="bg-[#C5A059] hover:bg-[#B08B42] text-[#1A1C19] font-bold px-3.5 py-2 rounded-xl text-xs flex items-center gap-1.5 shadow-xs border border-[#C5A059] transition-all active:scale-95 hover:shadow-sm cursor-pointer"
-                                        title="Add to dining order"
-                                      >
-                                        <ShoppingBag className="w-3.5 h-3.5 text-[#1A1C19]" />
-                                        <span>{cartQty > 0 ? `Ordered (${cartQty})` : 'Order Now'}</span>
-                                      </button>
+                                      {/* Order Now CTA Button / Sold Out State */}
+                                      {isSoldOut ? (
+                                        <button
+                                          type="button"
+                                          disabled
+                                          className="bg-stone-100 text-stone-400 font-bold px-3 py-2 rounded-xl text-xs flex items-center gap-1.5 border border-stone-200 cursor-not-allowed"
+                                          title="This item is currently sold out"
+                                        >
+                                          <Ban className="w-3.5 h-3.5 text-rose-500" />
+                                          <span>{lang === 'am' ? 'አልቋል' : 'Sold Out'}</span>
+                                        </button>
+                                      ) : (
+                                        <button
+                                          type="button"
+                                          onClick={(e) => handleAddToOrder(item, e)}
+                                          className="bg-[#C5A059] hover:bg-[#B08B42] text-[#1A1C19] font-bold px-3.5 py-2 rounded-xl text-xs flex items-center gap-1.5 shadow-xs border border-[#C5A059] transition-all active:scale-95 hover:shadow-sm cursor-pointer"
+                                          title="Add to dining order"
+                                        >
+                                          <ShoppingBag className="w-3.5 h-3.5 text-[#1A1C19]" />
+                                          <span>{cartQty > 0 ? `Ordered (${cartQty})` : 'Order Now'}</span>
+                                        </button>
+                                      )}
                                     </div>
                                   </div>
                                 </div>
@@ -690,20 +720,28 @@ export default function MenuSection({
                               const itemThumb = getItemImage(item);
                               const inCartItem = orderItems.find(o => o.id === item.id);
                               const cartQty = inCartItem?.quantity || 0;
+                              const isSoldOut = item.isAvailable === false;
 
                               return (
                                 <div
                                   key={item.id}
-                                  className="w-full group flex items-center justify-between py-3 px-2 sm:px-4 rounded-xl hover:bg-stone-50 transition-all"
+                                  className={`w-full group flex items-center justify-between py-3 px-2 sm:px-4 rounded-xl hover:bg-stone-50 transition-all ${isSoldOut ? 'bg-stone-50/40' : ''}`}
                                 >
                                   {/* Dish Name & Subtitle */}
                                   <div 
                                     className="flex flex-col min-w-0 pr-2 cursor-pointer flex-1"
                                     onClick={(e) => openLightbox(item, e)}
                                   >
-                                    <span className="font-serif font-bold text-sm sm:text-base text-[#1A1C19] group-hover:text-[#1B4D3E] transition-colors truncate">
-                                      {displayName}
-                                    </span>
+                                    <div className="flex items-center gap-2 truncate">
+                                      <span className={`font-serif font-bold text-sm sm:text-base transition-colors truncate ${isSoldOut ? 'text-stone-400 line-through decoration-rose-300' : 'text-[#1A1C19] group-hover:text-[#1B4D3E]'}`}>
+                                        {displayName}
+                                      </span>
+                                      {isSoldOut && (
+                                        <span className="bg-rose-50 text-rose-700 border border-rose-200 text-[10px] font-bold px-2 py-0.5 rounded-full shrink-0">
+                                          {lang === 'am' ? 'አልቋል' : 'Sold Out'}
+                                        </span>
+                                      )}
+                                    </div>
                                     {secondaryName && secondaryName !== displayName && (
                                       <span className="text-[11px] text-stone-500 truncate leading-tight font-medium">
                                         {secondaryName}
@@ -735,7 +773,7 @@ export default function MenuSection({
                                           src={itemThumb}
                                           alt=""
                                           loading="lazy"
-                                          className="w-full h-full object-cover object-center block"
+                                          className={`w-full h-full object-cover object-center block ${isSoldOut ? 'grayscale-[35%]' : ''}`}
                                           style={{
                                             width: '100%',
                                             height: '100%',
@@ -747,18 +785,35 @@ export default function MenuSection({
                                       ) : (
                                         <Camera className="w-4 h-4 text-stone-400 group-hover:text-[#1B4D3E]" />
                                       )}
+                                      {isSoldOut && (
+                                        <div className="absolute inset-0 bg-black/55 flex items-center justify-center">
+                                          <Ban className="w-3.5 h-3.5 text-rose-400" />
+                                        </div>
+                                      )}
                                     </div>
 
-                                    {/* Order Button */}
-                                    <button
-                                      type="button"
-                                      onClick={(e) => handleAddToOrder(item, e)}
-                                      className="bg-[#C5A059] hover:bg-[#B08B42] text-[#1A1C19] font-bold px-2.5 py-1.5 rounded-lg text-xs flex items-center gap-1 shadow-2xs border border-[#C5A059] cursor-pointer"
-                                      title="Add to dining order"
-                                    >
-                                      <Plus className="w-3.5 h-3.5 text-[#1A1C19]" />
-                                      <span>{cartQty > 0 ? `+${cartQty}` : 'Add'}</span>
-                                    </button>
+                                    {/* Order Button / Sold Out State */}
+                                    {isSoldOut ? (
+                                      <button
+                                        type="button"
+                                        disabled
+                                        className="bg-stone-100 text-stone-400 font-bold px-2 py-1.5 rounded-lg text-xs flex items-center gap-1 border border-stone-200 cursor-not-allowed"
+                                        title="Item currently out of stock"
+                                      >
+                                        <Ban className="w-3 h-3 text-rose-500" />
+                                        <span>{lang === 'am' ? 'አልቋል' : 'Sold Out'}</span>
+                                      </button>
+                                    ) : (
+                                      <button
+                                        type="button"
+                                        onClick={(e) => handleAddToOrder(item, e)}
+                                        className="bg-[#C5A059] hover:bg-[#B08B42] text-[#1A1C19] font-bold px-2.5 py-1.5 rounded-lg text-xs flex items-center gap-1 shadow-2xs border border-[#C5A059] cursor-pointer"
+                                        title="Add to dining order"
+                                      >
+                                        <Plus className="w-3.5 h-3.5 text-[#1A1C19]" />
+                                        <span>{cartQty > 0 ? `+${cartQty}` : 'Add'}</span>
+                                      </button>
+                                    )}
                                   </div>
                                 </div>
                               );

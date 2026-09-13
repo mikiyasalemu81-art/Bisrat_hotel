@@ -20,7 +20,7 @@ import { initialGallery } from './data/galleryData';
 import { initialReviews } from './data/reviewsData';
 import { loadAllPhotosFromStorage } from './utils/imageStorage';
 import { setImageSyncTimestamp } from './utils/imageUrl';
-import { fetchCloudAppState } from './utils/cloudSync';
+import { fetchCloudAppState, saveCloudAppState } from './utils/cloudSync';
 
 export default function App() {
   // Trilingual Language State (remembers choice)
@@ -338,6 +338,10 @@ export default function App() {
             setFacilities(remote.facilities);
             try { localStorage.setItem('bisrat_facilities', JSON.stringify(remote.facilities)); } catch (e) {}
           }
+          if (Array.isArray(remote.reviews) && remote.reviews.length > 0) {
+            setReviews(remote.reviews);
+            try { localStorage.setItem('bisrat_reviews', JSON.stringify(remote.reviews)); } catch (e) {}
+          }
           if (remote.paymentSettings && typeof remote.paymentSettings === 'object') {
             setPaymentSettings(prev => ({
               ...prev,
@@ -357,19 +361,29 @@ export default function App() {
     // 1. Initial cloud sync on mount
     syncWithCloud();
 
-    // 2. Poll cloud periodically (every 30s) for live cross-device updates
-    const interval = setInterval(syncWithCloud, 30000);
+    // 2. Poll cloud periodically (every 15s) for live cross-device updates
+    const interval = setInterval(syncWithCloud, 15000);
 
     // 3. Sync on tab focus or visibility change (e.g. user opens phone or switches back to tab)
     const handleFocus = () => syncWithCloud();
     window.addEventListener('focus', handleFocus);
     document.addEventListener('visibilitychange', handleFocus);
 
+    // 4. Same-device multi-tab live sync
+    let bc = null;
+    try {
+      if (typeof window !== 'undefined' && 'BroadcastChannel' in window) {
+        bc = new BroadcastChannel('bisrat_hotel_sync');
+        bc.onmessage = () => syncWithCloud();
+      }
+    } catch (e) {}
+
     return () => {
       isMounted = false;
       clearInterval(interval);
       window.removeEventListener('focus', handleFocus);
       document.removeEventListener('visibilitychange', handleFocus);
+      if (bc) bc.close();
     };
   }, [
     paymentSettings?.cloudStorage?.supabaseUrl, 
@@ -415,7 +429,12 @@ export default function App() {
   };
 
   const handleAddReview = (newReview) => {
-    setReviews([newReview, ...reviews]);
+    const updated = [newReview, ...reviews];
+    setReviews(updated);
+    try {
+      localStorage.setItem('bisrat_reviews', JSON.stringify(updated));
+    } catch (e) {}
+    saveCloudAppState('reviews', updated).catch(() => {});
   };
 
   return (

@@ -35,13 +35,13 @@ export default function PaymentSettingsManager({
     enableCbe: paymentSettings?.paymentMethods?.cbe ?? true,
     enableArrival: paymentSettings?.paymentMethods?.arrival ?? (paymentSettings?.paymentMethods?.cash ?? true),
     // Cloud storage & internet sync settings
-    cloudProvider: paymentSettings?.cloudStorage?.provider || 'supabase',
-    cloudName: paymentSettings?.cloudStorage?.cloudName || '',
-    uploadPreset: paymentSettings?.cloudStorage?.uploadPreset || '',
+    cloudProvider: paymentSettings?.cloudStorage?.provider || 'cloudinary',
+    cloudName: paymentSettings?.cloudStorage?.cloudName || 'trkihe9m',
+    uploadPreset: paymentSettings?.cloudStorage?.uploadPreset || 'bisrat_unsigned',
     supabaseUrl: paymentSettings?.cloudStorage?.supabaseUrl || '',
     supabaseKey: paymentSettings?.cloudStorage?.supabaseKey || '',
     supabaseBucket: paymentSettings?.cloudStorage?.supabaseBucket || 'bisrat-hotel',
-    imgbbApiKey: paymentSettings?.cloudStorage?.imgbbApiKey || '',
+    imgbbApiKey: paymentSettings?.cloudStorage?.imgbbApiKey || '8cf91a329d638beae098d6f966144e59',
   });
 
   const [newTableInput, setNewTableInput] = useState('');
@@ -296,9 +296,7 @@ export default function PaymentSettingsManager({
     setPaymentSettings(updated);
     try {
       localStorage.setItem('bisrat_payment_settings', JSON.stringify(updated));
-      if (formData.supabaseUrl && formData.supabaseKey) {
-        saveCloudAppState('paymentSettings', updated, updated.cloudStorage).catch(() => {});
-      }
+      saveCloudAppState('paymentSettings', updated, updated.cloudStorage).catch(() => {});
     } catch (err) {}
 
     setSavedSuccess(true);
@@ -608,27 +606,9 @@ export default function PaymentSettingsManager({
 
             {/* Quick Status Badges */}
             <div className="flex flex-wrap items-center gap-2">
-              <span className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold border ${
-                (formData.cloudProvider === 'supabase' && formData.supabaseUrl && formData.supabaseKey) ||
-                (formData.cloudProvider === 'cloudinary' && formData.cloudName && formData.uploadPreset) ||
-                (formData.cloudProvider === 'imgbb' && formData.imgbbApiKey)
-                  ? 'bg-emerald-50 text-emerald-800 border-emerald-200'
-                  : 'bg-amber-50 text-amber-800 border-amber-200'
-              }`}>
-                <span className={`w-2 h-2 rounded-full ${
-                  (formData.cloudProvider === 'supabase' && formData.supabaseUrl && formData.supabaseKey) ||
-                  (formData.cloudProvider === 'cloudinary' && formData.cloudName && formData.uploadPreset) ||
-                  (formData.cloudProvider === 'imgbb' && formData.imgbbApiKey)
-                    ? 'bg-emerald-500 animate-pulse'
-                    : 'bg-amber-500'
-                }`} />
-                <span>
-                  {(formData.cloudProvider === 'supabase' && formData.supabaseUrl && formData.supabaseKey) ||
-                   (formData.cloudProvider === 'cloudinary' && formData.cloudName && formData.uploadPreset) ||
-                   (formData.cloudProvider === 'imgbb' && formData.imgbbApiKey)
-                    ? `Cloud Storage: ${formData.cloudProvider.toUpperCase()}`
-                    : 'Cloud Storage: Local Only'}
-                </span>
+              <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold border bg-emerald-50 text-emerald-800 border-emerald-200 shadow-2xs">
+                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                <span>Cloud Storage & Internet Sync: ONLINE</span>
               </span>
 
               <button
