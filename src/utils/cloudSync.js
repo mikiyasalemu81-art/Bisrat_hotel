@@ -148,40 +148,73 @@ export async function fetchCloudAppState(customConfig = {}) {
 export async function saveCloudAppState(sliceKey, sliceData, customConfig = {}) {
   const config = getCloudConfig(customConfig);
 
-  // 1. Assemble full state from current localStorage cache
-  let fullState = {};
-  try {
-    const savedMenu = localStorage.getItem('bisrat_menu');
-    const savedPhotos = localStorage.getItem('bisrat_photos');
-    const savedGallery = localStorage.getItem('bisrat_gallery');
-    const savedRooms = localStorage.getItem('bisrat_rooms');
-    const savedSettings = localStorage.getItem('bisrat_payment_settings');
-    const savedFacilities = localStorage.getItem('bisrat_facilities');
-    const savedReviews = localStorage.getItem('bisrat_reviews');
+  // 1. Build targeted patch payload so we never overwrite untouched keys with empty defaults
+  let patchPayload = {};
 
-    fullState = {
-      menuItems: savedMenu ? JSON.parse(savedMenu) : [],
-      photos: savedPhotos ? JSON.parse(savedPhotos) : {},
-      gallery: savedGallery ? JSON.parse(savedGallery) : [],
-      rooms: savedRooms ? JSON.parse(savedRooms) : [],
-      paymentSettings: savedSettings ? JSON.parse(savedSettings) : {},
-      facilities: savedFacilities ? JSON.parse(savedFacilities) : [],
-      reviews: savedReviews ? JSON.parse(savedReviews) : [],
-      updatedAt: Date.now()
-    };
-  } catch (e) {
-    console.warn('[CloudSync] Error assembling local state:', e);
-  }
+  if (typeof sliceKey === 'string' && sliceData !== undefined) {
+    // Isolated slice save (e.g. 'paymentSettings', 'reviews', 'menuItems', 'photos')
+    if (sliceKey === 'menuItems') {
+      if (!Array.isArray(sliceData) || sliceData.length < 5) {
+        console.warn('[CloudSync] Refusing to push empty or incomplete menu catalog to cloud:', sliceData);
+        return { success: false, error: 'Cannot overwrite catalog with empty menu' };
+      }
+    }
+    patchPayload[sliceKey] = sliceData;
+    patchPayload.updatedAt = Date.now();
+  } else if (sliceKey && typeof sliceKey === 'object' && sliceData === undefined) {
+    // Multi-key object passed directly
+    patchPayload = { ...sliceKey, updatedAt: Date.now() };
+    if (patchPayload.menuItems && (!Array.isArray(patchPayload.menuItems) || patchPayload.menuItems.length < 5)) {
+      delete patchPayload.menuItems;
+    }
+  } else {
+    // Full sync from localStorage: only include slices that are actually present and non-empty
+    try {
+      const savedMenu = localStorage.getItem('bisrat_menu');
+      const savedPhotos = localStorage.getItem('bisrat_photos');
+      const savedGallery = localStorage.getItem('bisrat_gallery');
+      const savedRooms = localStorage.getItem('bisrat_rooms');
+      const savedSettings = localStorage.getItem('bisrat_payment_settings');
+      const savedFacilities = localStorage.getItem('bisrat_facilities');
+      const savedReviews = localStorage.getItem('bisrat_reviews');
 
-  // 2. Merge slice update if specified
-  if (sliceKey && sliceData !== undefined) {
-    fullState[sliceKey] = sliceData;
-    fullState.updatedAt = Date.now();
+      if (savedMenu) {
+        const parsed = JSON.parse(savedMenu);
+        if (Array.isArray(parsed) && parsed.length >= 5) patchPayload.menuItems = parsed;
+      }
+      if (savedPhotos) {
+        const parsed = JSON.parse(savedPhotos);
+        if (parsed && Object.keys(parsed).length > 0) patchPayload.photos = parsed;
+      }
+      if (savedGallery) {
+        const parsed = JSON.parse(savedGallery);
+        if (Array.isArray(parsed) && parsed.length > 0) patchPayload.gallery = parsed;
+      }
+      if (savedRooms) {
+        const parsed = JSON.parse(savedRooms);
+        if (Array.isArray(parsed) && parsed.length > 0) patchPayload.rooms = parsed;
+      }
+      if (savedSettings) {
+        const parsed = JSON.parse(savedSettings);
+        if (parsed && Object.keys(parsed).length > 0) patchPayload.paymentSettings = parsed;
+      }
+      if (savedFacilities) {
+        const parsed = JSON.parse(savedFacilities);
+        if (Array.isArray(parsed) && parsed.length > 0) patchPayload.facilities = parsed;
+      }
+      if (savedReviews) {
+        const parsed = JSON.parse(savedReviews);
+        if (Array.isArray(parsed) && parsed.length > 0) patchPayload.reviews = parsed;
+      }
+      patchPayload.updatedAt = Date.now();
+    } catch (e) {
+      console.warn('[CloudSync] Error assembling local state:', e);
+    }
   }
 
   let cloudSaved = false;
 
-  // 3. Persist to Primary Cloud Bin (accessible worldwide)
+  // 2. Persist to Primary Cloud Bin (accessible worldwide)
   try {
     const binRes = await fetch(PRIMARY_CLOUD_BIN, {
       method: 'PATCH',
@@ -189,7 +222,7 @@ export async function saveCloudAppState(sliceKey, sliceData, customConfig = {}) 
         'Content-Type': 'application/json',
         'Accept': 'application/json'
       },
-      body: JSON.stringify(fullState)
+      body: JSON.stringify(patchPayload)
     });
 
     if (binRes.ok) {
@@ -201,37 +234,37 @@ export async function saveCloudAppState(sliceKey, sliceData, customConfig = {}) 
     console.warn('[CloudSync] Primary bin save warning:', binErr);
   }
 
-  // 4. Also persist via Vercel Serverless Function `/api/sync`
+  // 3. Also persist via Vercel Serverless Function `/api/sync`
   try {
     const apiRes = await fetch(SECONDARY_API_ENDPOINT, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(fullState)
+      body: JSON.stringify(patchPayload)
     });
     if (apiRes.ok) {
       cloudSaved = true;
     }
   } catch (apiErr) {}
 
-  // 5. Also notify `/api/menu`
+  // 4. Also notify `/api/menu`
   try {
     const menuRes = await fetch(LEGACY_API_ENDPOINT, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(fullState)
+      body: JSON.stringify(patchPayload)
     });
     if (menuRes.ok) {
       cloudSaved = true;
     }
   } catch (menuErr) {}
 
-  // 6. Supabase Storage / DB backup (if configured)
+  // 5. Supabase Storage / DB backup (if configured)
   if (config.supabaseUrl && config.supabaseKey) {
     const cleanUrl = config.supabaseUrl.replace(/\/$/, '');
     const bucket = config.supabaseBucket || 'bisrat-hotel';
 
     try {
-      const stateBlob = new Blob([JSON.stringify(fullState, null, 2)], { type: 'application/json' });
+      const stateBlob = new Blob([JSON.stringify(patchPayload, null, 2)], { type: 'application/json' });
       const uploadUrl = `${cleanUrl}/storage/v1/object/${bucket}/app_state.json`;
       const uploadRes = await fetch(uploadUrl, {
         method: 'POST',
