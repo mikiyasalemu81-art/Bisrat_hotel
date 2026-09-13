@@ -22,6 +22,55 @@ import { loadAllPhotosFromStorage } from './utils/imageStorage';
 import { setImageSyncTimestamp } from './utils/imageUrl';
 import { fetchCloudAppState, saveCloudAppState } from './utils/cloudSync';
 
+/**
+ * Smart merge function: preserves the complete authentic menu catalog and photos
+ * while overlaying any admin modifications (availability, price, custom photo, details)
+ * so dishes can never be accidentally erased or lost across devices.
+ */
+function mergeCatalogWithRemote(baseCatalog, remoteList) {
+  if (!Array.isArray(remoteList) || remoteList.length === 0) return baseCatalog;
+
+  const remoteById = new Map();
+  const remoteByName = new Map();
+  remoteList.forEach(item => {
+    if (item && item.id) remoteById.set(String(item.id), item);
+    if (item && item.nameEn) remoteByName.set(item.nameEn.toLowerCase().trim(), item);
+  });
+
+  // 1. Overlay admin changes onto all authentic catalog dishes
+  const merged = baseCatalog.map(baseItem => {
+    const override = remoteById.get(String(baseItem.id)) || remoteByName.get(baseItem.nameEn?.toLowerCase().trim());
+    if (!override) return baseItem;
+
+    return {
+      ...baseItem,
+      price: typeof override.price === 'number' && override.price > 0 ? override.price : (Number(override.price) || baseItem.price),
+      isAvailable: override.isAvailable !== undefined ? override.isAvailable : baseItem.isAvailable,
+      imageUrl: override.imageUrl || override.image_url || override.customImage || baseItem.imageUrl,
+      customImage: override.customImage || override.imageUrl || baseItem.customImage,
+      nameEn: override.nameEn || baseItem.nameEn,
+      nameAm: override.nameAm || baseItem.nameAm,
+      nameOr: override.nameOr || baseItem.nameOr,
+      description: override.description || baseItem.description,
+      updatedAt: override.updatedAt || baseItem.updatedAt
+    };
+  });
+
+  // 2. Preserve any newly added custom dishes created in admin dashboard
+  remoteList.forEach(item => {
+    if (!item || !item.id) return;
+    const exists = baseCatalog.some(b => 
+      String(b.id) === String(item.id) || 
+      (b.nameEn && item.nameEn && b.nameEn.toLowerCase().trim() === item.nameEn.toLowerCase().trim())
+    );
+    if (!exists) {
+      merged.unshift(item);
+    }
+  });
+
+  return merged;
+}
+
 export default function App() {
   // Trilingual Language State (remembers choice)
   const [lang, setLang] = useState(() => {
@@ -52,17 +101,17 @@ export default function App() {
       paymentMethods: {
         telebirr: parsed.paymentMethods?.telebirr ?? true,
         cbe: parsed.paymentMethods?.cbe ?? true,
-        arrival: parsed.paymentMethods?.arrival ?? (parsed.paymentMethods?.cash ?? true),
-        cash: parsed.paymentMethods?.cash ?? (parsed.paymentMethods?.arrival ?? true),
+        arrival: parsed.paymentMethods?.arrival ?? true,
+        cash: parsed.paymentMethods?.cash ?? true,
       },
-      cloudStorage: parsed.cloudStorage || {
-        provider: "supabase",
-        supabaseUrl: "",
-        supabaseKey: "",
-        supabaseBucket: "bisrat-hotel",
-        cloudName: "",
-        uploadPreset: "",
-        imgbbApiKey: "",
+      cloudStorage: {
+        provider: parsed.cloudStorage?.provider || "cloudinary",
+        cloudName: parsed.cloudStorage?.cloudName || "trkihe9m",
+        uploadPreset: parsed.cloudStorage?.uploadPreset || "bisrat_unsigned",
+        supabaseUrl: parsed.cloudStorage?.supabaseUrl || "",
+        supabaseKey: parsed.cloudStorage?.supabaseKey || "",
+        supabaseBucket: parsed.cloudStorage?.supabaseBucket || "bisrat-hotel",
+        imgbbApiKey: parsed.cloudStorage?.imgbbApiKey || "8cf91a329d638beae098d6f966144e59",
       }
     };
   });
@@ -79,48 +128,24 @@ export default function App() {
     localStorage.setItem('bisrat_rooms', JSON.stringify(rooms));
   }, [rooms]);
 
-  // Menu Items State (Live Out-of-Stock sync & versioned migration to full catalog)
+  // Menu Items State (Full 111-dish catalog preserved with admin overrides)
   const [menuItems, setMenuItems] = useState(() => {
-    const version = localStorage.getItem('bisrat_menu_version');
-    const saved = localStorage.getItem('bisrat_menu');
-    if (version === '2.4' && saved) {
-      try {
+    try {
+      const saved = localStorage.getItem('bisrat_menu');
+      if (saved) {
         const parsed = JSON.parse(saved);
-        if (Array.isArray(parsed) && parsed.length >= 100) {
-          return parsed;
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          return mergeCatalogWithRemote(initialMenuItems, parsed);
         }
-      } catch (e) {
-        console.warn("Failed to parse saved menu, reverting to catalog:", e);
       }
+    } catch (e) {
+      console.warn("Notice reading saved menu:", e);
     }
-    // Migrate or initialize to 2.4 with real Kinche and Dulet photos
-    let updatedCatalog = initialMenuItems;
-    if (saved) {
-      try {
-        const parsed = JSON.parse(saved);
-        if (Array.isArray(parsed) && parsed.length >= 100) {
-          updatedCatalog = parsed.map(item => {
-            if (item.id === 'bf-5' || item.nameEn === 'Kinche') {
-              return { ...item, imageUrl: '/images/menu-kinche.jpg', placeholderSlot: 'menu-kinche.jpg' };
-            }
-            if (item.id === 'trad-9' || item.nameEn === 'Dulet') {
-              return { ...item, imageUrl: '/images/menu-dulet.jpg', placeholderSlot: 'menu-dulet.jpg' };
-            }
-            if (item.id === 'bf-14' || item.nameEn === 'Dulet (breakfast)') {
-              return { ...item, imageUrl: '/images/menu-dulet.jpg', placeholderSlot: 'menu-dulet-bf.jpg' };
-            }
-            return item;
-          });
-        }
-      } catch (e) {}
-    }
-    localStorage.setItem('bisrat_menu_version', '2.4');
-    localStorage.setItem('bisrat_menu', JSON.stringify(updatedCatalog));
-    return updatedCatalog;
+    return initialMenuItems;
   });
   useEffect(() => {
     localStorage.setItem('bisrat_menu', JSON.stringify(menuItems));
-    localStorage.setItem('bisrat_menu_version', '2.4');
+    localStorage.setItem('bisrat_menu_version', '3.0');
   }, [menuItems]);
 
   // Real-time synchronization across browser tabs and customer devices
@@ -134,7 +159,7 @@ export default function App() {
             setImageSyncTimestamp(event.data.imgSyncTs);
           }
           if (event.data?.type === 'MENU_UPDATE' && Array.isArray(event.data.menuItems)) {
-            setMenuItems(event.data.menuItems);
+            setMenuItems(prev => mergeCatalogWithRemote(initialMenuItems, event.data.menuItems));
           }
           if (event.data?.type === 'PHOTOS_UPDATE' && event.data.photos) {
             setPhotos(prev => ({ ...prev, ...event.data.photos }));
@@ -319,8 +344,11 @@ export default function App() {
           const remote = cloudRes.data;
 
           if (Array.isArray(remote.menuItems) && remote.menuItems.length > 0) {
-            setMenuItems(remote.menuItems);
-            try { localStorage.setItem('bisrat_menu', JSON.stringify(remote.menuItems)); } catch (e) {}
+            setMenuItems(prev => {
+              const updated = mergeCatalogWithRemote(initialMenuItems, remote.menuItems);
+              try { localStorage.setItem('bisrat_menu', JSON.stringify(updated)); } catch (e) {}
+              return updated;
+            });
           }
           if (remote.photos && typeof remote.photos === 'object' && Object.keys(remote.photos).length > 0) {
             setPhotos(prev => ({ ...prev, ...remote.photos }));
