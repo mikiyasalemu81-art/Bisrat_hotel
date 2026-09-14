@@ -33,17 +33,15 @@ export default function CustomerPaymentDrawer({
 
   const defaultTable = paymentSettings?.tableNumber || activeTables[0] || '1';
   const frontDeskPhone = paymentSettings?.phoneNumber || '0906320251';
-  const cbeAccount = paymentSettings?.cbeAccountNumber || '1000123456789';
-  const cbeName = paymentSettings?.cbeAccountName || 'Bisrat Hotel Adama';
-  const telebirrCode = paymentSettings?.telebirrShortcode || '654321';
-  const enabledMethods = paymentSettings?.paymentMethods || { telebirr: true, cbe: true, arrival: true, cash: true };
+  const cbeAccount = paymentSettings?.cbeAccountNumber || '1000679192934';
+  const cbeName = paymentSettings?.cbeAccountName || 'Bisrat Hotel';
+  const enabledMethods = paymentSettings?.paymentMethods || { cbe: true, arrival: true };
 
   const [selectedTable, setSelectedTable] = useState(defaultTable);
   const [guestName, setGuestName] = useState('');
   const [guestPhone, setGuestPhone] = useState('');
   const [paymentMethod, setPaymentMethod] = useState('cbe');
   const [copiedCbe, setCopiedCbe] = useState(false);
-  const [copiedTele, setCopiedTele] = useState(false);
   const [orderConfirmed, setOrderConfirmed] = useState(null);
 
   useEffect(() => {
@@ -53,14 +51,12 @@ export default function CustomerPaymentDrawer({
   }, [defaultTable]);
 
   useEffect(() => {
-    if (enabledMethods.cbe) {
+    if (enabledMethods.cbe !== false) {
       setPaymentMethod('cbe');
-    } else if (enabledMethods.telebirr) {
-      setPaymentMethod('telebirr');
     } else {
       setPaymentMethod('cash');
     }
-  }, [enabledMethods.cbe, enabledMethods.telebirr, enabledMethods.cash, enabledMethods.arrival]);
+  }, [enabledMethods.cbe, enabledMethods.cash, enabledMethods.arrival]);
 
   if (!isOpen) return null;
 
@@ -71,15 +67,10 @@ export default function CustomerPaymentDrawer({
 
   const totalItemCount = orderItems.reduce((sum, entry) => sum + (entry.quantity || 1), 0);
 
-  const copyToClipboard = (text, type) => {
+  const copyToClipboard = (text) => {
     navigator.clipboard.writeText(text);
-    if (type === 'cbe') {
-      setCopiedCbe(true);
-      setTimeout(() => setCopiedCbe(false), 2500);
-    } else {
-      setCopiedTele(true);
-      setTimeout(() => setCopiedTele(false), 2500);
-    }
+    setCopiedCbe(true);
+    setTimeout(() => setCopiedCbe(false), 2500);
   };
 
   const handlePlaceOrder = (e) => {
@@ -325,58 +316,8 @@ export default function CustomerPaymentDrawer({
                   </div>
                 )}
 
-                {/* Telebirr Option */}
-                {enabledMethods.telebirr && (
-                  <div
-                    onClick={() => setPaymentMethod('telebirr')}
-                    className={`cursor-pointer p-3 rounded-xl border-2 transition-all ${
-                      paymentMethod === 'telebirr' 
-                        ? 'bg-[#1B4D3E]/10 border-[#1B4D3E] shadow-xs' 
-                        : 'bg-[#FDFCF7] border-[#E8EFE9] hover:border-[#1B4D3E]/40'
-                    }`}
-                  >
-                    <div className="flex items-center justify-between mb-1">
-                      <div className="flex items-center gap-2">
-                        <Smartphone className="w-4 h-4 text-[#1B4D3E]" />
-                        <span className="font-bold text-xs text-[#1B4D3E]">
-                          Telebirr Mobile Payment
-                        </span>
-                      </div>
-                      <input
-                        type="radio"
-                        name="paymentMethod"
-                        checked={paymentMethod === 'telebirr'}
-                        onChange={() => setPaymentMethod('telebirr')}
-                        className="text-[#1B4D3E] focus:ring-[#1B4D3E]"
-                      />
-                    </div>
-
-                    {paymentMethod === 'telebirr' && (
-                      <div className="mt-2 pt-2 border-t border-[#1B4D3E]/20 text-xs text-[#1A1C19] space-y-1.5 animate-fade-in">
-                        <div className="flex items-center justify-between bg-white px-3 py-1.5 rounded-lg border border-[#1B4D3E]/30 font-mono font-bold">
-                          <span>Shortcode / Merchant ID: {telebirrCode}</span>
-                          <button
-                            type="button"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              copyToClipboard(telebirrCode, 'tele');
-                            }}
-                            className="text-[11px] text-[#1B4D3E] hover:underline flex items-center gap-1"
-                          >
-                            {copiedTele ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5" />}
-                            <span>{copiedTele ? 'Copied' : 'Copy'}</span>
-                          </button>
-                        </div>
-                        <p className="text-[11px] text-stone-600">
-                          Transfer to merchant shortcode & show receipt to your server.
-                        </p>
-                      </div>
-                    )}
-                  </div>
-                )}
-
-                {/* Cash at Counter Option */}
-                {(enabledMethods.arrival || enabledMethods.cash) && (
+                {/* Pay on Arrival Option */}
+                {(enabledMethods.arrival !== false || enabledMethods.cash !== false) && (
                   <div
                     onClick={() => setPaymentMethod('cash')}
                     className={`cursor-pointer p-3 rounded-xl border-2 transition-all ${
@@ -389,7 +330,7 @@ export default function CustomerPaymentDrawer({
                       <div className="flex items-center gap-2">
                         <CreditCard className="w-4 h-4 text-[#1B4D3E]" />
                         <span className="font-bold text-xs text-[#1A1C19]">
-                          Cash at Counter / Pay on Table
+                          Pay on Arrival / Cash at Counter
                         </span>
                       </div>
                       <input
@@ -491,7 +432,7 @@ export default function CustomerPaymentDrawer({
               <div className="flex justify-between pt-1 text-[11px] text-stone-500">
                 <span>Payment Mode:</span>
                 <span className="capitalize font-bold text-[#1A1C19]">
-                  {orderConfirmed.paymentMethod === 'cbe' ? 'CBE Bank Transfer' : orderConfirmed.paymentMethod === 'telebirr' ? 'Telebirr Shortcode' : 'Cash on Table'}
+                  {orderConfirmed.paymentMethod === 'cbe' ? 'CBE Birr Transfer' : 'Pay on Arrival'}
                 </span>
               </div>
             </div>

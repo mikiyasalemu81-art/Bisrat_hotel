@@ -27,6 +27,6 @@ export const initialReviews = [
     date: "June 2026",
     isVerified: true,
     status: "approved",
-    comment: "Very peaceful and tidy executive suite. Telebirr payment was smooth and instant. Will definitely come back with my family."
+    comment: "Very peaceful and tidy executive suite. CBE Birr payment was smooth and instant. Will definitely come back with my family."
   }
 ];

@@ -15,7 +15,7 @@ export default function BookingModal({
 
   const t = translations[lang] || translations.en;
 
-  const enabledMethods = paymentSettings?.paymentMethods || { telebirr: true, cbe: true, arrival: true };
+  const enabledMethods = paymentSettings?.paymentMethods || { cbe: true, arrival: true };
 
   const [activeRoomId, setActiveRoomId] = useState(selectedRoom?.id || rooms[0]?.id || '');
   const [fullName, setFullName] = useState('');
@@ -25,8 +25,7 @@ export default function BookingModal({
   const [checkOut, setCheckOut] = useState(new Date(Date.now() + 86400000).toISOString().split('T')[0]);
   const [guests, setGuests] = useState(1);
   const [paymentMethod, setPaymentMethod] = useState(() => {
-    if (enabledMethods.telebirr) return 'telebirr';
-    if (enabledMethods.cbe) return 'cbe';
+    if (enabledMethods.cbe !== false) return 'cbe';
     return 'arrival';
   });
   const [confirmedBooking, setConfirmedBooking] = useState(null);
@@ -204,36 +203,10 @@ export default function BookingModal({
                   {t.booking.paymentTitle}
                 </label>
 
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   
-                  {/* Telebirr Choice */}
-                  {enabledMethods.telebirr && (
-                    <div
-                      onClick={() => setPaymentMethod('telebirr')}
-                      className={`cursor-pointer rounded-2xl p-3.5 border-2 transition-all flex flex-col justify-between ${
-                        paymentMethod === 'telebirr'
-                          ? 'border-[#1B4D3E] bg-[#1B4D3E]/5 shadow-sm'
-                          : 'border-stone-200 bg-white hover:border-stone-300'
-                      }`}
-                    >
-                      <div className="flex items-center justify-between mb-2">
-                        <span className="font-bold text-xs text-[#1B4D3E] bg-[#1B4D3E]/10 px-2.5 py-0.5 rounded-lg border border-[#1B4D3E]/20">
-                          telebirr
-                        </span>
-                        <input 
-                          type="radio" 
-                          name="payment" 
-                          checked={paymentMethod === 'telebirr'} 
-                          onChange={() => setPaymentMethod('telebirr')}
-                        />
-                      </div>
-                      <p className="text-xs font-semibold text-[#1A1C19]">{t.booking.telebirr}</p>
-                      <p className="text-[10px] text-stone-500 mt-1">{t.booking.telebirrDesc}</p>
-                    </div>
-                  )}
-
                   {/* CBE Birr Choice */}
-                  {enabledMethods.cbe && (
+                  {enabledMethods.cbe !== false && (
                     <div
                       onClick={() => setPaymentMethod('cbe')}
                       className={`cursor-pointer rounded-2xl p-3.5 border-2 transition-all flex flex-col justify-between ${
@@ -259,7 +232,7 @@ export default function BookingModal({
                   )}
 
                   {/* Pay on Arrival Choice */}
-                  {enabledMethods.arrival && (
+                  {enabledMethods.arrival !== false && (
                     <div
                       onClick={() => setPaymentMethod('arrival')}
                       className={`cursor-pointer rounded-2xl p-3.5 border-2 transition-all flex flex-col justify-between ${
@@ -286,21 +259,11 @@ export default function BookingModal({
               </div>
 
               {/* Payment Instructions Display */}
-              {paymentMethod === 'telebirr' && enabledMethods.telebirr && (
-                <div className="bg-[#1B4D3E]/5 border border-[#1B4D3E]/20 rounded-2xl p-4 text-xs text-stone-800 space-y-1">
-                  <p className="font-bold text-[#1A1C19]">{t.booking.telebirrInstrTitle}</p>
-                  <p className="font-mono text-[#1B4D3E] bg-white px-2.5 py-1 rounded-lg inline-block border border-[#1B4D3E]/30 font-bold">
-                    Shortcode / Merchant ID: {paymentSettings.telebirrShortcode || t.booking.telebirrShortcode}
-                  </p>
-                  <p className="text-[11px] text-stone-600 mt-1">{t.booking.telebirrSteps}</p>
-                </div>
-              )}
-
-              {paymentMethod === 'cbe' && enabledMethods.cbe && (
+              {paymentMethod === 'cbe' && enabledMethods.cbe !== false && (
                 <div className="bg-purple-50 border border-purple-200 rounded-2xl p-4 text-xs text-stone-700 space-y-1">
                   <p className="font-bold text-purple-900">{t.booking.cbeInstrTitle}</p>
                   <p className="font-mono text-purple-900 bg-white px-2.5 py-1 rounded-lg inline-block border border-purple-200 font-bold">
-                    CBE Account #: {paymentSettings.cbeAccountNumber || t.booking.cbeAccNum}
+                    CBE Account #: {paymentSettings.cbeAccountNumber || "1000679192934"}
                   </p>
                   <p className="text-[11px] text-purple-800 font-medium">
                     Account Name: {paymentSettings.cbeAccountName || "Bisrat Hotel"}

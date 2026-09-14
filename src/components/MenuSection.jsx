@@ -94,6 +94,15 @@ export default function MenuSection({
     }
   });
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const [toastNotification, setToastNotification] = useState(null);
+
+  useEffect(() => {
+    if (!toastNotification) return;
+    const timer = setTimeout(() => {
+      setToastNotification(null);
+    }, 3200);
+    return () => clearTimeout(timer);
+  }, [toastNotification]);
 
   useEffect(() => {
     try {
@@ -324,7 +333,19 @@ export default function MenuSection({
         category: item.category
       }];
     });
-  }, [lang, getItemImage]);
+
+    const toastMsg = lang === 'am'
+      ? `"${displayName || item.nameAm || item.nameEn}" ${t.menu.itemAddedToast || 'ወደ ትእዛዝዎ ተጨምሯል'}`
+      : lang === 'or'
+      ? `"${displayName || item.nameOr || item.nameEn}" ${t.menu.itemAddedToast || 'gara ajajaatti dabalameera'}`
+      : `"${item.nameEn || displayName}" ${t.menu.itemAddedToast || 'added to your order'}`;
+
+    setToastNotification({
+      message: toastMsg,
+      image: thumb,
+      id: Date.now()
+    });
+  }, [lang, getItemImage, t.menu.itemAddedToast]);
 
   const handleUpdateQuantity = useCallback((id, delta) => {
     setOrderItems(prev => {
@@ -859,6 +880,46 @@ export default function MenuSection({
         </div>
 
       </div>
+
+      {/* ======================================================== */}
+      {/* DISH ORDER TOAST NOTIFICATION                             */}
+      {/* ======================================================== */}
+      {toastNotification && (
+        <div 
+          className="fixed top-24 right-4 sm:right-6 z-50 max-w-sm bg-[#1B4D3E] text-white p-3.5 rounded-2xl shadow-2xl border border-[#C5A059]/40 flex items-center gap-3 animate-fade-in"
+          role="status"
+          aria-live="polite"
+        >
+          {toastNotification.image ? (
+            <img 
+              src={toastNotification.image} 
+              alt="" 
+              className="w-10 h-10 rounded-xl object-cover border border-[#C5A059]/50 shrink-0" 
+            />
+          ) : (
+            <div className="w-10 h-10 rounded-xl bg-[#C5A059] text-[#1A1C19] flex items-center justify-center shrink-0">
+              <CheckCircle2 className="w-5 h-5 text-[#1A1C19]" />
+            </div>
+          )}
+          <div className="flex-1 min-w-0 pr-1">
+            <div className="flex items-center gap-1.5 text-xs text-[#C5A059] font-bold uppercase tracking-wider">
+              <Sparkles className="w-3 h-3 text-[#C5A059]" />
+              <span>{lang === 'am' ? 'ትእዛዝ ተቀብለናል' : lang === 'or' ? 'Ajajni Galmeeffameera' : 'Order Updated'}</span>
+            </div>
+            <p className="text-xs font-semibold text-stone-100 truncate mt-0.5">
+              {toastNotification.message}
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={() => setToastNotification(null)}
+            className="text-stone-300 hover:text-white p-1 rounded-full cursor-pointer"
+            aria-label="Dismiss notification"
+          >
+            <X className="w-4 h-4" />
+          </button>
+        </div>
+      )}
 
       {/* ======================================================== */}
       {/* FLOATING ORDER BAR (Warm Champagne Gold #C5A059 CTA)      */}

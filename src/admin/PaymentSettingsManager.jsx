@@ -28,10 +28,8 @@ export default function PaymentSettingsManager({
     tableNumber: paymentSettings?.tableNumber || "1",
     phoneNumber: paymentSettings?.phoneNumber || "0906320251",
     landlinePhone: paymentSettings?.landlinePhone || "022 211 2555",
-    cbeAccountNumber: paymentSettings?.cbeAccountNumber || "1000123456789",
-    cbeAccountName: paymentSettings?.cbeAccountName || "Bisrat Hotel Adama",
-    telebirrShortcode: paymentSettings?.telebirrShortcode || "654321",
-    enableTelebirr: paymentSettings?.paymentMethods?.telebirr ?? true,
+    cbeAccountNumber: paymentSettings?.cbeAccountNumber || "1000679192934",
+    cbeAccountName: paymentSettings?.cbeAccountName || "Bisrat Hotel",
     enableCbe: paymentSettings?.paymentMethods?.cbe ?? true,
     enableArrival: paymentSettings?.paymentMethods?.arrival ?? (paymentSettings?.paymentMethods?.cash ?? true),
     // Cloud storage & internet sync settings
@@ -276,9 +274,7 @@ export default function PaymentSettingsManager({
       landlinePhone: formData.landlinePhone,
       cbeAccountNumber: formData.cbeAccountNumber,
       cbeAccountName: formData.cbeAccountName,
-      telebirrShortcode: formData.telebirrShortcode,
       paymentMethods: {
-        telebirr: formData.enableTelebirr,
         cbe: formData.enableCbe,
         arrival: formData.enableArrival,
         cash: formData.enableArrival,
@@ -313,7 +309,7 @@ export default function PaymentSettingsManager({
             <span>Operational & Payment Controls</span>
           </h3>
           <p className="text-xs text-slate-500 mt-1">
-            Configure active table numbers, hotel front-desk direct contact, CBE & Telebirr accounts, active checkout payment methods, and cloud storage bucket sync.
+            Configure active table numbers, hotel front-desk direct contact, CBE accounts, active checkout payment methods, and cloud storage bucket sync.
           </p>
         </div>
 
@@ -504,20 +500,6 @@ export default function PaymentSettingsManager({
               />
             </div>
 
-            <div>
-              <label className="block text-xs font-bold text-slate-700 mb-1 flex items-center gap-1">
-                <Smartphone className="w-3.5 h-3.5 text-[#1B4D3E]" />
-                Telebirr Shortcode / Merchant ID
-              </label>
-              <input
-                type="text"
-                name="telebirrShortcode"
-                value={formData.telebirrShortcode}
-                onChange={handleChange}
-                placeholder="e.g. 654321"
-                className="w-full bg-[#FDFCF7] border border-stone-300 rounded-xl px-3.5 py-2.5 text-sm font-mono font-bold text-stone-900 focus:ring-2 focus:ring-[#1B4D3E] focus:outline-none"
-              />
-            </div>
           </div>
 
           {/* Payment Method Toggles */}
@@ -526,7 +508,7 @@ export default function PaymentSettingsManager({
               Active Payment Methods for Customer Checkout Drawer:
             </label>
 
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               {/* CBE Mobile Banking Toggle */}
               <label className={`cursor-pointer border-2 rounded-2xl p-4 flex items-center justify-between transition-all ${
                 formData.enableCbe ? 'bg-[#1B4D3E]/10 border-[#1B4D3E] shadow-xs' : 'bg-white border-stone-200 opacity-60'
@@ -541,25 +523,6 @@ export default function PaymentSettingsManager({
                   type="checkbox"
                   name="enableCbe"
                   checked={formData.enableCbe}
-                  onChange={handleChange}
-                  className="w-5 h-5 rounded text-[#1B4D3E] focus:ring-[#1B4D3E]"
-                />
-              </label>
-
-              {/* Telebirr Toggle */}
-              <label className={`cursor-pointer border-2 rounded-2xl p-4 flex items-center justify-between transition-all ${
-                formData.enableTelebirr ? 'bg-[#1B4D3E]/10 border-[#1B4D3E] shadow-xs' : 'bg-white border-stone-200 opacity-60'
-              }`}>
-                <div>
-                  <span className="font-bold text-xs text-[#1B4D3E] bg-[#1B4D3E]/15 px-2 py-0.5 rounded">
-                    Telebirr
-                  </span>
-                  <p className="text-xs font-semibold text-stone-800 mt-1">Merchant Shortcode</p>
-                </div>
-                <input
-                  type="checkbox"
-                  name="enableTelebirr"
-                  checked={formData.enableTelebirr}
                   onChange={handleChange}
                   className="w-5 h-5 rounded text-[#1B4D3E] focus:ring-[#1B4D3E]"
                 />

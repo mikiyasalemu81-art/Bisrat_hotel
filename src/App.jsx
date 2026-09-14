@@ -86,8 +86,9 @@ export default function App() {
 
   // Payment & Contact Settings State
   const [paymentSettings, setPaymentSettings] = useState(() => {
+    const version = localStorage.getItem('bisrat_payment_version');
     const saved = localStorage.getItem('bisrat_payment_settings');
-    const parsed = saved ? JSON.parse(saved) : {};
+    const parsed = (saved && version === '3.0') ? JSON.parse(saved) : {};
     return {
       activeTables: Array.isArray(parsed.activeTables) && parsed.activeTables.length > 0 
         ? parsed.activeTables 
@@ -95,14 +96,11 @@ export default function App() {
       tableNumber: parsed.tableNumber || "1",
       phoneNumber: parsed.phoneNumber || "0906320251",
       landlinePhone: parsed.landlinePhone || "022 211 2555",
-      cbeAccountNumber: parsed.cbeAccountNumber || "1000123456789",
-      cbeAccountName: parsed.cbeAccountName || "Bisrat Hotel Adama",
-      telebirrShortcode: parsed.telebirrShortcode || "654321",
+      cbeAccountNumber: "1000679192934",
+      cbeAccountName: "Bisrat Hotel",
       paymentMethods: {
-        telebirr: parsed.paymentMethods?.telebirr ?? true,
-        cbe: parsed.paymentMethods?.cbe ?? true,
-        arrival: parsed.paymentMethods?.arrival ?? true,
-        cash: parsed.paymentMethods?.cash ?? true,
+        cbe: true,
+        arrival: true,
       },
       cloudStorage: {
         provider: parsed.cloudStorage?.provider || "cloudinary",
@@ -117,6 +115,7 @@ export default function App() {
   });
   useEffect(() => {
     localStorage.setItem('bisrat_payment_settings', JSON.stringify(paymentSettings));
+    localStorage.setItem('bisrat_payment_version', '3.0');
   }, [paymentSettings]);
 
   // Rooms Data State
@@ -131,11 +130,14 @@ export default function App() {
   // Menu Items State (Full 111-dish catalog preserved with admin overrides)
   const [menuItems, setMenuItems] = useState(() => {
     try {
-      const saved = localStorage.getItem('bisrat_menu');
-      if (saved) {
-        const parsed = JSON.parse(saved);
-        if (Array.isArray(parsed) && parsed.length > 0) {
-          return mergeCatalogWithRemote(initialMenuItems, parsed);
+      const version = localStorage.getItem('bisrat_menu_version');
+      if (version === '4.0') {
+        const saved = localStorage.getItem('bisrat_menu');
+        if (saved) {
+          const parsed = JSON.parse(saved);
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            return mergeCatalogWithRemote(initialMenuItems, parsed);
+          }
         }
       }
     } catch (e) {
@@ -145,7 +147,7 @@ export default function App() {
   });
   useEffect(() => {
     localStorage.setItem('bisrat_menu', JSON.stringify(menuItems));
-    localStorage.setItem('bisrat_menu_version', '3.0');
+    localStorage.setItem('bisrat_menu_version', '4.0');
   }, [menuItems]);
 
   // Real-time synchronization across browser tabs and customer devices
@@ -272,7 +274,7 @@ export default function App() {
         nights: 2,
         guests: 2,
         totalPrice: 5000,
-        paymentMethod: "telebirr",
+        paymentMethod: "cbe",
         status: "Confirmed",
         createdAt: "2026-09-08"
       }
