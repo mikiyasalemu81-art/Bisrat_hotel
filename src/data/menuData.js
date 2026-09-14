@@ -527,8 +527,8 @@ export const initialMenuItems = [
     category: "pasta",
     price: 420,
     isAvailable: true,
-    placeholderSlot: "menu-penne-with-arbiyata.png",
-    imageUrl: "/images/menu-penne-with-arbiyata.png",
+    placeholderSlot: "menu-pasta-with-arbiyata.jpg",
+    imageUrl: "/images/menu-pasta-with-arbiyata.jpg",
     description: "Pasta in fiery garlic chili tomato sauce, garnished with fresh basil leaves.",
   },
   {
@@ -551,8 +551,8 @@ export const initialMenuItems = [
     category: "pasta",
     price: 425,
     isAvailable: true,
-    placeholderSlot: "menu-pasta-with-carbonara.png",
-    imageUrl: "/images/menu-pasta-with-carbonara.png",
+    placeholderSlot: "menu-pasta-carbonara.jpg",
+    imageUrl: "/images/menu-pasta-carbonara.jpg",
     description: "Al dente pasta swirled in creamy parmesan egg sauce with cured meat crisps.",
   },
   {
@@ -587,8 +587,8 @@ export const initialMenuItems = [
     category: "pasta",
     price: 485,
     isAvailable: true,
-    placeholderSlot: "menu-pasta-tuna.jpg",
-    imageUrl: "https://images.unsplash.com/photo-1608897013039-887f21d8c804?auto=format&fit=crop&w=1200&q=85",
+    placeholderSlot: "menu-penne-with-tuna.png",
+    imageUrl: "/images/menu-penne-with-tuna.png",
     description: "Spaghetti tossed with ocean tuna flakes, garlic, cherry tomatoes, and parsley.",
   },
   {
@@ -600,7 +600,7 @@ export const initialMenuItems = [
     price: 370,
     isAvailable: true,
     placeholderSlot: "menu-pasta-vegetable.jpg",
-    imageUrl: "https://images.unsplash.com/photo-1473093295043-cdd812d0e601?auto=format&fit=crop&w=1200&q=85",
+    imageUrl: "/images/menu-pasta-vegetable.jpg",
     description: "Pasta tossed with colorful garden vegetables including zucchini, carrots, and sweet bell peppers.",
   },
   {
@@ -635,8 +635,8 @@ export const initialMenuItems = [
     category: "pasta",
     price: 485,
     isAvailable: true,
-    placeholderSlot: "menu-penne-with-tuna.png",
-    imageUrl: "/images/menu-penne-with-tuna.png",
+    placeholderSlot: "menu-pasta-tuna.jpg",
+    imageUrl: "https://images.unsplash.com/photo-1608897013039-887f21d8c804?auto=format&fit=crop&w=1200&q=85",
     description: "Al dente penne paired with savory flaked tuna and rich tomato basil sauce.",
   },
   {
@@ -1420,7 +1420,7 @@ export const initialMenuItems = [
     price: 50,
     isAvailable: true,
     placeholderSlot: "menu-traditional-coffee.jpg",
-    imageUrl: "/images/ethiopian-coffee.jpg",
+    imageUrl: "/images/menu-traditional-coffee.jpg",
     description: "Freshly roasted organic Ethiopian highland coffee brewed in a clay Jebena and poured into small cups.",
   },
   {

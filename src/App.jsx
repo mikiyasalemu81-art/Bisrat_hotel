@@ -131,7 +131,7 @@ export default function App() {
   const [menuItems, setMenuItems] = useState(() => {
     try {
       const version = localStorage.getItem('bisrat_menu_version');
-      if (version === '4.0') {
+      if (version === '5.0') {
         const saved = localStorage.getItem('bisrat_menu');
         if (saved) {
           const parsed = JSON.parse(saved);
@@ -147,7 +147,7 @@ export default function App() {
   });
   useEffect(() => {
     localStorage.setItem('bisrat_menu', JSON.stringify(menuItems));
-    localStorage.setItem('bisrat_menu_version', '4.0');
+    localStorage.setItem('bisrat_menu_version', '5.0');
   }, [menuItems]);
 
   // Real-time synchronization across browser tabs and customer devices
@@ -468,9 +468,9 @@ export default function App() {
   };
 
   return (
-    <div className="w-full max-w-[100vw] overflow-x-hidden min-h-screen flex flex-col bg-[#FDFCF7] text-[#1A1C19] selection:bg-[#C5A059] selection:text-[#1B4D3E] pb-16 sm:pb-20">
+    <div className="w-full max-w-[100vw] overflow-x-clip min-h-screen flex flex-col bg-[#FDFCF7] text-[#1A1C19] selection:bg-[#C5A059] selection:text-[#1B4D3E] pb-16 sm:pb-20">
       
-      {/* Sticky Header with Logo, Trilingual Switcher, Reception Phone, and Book Button */}
+      {/* Pinned Top Navigation Bar */}
       <Header
         activeTab={activeTab}
         setActiveTab={setActiveTab}
@@ -479,8 +479,11 @@ export default function App() {
         onBookClick={() => handleOpenBooking()}
       />
 
+      {/* Spacer to offset fixed Header */}
+      <div className="h-14 sm:h-16 shrink-0" aria-hidden="true" />
+
       {/* Main Content Area based on 3-Tab Bar */}
-      <main className="flex-1 w-full max-w-[100vw] overflow-x-hidden">
+      <main className="flex-1 w-full max-w-[100vw] overflow-x-clip">
         
         {/* TAB 1: HOME */}
         {activeTab === 'home' && (
