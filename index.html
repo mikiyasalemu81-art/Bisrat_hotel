@@ -18,37 +18,77 @@
   <body class="bg-[#FDFCF7] text-[#1A1C19] font-sans antialiased selection:bg-[#C5A059] selection:text-[#1B4D3E] min-h-screen flex flex-col">
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
-    <!-- ... all your existing hotel sections/content ... -->
+  <!-- n8n Chat Widget CSS -->
+<link href="https://cdn.jsdelivr.net/npm/@n8n/chat/dist/style.css" rel="stylesheet" />
 
-    <!-- PASTE CHAT CODE RIGHT HERE (ABOVE </body>) -->
-    <link href="https://cdn.jsdelivr.net/npm/@n8n/chat/dist/style.css" rel="stylesheet" />
-    <style>
-      :root {
-        --chat--color-primary: #1E293B;
-        --chat--color-primary-shade-50: #0F172A;
-        --chat--color-primary-light: #D97706;
-        --chat--color-secondary: #D97706;
-        --chat--header--background: #1E293B;
-        --chat--header--color: #FFFFFF;
-        --chat--border-radius: 12px;
+<style>
+  :root {
+    /* Bisrat Brand Colors matching your website */
+    --chat--color-primary: #0e4d34;          /* Deep Emerald Green */
+    --chat--color-primary-shade-50: #093322;
+    --chat--color-primary-light: #e5a93c;     /* Gold Accent */
+    --chat--color-secondary: #e5a93c;
+    --chat--header--background: #0e4d34;
+    --chat--header--color: #ffffff;
+    --chat--border-radius: 14px;
+    --chat--toggle--background: #0e4d34;     /* Replaces the bright pink button */
+    --chat--toggle--hover: #093322;
+    --chat--toggle--color: #ffffff;
+    --chat--body--background: #f8faf9;
+  }
+
+  /* Fix Mobile Cutoff: Ensures the input box is always visible above bottom nav */
+  .chat-layout, 
+  div[class*="chat-window"], 
+  div[class*="chat-container"] {
+    max-height: 78vh !important;
+    bottom: 75px !important; /* Positions it nicely above the bottom navigation bar */
+    z-index: 99999 !important;
+  }
+
+  /* Fix Toggle Button Position */
+  .chat-toggle,
+  button[class*="chat-toggle"] {
+    bottom: 75px !important;
+    background-color: #0e4d34 !important;
+    border: 2px solid #e5a93c !important;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25) !important;
+  }
+
+  /* Replace Message Bubble with an AI Bot Icon */
+  .chat-toggle svg {
+    display: none !important;
+  }
+  .chat-toggle::after {
+    content: '';
+    display: block;
+    width: 28px;
+    height: 28px;
+    background-color: #ffffff;
+    /* Clean modern AI Agent / Bot mask */
+    -webkit-mask: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a2 2 0 0 1 2 2c0 .74-.4 1.39-1 1.73V7h1a7 7 0 0 1 7 7h1a1 1 0 0 1 1 1v3a1 1 0 0 1-1 1h-1v1a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-1H2a1 1 0 0 1-1-1v-3a1 1 0 0 1 1-1h1a7 7 0 0 1 7-7h1V5.73c-.6-.34-1-.99-1-1.73a2 2 0 0 1 2-2M7.5 13A2.5 2.5 0 0 0 5 15.5 2.5 2.5 0 0 0 7.5 18a2.5 2.5 0 0 0 2.5-2.5A2.5 2.5 0 0 0 7.5 13m9 0a2.5 2.5 0 0 0-2.5 2.5 2.5 2.5 0 0 0 2.5 2.5 2.5 2.5 0 0 0 2.5-2.5 2.5 2.5 0 0 0-2.5-2.5"/></svg>') no-repeat center;
+    mask: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a2 2 0 0 1 2 2c0 .74-.4 1.39-1 1.73V7h1a7 7 0 0 1 7 7h1a1 1 0 0 1 1 1v3a1 1 0 0 1-1 1h-1v1a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-1H2a1 1 0 0 1-1-1v-3a1 1 0 0 1 1-1h1a7 7 0 0 1 7-7h1V5.73c-.6-.34-1-.99-1-1.73a2 2 0 0 1 2-2M7.5 13A2.5 2.5 0 0 0 5 15.5 2.5 2.5 0 0 0 7.5 18a2.5 2.5 0 0 0 2.5-2.5A2.5 2.5 0 0 0 7.5 13m9 0a2.5 2.5 0 0 0-2.5 2.5 2.5 2.5 0 0 0 2.5 2.5 2.5 2.5 0 0 0 2.5-2.5 2.5 2.5 0 0 0-2.5-2.5"/></svg>') no-repeat center;
+  }
+</style>
+
+<!-- n8n Chat Widget Script -->
+<script type="module">
+  import { createChat } from 'https://cdn.jsdelivr.net/npm/@n8n/chat/dist/chat.bundle.es.js';
+
+  createChat({
+    webhookUrl: 'https://mikiyas11.app.n8n.cloud/webhook/bisrat-chat-trigger/chat',
+    initialMessages: [
+      'Welcome to Bisrat Hotel! How may I assist you with your booking or stay today?'
+    ],
+    i18n: {
+      en: {
+        title: 'Bisrat Hotel Concierge',
+        subtitle: 'Adama, Ethiopia',
+        inputPlaceholder: 'Ask anything about Bisrat Hotel...'
       }
-    </style>
-    <script type="module">
-      import { createChat } from 'https://cdn.jsdelivr.net/npm/@n8n/chat/dist/chat.bundle.es.js';
-      createChat({
-        webhookUrl: 'https://mikiyas11.app.n8n.cloud/webhook/bisrat-chat-trigger/chat',
-        initialMessages: [
-          'Welcome to Bisrat Hotel! How may I assist you with your booking or stay today?'
-        ],
-        i18n: {
-          en: {
-            title: 'Bisrat Hotel Concierge',
-            subtitle: 'Adama, Ethiopia'
-          }
-        }
-      });
-    </script>
-
+    }
+  });
+</script>
   </body>
 </html>
   
