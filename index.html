@@ -18,5 +18,37 @@
   <body class="bg-[#FDFCF7] text-[#1A1C19] font-sans antialiased selection:bg-[#C5A059] selection:text-[#1B4D3E] min-h-screen flex flex-col">
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
+    <!-- ... all your existing hotel sections/content ... -->
+
+    <!-- PASTE CHAT CODE RIGHT HERE (ABOVE </body>) -->
+    <link href="https://cdn.jsdelivr.net/npm/@n8n/chat/dist/style.css" rel="stylesheet" />
+    <style>
+      :root {
+        --chat--color-primary: #1E293B;
+        --chat--color-primary-shade-50: #0F172A;
+        --chat--color-primary-light: #D97706;
+        --chat--color-secondary: #D97706;
+        --chat--header--background: #1E293B;
+        --chat--header--color: #FFFFFF;
+        --chat--border-radius: 12px;
+      }
+    </style>
+    <script type="module">
+      import { createChat } from 'https://cdn.jsdelivr.net/npm/@n8n/chat/dist/chat.bundle.es.js';
+      createChat({
+        webhookUrl: 'https://mikiyas11.app.n8n.cloud/webhook/bisrat-chat-trigger/chat',
+        initialMessages: [
+          'Welcome to Bisrat Hotel! How may I assist you with your booking or stay today?'
+        ],
+        i18n: {
+          en: {
+            title: 'Bisrat Hotel Concierge',
+            subtitle: 'Adama, Ethiopia'
+          }
+        }
+      });
+    </script>
+
   </body>
 </html>
+  
