@@ -18,77 +18,253 @@
   <body class="bg-[#FDFCF7] text-[#1A1C19] font-sans antialiased selection:bg-[#C5A059] selection:text-[#1B4D3E] min-h-screen flex flex-col">
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
-    <style>
-  :root {
-    /* Brand Theme */
-    --chat--color-primary: #0e4d34;
-    --chat--color-primary-shade-50: #093322;
-    --chat--color-primary-light: #e5a93c;
-    --chat--color-secondary: #e5a93c;
-    --chat--header--background: #0e4d34;
-    --chat--header--color: #ffffff;
-    --chat--border-radius: 16px;
-    --chat--toggle--background: #0e4d34;
-    --chat--toggle--hover: #093322;
-    --chat--toggle--color: #ffffff;
-  }
+    <!-- Custom Bisrat Hotel Concierge Widget -->
+<div id="bisrat-chat-widget">
+  <!-- Floating Bot Button -->
+  <button id="bisrat-chat-toggle" aria-label="Open Hotel Concierge">
+    <!-- Bot / AI Agent Icon -->
+    <svg id="bot-icon-open" viewBox="0 0 24 24" width="28" height="28" fill="#ffffff">
+      <path d="M12 2a2 2 0 0 1 2 2c0 .74-.4 1.39-1 1.73V7h1a7 7 0 0 1 7 7h1a1 1 0 0 1 1 1v3a1 1 0 0 1-1 1h-1v1a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-1H2a1 1 0 0 1-1-1v-3a1 1 0 0 1 1-1h1a7 7 0 0 1 7-7h1V5.73c-.6-.34-1-.99-1-1.73a2 2 0 0 1 2-2M7.5 13A2.5 2.5 0 0 0 5 15.5 2.5 2.5 0 0 0 7.5 18a2.5 2.5 0 0 0 2.5-2.5A2.5 2.5 0 0 0 7.5 13m9 0a2.5 2.5 0 0 0-2.5 2.5 2.5 2.5 0 0 0 2.5 2.5 2.5 2.5 0 0 0 2.5-2.5A2.5 2.5 0 0 0 16.5 13"/>
+    </svg>
+    <svg id="bot-icon-close" style="display:none;" viewBox="0 0 24 24" width="26" height="26" fill="#ffffff">
+      <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
+    </svg>
+  </button>
 
-  /* Force the floating button above the bottom navigation bar */
-  .chat-toggle,
-  [class*="toggle"],
-  button[aria-label*="chat" i] {
-    bottom: 80px !important;
-    right: 20px !important;
-    background-color: #0e4d34 !important;
-    border: 2px solid #e5a93c !important;
-    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35) !important;
-    z-index: 2147483645 !important;
-  }
+  <!-- Chat Window -->
+  <div id="bisrat-chat-window">
+    <div class="bisrat-chat-header">
+      <div>
+        <div class="bisrat-chat-title">Bisrat Hotel Concierge</div>
+        <div class="bisrat-chat-subtitle">Adama, Ethiopia</div>
+      </div>
+      <button id="bisrat-chat-close-btn">&times;</button>
+    </div>
 
-  /* Replace message bubble icon with an AI Bot Icon */
-  .chat-toggle svg:not(.chat-custom-icon) {
-    display: none !important;
-  }
-  .chat-toggle::before {
-    content: '';
-    display: block;
-    width: 26px;
-    height: 26px;
-    background-color: #ffffff;
-    -webkit-mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='currentColor'><path d='M12 2a2 2 0 0 1 2 2c0 .74-.4 1.39-1 1.73V7h1a7 7 0 0 1 7 7h1a1 1 0 0 1 1 1v3a1 1 0 0 1-1 1h-1v1a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-1H2a1 1 0 0 1-1-1v-3a1 1 0 0 1 1-1h1a7 7 0 0 1 7-7h1V5.73c-.6-.34-1-.99-1-1.73a2 2 0 0 1 2-2M7.5 13A2.5 2.5 0 0 0 5 15.5 2.5 2.5 0 0 0 7.5 18a2.5 2.5 0 0 0 2.5-2.5A2.5 2.5 0 0 0 7.5 13m9 0a2.5 2.5 0 0 0-2.5 2.5 2.5 2.5 0 0 0 2.5 2.5 2.5 2.5 0 0 0 2.5-2.5 2.5 2.5 0 0 0-2.5-2.5'/></svg>") no-repeat center;
-    mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='currentColor'><path d='M12 2a2 2 0 0 1 2 2c0 .74-.4 1.39-1 1.73V7h1a7 7 0 0 1 7 7h1a1 1 0 0 1 1 1v3a1 1 0 0 1-1 1h-1v1a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-1H2a1 1 0 0 1-1-1v-3a1 1 0 0 1 1-1h1a7 7 0 0 1 7-7h1V5.73c-.6-.34-1-.99-1-1.73a2 2 0 0 1 2-2M7.5 13A2.5 2.5 0 0 0 5 15.5 2.5 2.5 0 0 0 7.5 18a2.5 2.5 0 0 0 2.5-2.5A2.5 2.5 0 0 0 7.5 13m9 0a2.5 2.5 0 0 0-2.5 2.5 2.5 2.5 0 0 0 2.5 2.5 2.5 2.5 0 0 0 2.5-2.5 2.5 2.5 0 0 0-2.5-2.5'/></svg>") no-repeat center;
-  }
+    <div id="bisrat-chat-messages">
+      <div class="bisrat-msg bot">
+        Welcome to Bisrat Hotel! How may I assist you with your booking or stay today?
+      </div>
+    </div>
 
-  /* CRITICAL MOBILE RESIZE: Constrain the chat window height and lift it above bottom nav */
-  div:has(> .chat-window),
-  .chat-window,
-  div[class*="chat-window"],
-  div[class*="layout"] {
-    max-height: calc(100dvh - 160px) !important;
-    height: 520px !important;
-    bottom: 85px !important;
-    right: 15px !important;
-    left: 15px !important;
-    width: auto !important;
-    max-width: 420px !important;
-    margin: 0 auto !important;
-    z-index: 2147483646 !important;
-    display: flex !important;
-    flex-direction: column !important;
-  }
+    <form id="bisrat-chat-form">
+      <input type="text" id="bisrat-chat-input" placeholder="Ask about rooms, dining, or services..." required autocomplete="off" />
+      <button type="submit" id="bisrat-chat-send">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="#ffffff">
+          <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
+        </svg>
+      </button>
+    </form>
+  </div>
+</div>
 
-  /* Ensure the footer/input area inside the window is forced to remain visible */
-  .chat-footer,
-  [class*="chat-footer"],
-  [class*="chat-input-container"] {
-    display: flex !important;
-    visibility: visible !important;
-    opacity: 1 !important;
-    background: #ffffff !important;
-    position: relative !important;
-    z-index: 10 !important;
+<style>
+  #bisrat-chat-widget {
+    position: fixed;
+    bottom: 75px;
+    right: 18px;
+    z-index: 999999;
+    font-family: inherit;
+  }
+  #bisrat-chat-toggle {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: #0e4d34;
+    border: 2px solid #e5a93c;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: transform 0.2s ease;
+  }
+  #bisrat-chat-toggle:hover {
+    transform: scale(1.05);
+  }
+  #bisrat-chat-window {
+    display: none;
+    position: absolute;
+    bottom: 70px;
+    right: 0;
+    width: 360px;
+    height: 500px;
+    max-height: calc(100dvh - 170px);
+    background: #ffffff;
+    border-radius: 16px;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.25);
+    overflow: hidden;
+    flex-direction: column;
+    border: 1px solid rgba(0,0,0,0.08);
+  }
+  @media (max-width: 480px) {
+    #bisrat-chat-window {
+      position: fixed;
+      left: 16px;
+      right: 16px;
+      bottom: 80px;
+      width: auto;
+      height: 60vh;
+      max-height: 480px;
+    }
+  }
+  .bisrat-chat-header {
+    background: #0e4d34;
+    color: #ffffff;
+    padding: 14px 18px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 2px solid #e5a93c;
+  }
+  .bisrat-chat-title {
+    font-weight: 700;
+    font-size: 16px;
+    letter-spacing: 0.3px;
+  }
+  .bisrat-chat-subtitle {
+    font-size: 12px;
+    color: #e5a93c;
+  }
+  #bisrat-chat-close-btn {
+    background: none;
+    border: none;
+    color: #ffffff;
+    font-size: 22px;
+    cursor: pointer;
+  }
+  #bisrat-chat-messages {
+    flex: 1;
+    padding: 14px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    background: #f8faf9;
+  }
+  .bisrat-msg {
+    max-width: 80%;
+    padding: 10px 14px;
+    border-radius: 12px;
+    font-size: 14px;
+    line-height: 1.4;
+    word-break: break-word;
+  }
+  .bisrat-msg.bot {
+    align-self: flex-start;
+    background: #ffffff;
+    color: #1a1a1a;
+    border: 1px solid #e2e8f0;
+    border-bottom-left-radius: 2px;
+  }
+  .bisrat-msg.user {
+    align-self: flex-end;
+    background: #0e4d34;
+    color: #ffffff;
+    border-bottom-right-radius: 2px;
+  }
+  #bisrat-chat-form {
+    display: flex;
+    padding: 10px;
+    background: #ffffff;
+    border-top: 1px solid #e2e8f0;
+    gap: 8px;
+  }
+  #bisrat-chat-input {
+    flex: 1;
+    border: 1px solid #cbd5e1;
+    border-radius: 20px;
+    padding: 8px 14px;
+    font-size: 14px;
+    outline: none;
+  }
+  #bisrat-chat-input:focus {
+    border-color: #0e4d34;
+  }
+  #bisrat-chat-send {
+    background: #0e4d34;
+    border: none;
+    border-radius: 50%;
+    width: 38px;
+    height: 38px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
   }
 </style>
+
+<script>
+  (function() {
+    const toggleBtn = document.getElementById('bisrat-chat-toggle');
+    const chatWindow = document.getElementById('bisrat-chat-window');
+    const closeBtn = document.getElementById('bisrat-chat-close-btn');
+    const form = document.getElementById('bisrat-chat-form');
+    const input = document.getElementById('bisrat-chat-input');
+    const messages = document.getElementById('bisrat-chat-messages');
+    const openIcon = document.getElementById('bot-icon-open');
+    const closeIcon = document.getElementById('bot-icon-close');
+
+    const WEBHOOK_URL = 'https://mikiyas11.app.n8n.cloud/webhook/bisrat-chat-trigger/chat';
+    let sessionId = localStorage.getItem('bisrat_chat_session') || 'sess_' + Math.random().toString(36).substring(2, 12);
+    localStorage.setItem('bisrat_chat_session', sessionId);
+
+    function toggleChat() {
+      const isOpen = chatWindow.style.display === 'flex';
+      chatWindow.style.display = isOpen ? 'none' : 'flex';
+      openIcon.style.display = isOpen ? 'block' : 'none';
+      closeIcon.style.display = isOpen ? 'none' : 'block';
+      if (!isOpen) input.focus();
+    }
+
+    toggleBtn.addEventListener('click', toggleChat);
+    closeBtn.addEventListener('click', toggleChat);
+
+    function appendMessage(text, sender) {
+      const div = document.createElement('div');
+      div.className = 'bisrat-msg ' + sender;
+      div.textContent = text;
+      messages.appendChild(div);
+      messages.scrollTop = messages.scrollHeight;
+    }
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const text = input.value.trim();
+      if (!text) return;
+
+      appendMessage(text, 'user');
+      input.value = '';
+
+      const typingDiv = document.createElement('div');
+      typingDiv.className = 'bisrat-msg bot';
+      typingDiv.textContent = '...';
+      messages.appendChild(typingDiv);
+      messages.scrollTop = messages.scrollHeight;
+
+      try {
+        const response = await fetch(WEBHOOK_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            action: 'sendMessage',
+            chatInput: text,
+            sessionId: sessionId
+          })
+        });
+
+        const data = await response.json();
+        typingDiv.remove();
+        
+        // n8n returns string directly or inside an output property
+        const botReply = typeof data === 'string' ? data : (data.output || data.text || 'Thank you for reaching out to Bisrat Hotel.');
+        appendMessage(botReply, 'bot');
+      } catch (err) {
+        typingDiv.textContent = 'Unable to connect to concierge right now. Please call reception directly.';
+      }
+    });
+  })();
+</script>
 
   </body>
 </html>
