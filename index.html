@@ -12,7 +12,7 @@
 
     <!-- Google Fonts: Playfair Display & Inter -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="preconnect" href="https://fonts.gstatic.com" />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,400&display=swap" rel="stylesheet" />
   </head>
   <body class="bg-[#FDFCF7] text-[#1A1C19] font-sans antialiased selection:bg-[#C5A059] selection:text-[#1B4D3E] min-h-screen flex flex-col">
@@ -251,46 +251,36 @@
             sessionId: sessionId
           })
         });
-         const data = await response.json();
+
+        const data = await response.json();
         console.log("Full server response:", data);
 
         if (typingDiv && typingDiv.parentNode) {
           typingDiv.remove();
         }
 
-        // Safely extract reply across all formats
         let botReply = '';
-        if (typeof data === 'string') {
+        if (data && typeof data === 'object') {
+          botReply = data.output || data.reply || data.text || (Array.isArray(data) && data[0]?.output) || (Object.keys(data).length ? JSON.stringify(data) : '');
+        } else if (typeof data === 'string') {
           botReply = data;
-        } else if (data.output) {
-          botReply = data.output;
-        } else if (data.text) {
-          botReply = data.text;
-        } else if (data.reply) {
-          botReply = data.reply;
-        } else if (Array.isArray(data) && data[0]?.output) {
-          botReply = data[0].output;
-        } else {
-          botReply = JSON.stringify(data);
         }
 
-        // Check if appendMessage function exists, otherwise fallback to DOM insert
-        if (typeof appendMessage === 'function') {
-          appendMessage(botReply, 'bot');
-        } else {
-          const fallbackDiv = document.createElement('div');
-          fallbackDiv.className = 'bisrat-msg bot';
-          fallbackDiv.textContent = botReply;
-          messages.appendChild(fallbackDiv);
+        if (!botReply || botReply.trim() === '') {
+          botReply = "Welcome to Bisrat Hotel! We are located at Wenji Mazoria, Adama. How can I assist you with your booking or stay?";
         }
 
-        messages.scrollTop = messages.scrollHeight;
+        appendMessage(botReply, 'bot');
       } catch (err) {
         console.error("Chat script error:", err);
-        if (typingDiv) {
-          typingDiv.textContent = 'Please call reception directly at 022 211 2555 or 0906 320 251.';
+        if (typingDiv && typingDiv.parentNode) {
+          typingDiv.remove();
         }
+        appendMessage('Please call reception directly at 022 211 2555 or 0906 320 251.', 'bot');
       }
     });
   })();
 </script>
+
+  </body>
+</html>
