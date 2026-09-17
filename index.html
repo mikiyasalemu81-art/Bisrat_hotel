@@ -251,9 +251,12 @@
             sessionId: sessionId
           })
         });
+         const data = await response.json();
+        console.log("Full server response:", data);
 
-        const data = await response.json();
-        typingDiv.remove();
+        if (typingDiv && typingDiv.parentNode) {
+          typingDiv.remove();
+        }
 
         // Safely extract reply across all formats
         let botReply = '';
@@ -268,17 +271,26 @@
         } else if (Array.isArray(data) && data[0]?.output) {
           botReply = data[0].output;
         } else {
-          botReply = 'Please call reception at 022 211 2555 or 0906 320 251.';
+          botReply = JSON.stringify(data);
         }
 
-        appendMessage(botReply, 'bot');
+        // Check if appendMessage function exists, otherwise fallback to DOM insert
+        if (typeof appendMessage === 'function') {
+          appendMessage(botReply, 'bot');
+        } else {
+          const fallbackDiv = document.createElement('div');
+          fallbackDiv.className = 'bisrat-msg bot';
+          fallbackDiv.textContent = botReply;
+          messages.appendChild(fallbackDiv);
+        }
+
+        messages.scrollTop = messages.scrollHeight;
       } catch (err) {
-        typingDiv.textContent = 'Please call reception directly at 022 211 2555 or 0906 320 251.';
+        console.error("Chat script error:", err);
+        if (typingDiv) {
+          typingDiv.textContent = 'Please call reception directly at 022 211 2555 or 0906 320 251.';
+        }
       }
     });
   })();
 </script>
-
-  </body>
-</html>
-  
