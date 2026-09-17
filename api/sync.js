@@ -48,31 +48,54 @@ export default async function handler(req, res) {
     }
   }
 
-  // POST: Persist updated state to cloud bin
-  if (req.method === 'POST') {
+  // POST / PATCH / PUT: Persist updated state to cloud bin with safe read-merge-write
+  if (req.method === 'POST' || req.method === 'PATCH' || req.method === 'PUT') {
     try {
       const statePayload = typeof req.body === 'string' ? JSON.parse(req.body) : req.body;
 
-      const patchRes = await fetch(CLOUD_BIN_URL, {
-        method: 'PATCH',
+      // 1. Safe Read: fetch existing state
+      let existingData = {};
+      try {
+        const getRes = await fetch(`${CLOUD_BIN_URL}?t=${Date.now()}`, {
+          headers: { 'Accept': 'application/json' }
+        });
+        if (getRes.ok) {
+          existingData = await getRes.json();
+        }
+      } catch (readErr) {
+        console.warn('[api/sync] Error fetching existing bin data:', readErr);
+      }
+
+      // 2. Safe Merge: overlay incoming slices onto existing data so untouched keys are preserved
+      const now = statePayload.updatedAt || Date.now();
+      const mergedPayload = {
+        ...existingData,
+        ...statePayload,
+        updatedAt: now
+      };
+
+      // 3. Safe Write: persist full merged state via PUT
+      const putRes = await fetch(CLOUD_BIN_URL, {
+        method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
           'Accept': 'application/json'
         },
-        body: JSON.stringify(statePayload)
+        body: JSON.stringify(mergedPayload)
       });
 
-      if (patchRes.ok) {
+      if (putRes.ok) {
         return res.status(200).json({ 
           success: true, 
           message: 'Saved to cloud storage bin successfully',
-          updatedAt: Date.now() 
+          updatedAt: now,
+          data: mergedPayload
         });
       } else {
-        const errText = await patchRes.text().catch(() => '');
+        const errText = await putRes.text().catch(() => '');
         return res.status(500).json({ 
           error: 'Cloud storage persistence failed', 
-          status: patchRes.status,
+          status: putRes.status,
           details: errText 
         });
       }

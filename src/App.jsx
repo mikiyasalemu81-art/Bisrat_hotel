@@ -21,6 +21,13 @@ import { initialReviews } from './data/reviewsData';
 import { loadAllPhotosFromStorage } from './utils/imageStorage';
 import { setImageSyncTimestamp } from './utils/imageUrl';
 import { fetchCloudAppState, saveCloudAppState } from './utils/cloudSync';
+import { 
+  INITIAL_ROOM_RESERVATIONS, 
+  INITIAL_FOOD_RESERVATIONS, 
+  DEFAULT_PAYMENT_METHODS, 
+  DEFAULT_ADMIN_PASSWORD,
+  fetchDatabaseState
+} from './utils/database';
 
 /**
  * Smart merge function: preserves the complete authentic menu catalog and photos
@@ -46,6 +53,7 @@ function mergeCatalogWithRemote(baseCatalog, remoteList) {
       ...baseItem,
       price: typeof override.price === 'number' && override.price > 0 ? override.price : (Number(override.price) || baseItem.price),
       isAvailable: override.isAvailable !== undefined ? override.isAvailable : baseItem.isAvailable,
+      isActive: override.isActive !== undefined ? override.isActive : (override.isAvailable !== undefined ? override.isAvailable : baseItem.isAvailable),
       imageUrl: override.imageUrl || override.image_url || override.customImage || baseItem.imageUrl,
       customImage: override.customImage || override.imageUrl || baseItem.customImage,
       nameEn: override.nameEn || baseItem.nameEn,
@@ -88,8 +96,11 @@ export default function App() {
   const [paymentSettings, setPaymentSettings] = useState(() => {
     const version = localStorage.getItem('bisrat_payment_version');
     const saved = localStorage.getItem('bisrat_payment_settings');
-    const parsed = (saved && version === '3.0') ? JSON.parse(saved) : {};
+    const parsed = (saved && (version === '3.0' || version === '4.0')) ? JSON.parse(saved) : {};
     return {
+      paymentMethodsList: Array.isArray(parsed.paymentMethodsList) && parsed.paymentMethodsList.length > 0
+        ? parsed.paymentMethodsList
+        : DEFAULT_PAYMENT_METHODS,
       activeTables: Array.isArray(parsed.activeTables) && parsed.activeTables.length > 0 
         ? parsed.activeTables 
         : ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "VIP 1", "VIP 2", "Terrace 1"],
@@ -115,7 +126,7 @@ export default function App() {
   });
   useEffect(() => {
     localStorage.setItem('bisrat_payment_settings', JSON.stringify(paymentSettings));
-    localStorage.setItem('bisrat_payment_version', '3.0');
+    localStorage.setItem('bisrat_payment_version', '4.0');
   }, [paymentSettings]);
 
   // Rooms Data State
@@ -178,6 +189,20 @@ export default function App() {
           if (event.data?.type === 'PAYMENT_SETTINGS_UPDATE' && event.data.paymentSettings) {
             setPaymentSettings(event.data.paymentSettings);
           }
+          if (event.data?.type === 'SLICE_UPDATE') {
+            if (event.data.sliceKey === 'room_reservations' && Array.isArray(event.data.data)) {
+              setRoomReservations(event.data.data);
+            }
+            if (event.data.sliceKey === 'food_reservations' && Array.isArray(event.data.data)) {
+              setFoodReservations(event.data.data);
+            }
+            if (event.data.sliceKey === 'admin_password' && typeof event.data.data === 'string') {
+              setAdminPassword(event.data.data);
+            }
+            if (event.data.sliceKey === 'paymentSettings' && event.data.data) {
+              setPaymentSettings(event.data.data);
+            }
+          }
         };
       }
     } catch (e) {
@@ -211,6 +236,21 @@ export default function App() {
           const parsed = JSON.parse(e.newValue);
           if (parsed) setPaymentSettings(parsed);
         } catch {}
+      }
+      if (e.key === 'bisrat_room_reservations' && e.newValue) {
+        try {
+          const parsed = JSON.parse(e.newValue);
+          if (Array.isArray(parsed)) setRoomReservations(parsed);
+        } catch {}
+      }
+      if (e.key === 'bisrat_food_reservations' && e.newValue) {
+        try {
+          const parsed = JSON.parse(e.newValue);
+          if (Array.isArray(parsed)) setFoodReservations(parsed);
+        } catch {}
+      }
+      if (e.key === 'bisrat_admin_password' && e.newValue) {
+        setAdminPassword(e.newValue);
       }
     };
 
@@ -259,30 +299,29 @@ export default function App() {
     localStorage.setItem('bisrat_facilities', JSON.stringify(facilities));
   }, [facilities]);
 
-  // Bookings Data State
-  const [bookings, setBookings] = useState(() => {
-    const saved = localStorage.getItem('bisrat_bookings');
-    return saved ? JSON.parse(saved) : [
-      {
-        id: "BH-2026-9041",
-        roomName: "Deluxe King Room",
-        guestName: "Abebe Bikila",
-        phone: "0911223344",
-        email: "abebe@example.com",
-        checkIn: "2026-09-10",
-        checkOut: "2026-09-12",
-        nights: 2,
-        guests: 2,
-        totalPrice: 5000,
-        paymentMethod: "cbe",
-        status: "Confirmed",
-        createdAt: "2026-09-08"
-      }
-    ];
+  // Room Reservations State (Database Table: room_reservations)
+  const [roomReservations, setRoomReservations] = useState(() => {
+    try {
+      const saved = localStorage.getItem('bisrat_room_reservations');
+      if (saved) return JSON.parse(saved);
+    } catch {}
+    return INITIAL_ROOM_RESERVATIONS;
   });
   useEffect(() => {
-    localStorage.setItem('bisrat_bookings', JSON.stringify(bookings));
-  }, [bookings]);
+    localStorage.setItem('bisrat_room_reservations', JSON.stringify(roomReservations));
+  }, [roomReservations]);
+
+  // Food Reservations State (Database Table: food_reservations)
+  const [foodReservations, setFoodReservations] = useState(() => {
+    try {
+      const saved = localStorage.getItem('bisrat_food_reservations');
+      if (saved) return JSON.parse(saved);
+    } catch {}
+    return INITIAL_FOOD_RESERVATIONS;
+  });
+  useEffect(() => {
+    localStorage.setItem('bisrat_food_reservations', JSON.stringify(foodReservations));
+  }, [foodReservations]);
 
   // Reviews Data State
   const [reviews, setReviews] = useState(() => {
@@ -336,84 +375,102 @@ export default function App() {
   }, [gallery]);
 
   // Automatic Cloud Network Sync across all devices (phones, computers, customers)
-  useEffect(() => {
-    let isMounted = true;
+  const syncWithCloud = async (force = false) => {
+    try {
+      const cloudRes = await fetchCloudAppState(paymentSettings?.cloudStorage);
+      if (cloudRes && cloudRes.success && cloudRes.data) {
+        const remote = cloudRes.data;
+        const remoteTs = Number(remote.updatedAt || 0);
 
-    const syncWithCloud = async () => {
-      try {
-        const cloudRes = await fetchCloudAppState(paymentSettings?.cloudStorage);
-        if (isMounted && cloudRes.success && cloudRes.data) {
-          const remote = cloudRes.data;
-
-          if (Array.isArray(remote.menuItems) && remote.menuItems.length > 0) {
+        if (Array.isArray(remote.menuItems) && remote.menuItems.length > 0) {
+          const localMenuTs = Number(localStorage.getItem('bisrat_menu_ts') || 0);
+          // Only overwrite if remote payload's updatedAt timestamp is strictly greater than local timestamp
+          if (force || !localMenuTs || (remoteTs && remoteTs > localMenuTs)) {
             setMenuItems(prev => {
               const updated = mergeCatalogWithRemote(initialMenuItems, remote.menuItems);
-              try { localStorage.setItem('bisrat_menu', JSON.stringify(updated)); } catch (e) {}
+              try { 
+                localStorage.setItem('bisrat_menu', JSON.stringify(updated));
+                if (remoteTs) localStorage.setItem('bisrat_menu_ts', String(remoteTs));
+              } catch (e) {}
               return updated;
             });
+          } else {
+            console.log('[App] Skipped stale remote menu sync (local is newer or equal):', { remoteTs, localMenuTs });
           }
-          if (remote.photos && typeof remote.photos === 'object' && Object.keys(remote.photos).length > 0) {
-            setPhotos(prev => ({ ...prev, ...remote.photos }));
-            try { localStorage.setItem('bisrat_photos', JSON.stringify(remote.photos)); } catch (e) {}
-          }
-          if (Array.isArray(remote.gallery) && remote.gallery.length > 0) {
-            setGallery(remote.gallery);
-            try { localStorage.setItem('bisrat_gallery', JSON.stringify(remote.gallery)); } catch (e) {}
-          }
-          if (Array.isArray(remote.rooms) && remote.rooms.length > 0) {
-            setRooms(remote.rooms);
-            try { localStorage.setItem('bisrat_rooms', JSON.stringify(remote.rooms)); } catch (e) {}
-          }
-          if (Array.isArray(remote.facilities) && remote.facilities.length > 0) {
-            setFacilities(remote.facilities);
-            try { localStorage.setItem('bisrat_facilities', JSON.stringify(remote.facilities)); } catch (e) {}
-          }
-          if (Array.isArray(remote.reviews) && remote.reviews.length > 0) {
-            setReviews(remote.reviews);
-            try { localStorage.setItem('bisrat_reviews', JSON.stringify(remote.reviews)); } catch (e) {}
-          }
-          if (remote.paymentSettings && typeof remote.paymentSettings === 'object') {
+        }
+        if (remote.photos && typeof remote.photos === 'object' && Object.keys(remote.photos).length > 0) {
+          setPhotos(prev => ({ ...prev, ...remote.photos }));
+          try { localStorage.setItem('bisrat_photos', JSON.stringify(remote.photos)); } catch (e) {}
+        }
+        if (Array.isArray(remote.gallery) && remote.gallery.length > 0) {
+          setGallery(remote.gallery);
+          try { localStorage.setItem('bisrat_gallery', JSON.stringify(remote.gallery)); } catch (e) {}
+        }
+        if (Array.isArray(remote.rooms) && remote.rooms.length > 0) {
+          setRooms(remote.rooms);
+          try { localStorage.setItem('bisrat_rooms', JSON.stringify(remote.rooms)); } catch (e) {}
+        }
+        if (Array.isArray(remote.facilities) && remote.facilities.length > 0) {
+          setFacilities(remote.facilities);
+          try { localStorage.setItem('bisrat_facilities', JSON.stringify(remote.facilities)); } catch (e) {}
+        }
+        if (Array.isArray(remote.reviews) && remote.reviews.length > 0) {
+          setReviews(remote.reviews);
+          try { localStorage.setItem('bisrat_reviews', JSON.stringify(remote.reviews)); } catch (e) {}
+        }
+        if (Array.isArray(remote.room_reservations)) {
+          setRoomReservations(remote.room_reservations);
+          try { localStorage.setItem('bisrat_room_reservations', JSON.stringify(remote.room_reservations)); } catch (e) {}
+        }
+        if (Array.isArray(remote.food_reservations)) {
+          setFoodReservations(remote.food_reservations);
+          try { localStorage.setItem('bisrat_food_reservations', JSON.stringify(remote.food_reservations)); } catch (e) {}
+        }
+        if (remote.admin_password && typeof remote.admin_password === 'string') {
+          setAdminPassword(remote.admin_password);
+          try { localStorage.setItem('bisrat_admin_password', remote.admin_password); } catch (e) {}
+        }
+        if (remote.paymentSettings && typeof remote.paymentSettings === 'object') {
+          const localPayTs = Number(localStorage.getItem('bisrat_payment_ts') || 0);
+          if (force || !localPayTs || (remoteTs && remoteTs >= localPayTs)) {
             setPaymentSettings(prev => ({
               ...prev,
               ...remote.paymentSettings,
+              paymentMethodsList: Array.isArray(remote.paymentSettings.paymentMethodsList) && remote.paymentSettings.paymentMethodsList.length > 0
+                ? remote.paymentSettings.paymentMethodsList
+                : prev.paymentMethodsList,
               cloudStorage: prev.cloudStorage?.supabaseUrl ? prev.cloudStorage : (remote.paymentSettings.cloudStorage || prev.cloudStorage)
             }));
-          }
-          if (remote.updatedAt) {
-            setImageSyncTimestamp(remote.updatedAt);
+            if (remoteTs) {
+              try { localStorage.setItem('bisrat_payment_ts', String(remoteTs)); } catch (e) {}
+            }
           }
         }
-      } catch (err) {
-        console.warn('[App] Remote cloud synchronization notice:', err);
+        if (remote.updatedAt) {
+          setImageSyncTimestamp(remote.updatedAt);
+        }
       }
-    };
+    } catch (err) {
+      console.warn('[App] Remote cloud synchronization notice:', err);
+    }
+  };
 
+  useEffect(() => {
     // 1. Initial cloud sync on mount
     syncWithCloud();
 
     // 2. Poll cloud periodically (every 15s) for live cross-device updates
-    const interval = setInterval(syncWithCloud, 15000);
+    const interval = setInterval(() => syncWithCloud(false), 15000);
 
-    // 3. Sync on tab focus or visibility change (e.g. user opens phone or switches back to tab)
-    const handleFocus = () => syncWithCloud();
+    // 3. Sync on tab focus or visibility change
+    const handleFocus = () => syncWithCloud(false);
     window.addEventListener('focus', handleFocus);
     document.addEventListener('visibilitychange', handleFocus);
 
-    // 4. Same-device multi-tab live sync
-    let bc = null;
-    try {
-      if (typeof window !== 'undefined' && 'BroadcastChannel' in window) {
-        bc = new BroadcastChannel('bisrat_hotel_sync');
-        bc.onmessage = () => syncWithCloud();
-      }
-    } catch (e) {}
-
     return () => {
-      isMounted = false;
       clearInterval(interval);
       window.removeEventListener('focus', handleFocus);
       document.removeEventListener('visibilitychange', handleFocus);
-      if (bc) bc.close();
     };
   }, [
     paymentSettings?.cloudStorage?.supabaseUrl, 
@@ -455,7 +512,7 @@ export default function App() {
   };
 
   const handleBookingSubmit = (newBooking) => {
-    setBookings([newBooking, ...bookings]);
+    setRoomReservations(prev => [newBooking, ...prev.filter(r => r.id !== newBooking.id)]);
   };
 
   const handleAddReview = (newReview) => {
@@ -533,7 +590,7 @@ export default function App() {
           </div>
         )}
 
-        {/* TAB 3: ADMIN PORTAL */}
+        {/* TAB 3: ADMIN PORTAL (Exactly 4 Sections: Reservations, Menu, Payment Settings, Change Password) */}
         {activeTab === 'admin' && (
           <div className="animate-fade-in">
             {!isAdminAuth ? (
@@ -544,26 +601,21 @@ export default function App() {
               />
             ) : (
               <AdminDashboard
-                rooms={rooms}
-                setRooms={setRooms}
-                bookings={bookings}
-                setBookings={setBookings}
                 menuItems={menuItems}
                 setMenuItems={setMenuItems}
-                reviews={reviews}
-                setReviews={setReviews}
-                photos={photos}
-                setPhotos={setPhotos}
-                gallery={gallery}
-                setGallery={setGallery}
-                facilities={facilities}
-                setFacilities={setFacilities}
+                roomReservations={roomReservations}
+                setRoomReservations={setRoomReservations}
+                foodReservations={foodReservations}
+                setFoodReservations={setFoodReservations}
                 paymentSettings={paymentSettings}
                 setPaymentSettings={setPaymentSettings}
                 adminPassword={adminPassword}
                 setAdminPassword={setAdminPassword}
+                photos={photos}
+                setPhotos={setPhotos}
                 lang={lang}
                 onLogout={handleAdminLogout}
+                onRefreshAll={() => syncWithCloud(true)}
               />
             )}
           </div>

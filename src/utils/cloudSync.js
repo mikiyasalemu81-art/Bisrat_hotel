@@ -9,8 +9,8 @@
 import { triggerGlobalImageRefresh } from './imageUrl';
 import { getCloudinaryConfig } from './cloudinary';
 
-// Dedicated Global Public Cloud State Bin (Free, zero-config, persistent)
-const PRIMARY_CLOUD_BIN = 'https://extendsclass.com/api/json-storage/bin/eceaede';
+// Dedicated Global Public Cloud State Bin (Proxied via local Vite middleware to avoid CORS)
+const PRIMARY_CLOUD_BIN = '/api/sync';
 const SECONDARY_API_ENDPOINT = '/api/sync';
 const LEGACY_API_ENDPOINT = '/api/menu';
 
@@ -71,12 +71,7 @@ export async function fetchCloudAppState(customConfig = {}) {
   // 1. Try Primary Cloud Bin directly (accessible from any device globally)
   try {
     const binRes = await fetch(`${PRIMARY_CLOUD_BIN}?t=${now}`, {
-      cache: 'no-store',
-      headers: {
-        'Accept': 'application/json',
-        'Cache-Control': 'no-cache, no-store, must-revalidate',
-        'Pragma': 'no-cache'
-      }
+      cache: 'no-store'
     });
 
     if (binRes.ok) {
@@ -212,12 +207,36 @@ export async function saveCloudAppState(sliceKey, sliceData, customConfig = {}) 
     }
   }
 
+  // Sanitize any transient blob URLs that cannot sync across devices
+  if (Array.isArray(patchPayload.menuItems)) {
+    patchPayload.menuItems = patchPayload.menuItems.map(item => {
+      let cleaned = { ...item };
+      if (typeof cleaned.imageUrl === 'string' && cleaned.imageUrl.startsWith('blob:')) {
+        cleaned.imageUrl = (cleaned.customImage && !cleaned.customImage.startsWith('blob:')) ? cleaned.customImage : '';
+      }
+      if (typeof cleaned.customImage === 'string' && cleaned.customImage.startsWith('blob:')) {
+        delete cleaned.customImage;
+      }
+      return cleaned;
+    });
+  }
+
+  const now = patchPayload.updatedAt || Date.now();
+  patchPayload.updatedAt = now;
+
+  // Update local timestamp caches immediately
+  try {
+    localStorage.setItem('bisrat_last_sync', String(now));
+    if (patchPayload.menuItems) localStorage.setItem('bisrat_menu_ts', String(now));
+    if (patchPayload.paymentSettings) localStorage.setItem('bisrat_payment_ts', String(now));
+  } catch (e) {}
+
   let cloudSaved = false;
 
-  // 2. Persist to Primary Cloud Bin (accessible worldwide)
+  // 2. Persist to API sync (/api/sync)
   try {
-    const binRes = await fetch(PRIMARY_CLOUD_BIN, {
-      method: 'PATCH',
+    const apiRes = await fetch(PRIMARY_CLOUD_BIN, {
+      method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         'Accept': 'application/json'
@@ -225,38 +244,30 @@ export async function saveCloudAppState(sliceKey, sliceData, customConfig = {}) 
       body: JSON.stringify(patchPayload)
     });
 
-    if (binRes.ok) {
-      cloudSaved = true;
-    } else {
-      console.warn('[CloudSync] Primary bin patch returned:', binRes.status);
-    }
-  } catch (binErr) {
-    console.warn('[CloudSync] Primary bin save warning:', binErr);
-  }
-
-  // 3. Also persist via Vercel Serverless Function `/api/sync`
-  try {
-    const apiRes = await fetch(SECONDARY_API_ENDPOINT, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(patchPayload)
-    });
     if (apiRes.ok) {
       cloudSaved = true;
+    } else {
+      console.warn('[CloudSync] /api/sync returned status:', apiRes.status);
     }
-  } catch (apiErr) {}
-
-  // 4. Also notify `/api/menu`
-  try {
-    const menuRes = await fetch(LEGACY_API_ENDPOINT, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(patchPayload)
-    });
-    if (menuRes.ok) {
-      cloudSaved = true;
+  } catch (binErr) {
+    console.warn('[CloudSync] /api/sync save error, trying direct bin fallback:', binErr);
+    // Direct cloud bin fallback with read-merge-write
+    try {
+      const DIRECT_BIN = 'https://extendsclass.com/api/json-storage/bin/eceaede';
+      const readRes = await fetch(`${DIRECT_BIN}?t=${Date.now()}`);
+      let currentBin = {};
+      if (readRes.ok) currentBin = await readRes.json();
+      const mergedDirect = { ...currentBin, ...patchPayload, updatedAt: now };
+      const putRes = await fetch(DIRECT_BIN, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(mergedDirect)
+      });
+      if (putRes.ok) cloudSaved = true;
+    } catch (directErr) {
+      console.warn('[CloudSync] Direct bin fallback error:', directErr);
     }
-  } catch (menuErr) {}
+  }
 
   // 5. Supabase Storage / DB backup (if configured)
   if (config.supabaseUrl && config.supabaseKey) {
@@ -284,7 +295,7 @@ export async function saveCloudAppState(sliceKey, sliceData, customConfig = {}) 
   try {
     if (typeof window !== 'undefined' && 'BroadcastChannel' in window) {
       const channel = new BroadcastChannel('bisrat_hotel_sync');
-      channel.postMessage({ type: 'STATE_UPDATE', state: fullState, updatedAt: fullState.updatedAt });
+      channel.postMessage({ type: 'STATE_UPDATE', state: patchPayload, updatedAt: patchPayload.updatedAt });
       channel.close();
     }
   } catch (e) {}
@@ -298,7 +309,7 @@ export async function saveCloudAppState(sliceKey, sliceData, customConfig = {}) 
     message: cloudSaved 
       ? '✓ Saved to cloud! Changes are now live on all phones, PCs, and customer screens across the internet.' 
       : 'Saved locally and pending cloud synchronization.',
-    updatedAt: fullState.updatedAt
+    updatedAt: patchPayload.updatedAt
   };
 }
 

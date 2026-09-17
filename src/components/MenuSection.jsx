@@ -34,6 +34,7 @@ import {
 import { CATEGORY_CONFIG } from '../data/menuData';
 import { translations } from '../translations';
 import CustomerPaymentDrawer from './CustomerPaymentDrawer';
+import FoodReservationModal from './FoodReservationModal';
 import { getOptimizedImageUrl } from '../utils/imageUrl';
 
 // Map category icons safely
@@ -96,6 +97,19 @@ export default function MenuSection({
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [toastNotification, setToastNotification] = useState(null);
 
+  // Food Reservation Modal State (Prompt #5)
+  const [selectedItemForReservation, setSelectedItemForReservation] = useState(null);
+  const [isFoodReservationOpen, setIsFoodReservationOpen] = useState(false);
+
+  const handleOpenFoodReservation = useCallback((item, e) => {
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+    setSelectedItemForReservation(item);
+    setIsFoodReservationOpen(true);
+  }, []);
+
   useEffect(() => {
     if (!toastNotification) return;
     const timer = setTimeout(() => {
@@ -110,9 +124,9 @@ export default function MenuSection({
     } catch (e) {}
   }, [orderItems]);
 
-  // All catalog items (both available and marked sold-out are displayed on the menu)
+  // Public-facing menu only includes active/in-stock items (inactive items disappear completely per Requirement #2)
   const availableItems = useMemo(() => {
-    return (menuItems || []).filter(item => Boolean(item && item.id));
+    return (menuItems || []).filter(item => Boolean(item && item.id) && item.isAvailable !== false && item.isActive !== false);
   }, [menuItems]);
 
   // Group available items by category
@@ -701,7 +715,7 @@ export default function MenuSection({
                                         {item.price} <span className="text-[10px] font-sans font-bold text-[#1A1C19]">ETB</span>
                                       </span>
 
-                                      {/* Order Now CTA Button / Sold Out State */}
+                                      {/* Reserve & Order Action Buttons */}
                                       {isSoldOut ? (
                                         <button
                                           type="button"
@@ -713,15 +727,27 @@ export default function MenuSection({
                                           <span>{lang === 'am' ? 'አልቋል' : 'Sold Out'}</span>
                                         </button>
                                       ) : (
-                                        <button
-                                          type="button"
-                                          onClick={(e) => handleAddToOrder(item, e)}
-                                          className="bg-[#C5A059] hover:bg-[#B08B42] text-[#1A1C19] font-bold px-3.5 py-2 rounded-xl text-xs flex items-center gap-1.5 shadow-xs border border-[#C5A059] transition-all active:scale-95 hover:shadow-sm cursor-pointer"
-                                          title="Add to dining order"
-                                        >
-                                          <ShoppingBag className="w-3.5 h-3.5 text-[#1A1C19]" />
-                                          <span>{cartQty > 0 ? `Ordered (${cartQty})` : 'Order Now'}</span>
-                                        </button>
+                                        <div className="flex items-center gap-1.5 sm:gap-2">
+                                          <button
+                                            type="button"
+                                            onClick={(e) => handleOpenFoodReservation(item, e)}
+                                            className="bg-[#1B4D3E] hover:bg-[#153D31] text-white font-bold px-3 py-2 rounded-xl text-xs flex items-center gap-1 shadow-xs transition-all active:scale-95 cursor-pointer border border-[#13382D]"
+                                            title="Reserve this dish and table in advance"
+                                          >
+                                            <Utensils className="w-3.5 h-3.5 text-[#C5A059]" />
+                                            <span>{lang === 'am' ? 'ቦታ ያዝ' : 'Reserve'}</span>
+                                          </button>
+
+                                          <button
+                                            type="button"
+                                            onClick={(e) => handleAddToOrder(item, e)}
+                                            className="bg-[#C5A059] hover:bg-[#B08B42] text-[#1A1C19] font-bold px-3 py-2 rounded-xl text-xs flex items-center gap-1 shadow-xs border border-[#C5A059] transition-all active:scale-95 hover:shadow-sm cursor-pointer"
+                                            title="Add to dining order"
+                                          >
+                                            <ShoppingBag className="w-3.5 h-3.5 text-[#1A1C19]" />
+                                            <span>{cartQty > 0 ? `(${cartQty})` : (lang === 'am' ? 'እዘዝ' : 'Order')}</span>
+                                          </button>
+                                        </div>
                                       )}
                                     </div>
                                   </div>
@@ -813,28 +839,40 @@ export default function MenuSection({
                                       )}
                                     </div>
 
-                                    {/* Order Button / Sold Out State */}
-                                    {isSoldOut ? (
-                                      <button
-                                        type="button"
-                                        disabled
-                                        className="bg-stone-100 text-stone-400 font-bold px-2 py-1.5 rounded-lg text-xs flex items-center gap-1 border border-stone-200 cursor-not-allowed"
-                                        title="Item currently out of stock"
-                                      >
-                                        <Ban className="w-3 h-3 text-rose-500" />
-                                        <span>{lang === 'am' ? 'አልቋል' : 'Sold Out'}</span>
-                                      </button>
-                                    ) : (
-                                      <button
-                                        type="button"
-                                        onClick={(e) => handleAddToOrder(item, e)}
-                                        className="bg-[#C5A059] hover:bg-[#B08B42] text-[#1A1C19] font-bold px-2.5 py-1.5 rounded-lg text-xs flex items-center gap-1 shadow-2xs border border-[#C5A059] cursor-pointer"
-                                        title="Add to dining order"
-                                      >
-                                        <Plus className="w-3.5 h-3.5 text-[#1A1C19]" />
-                                        <span>{cartQty > 0 ? `+${cartQty}` : 'Add'}</span>
-                                      </button>
-                                    )}
+                                     {/* Action Buttons: Reserve & Order */}
+                                     {isSoldOut ? (
+                                       <button
+                                         type="button"
+                                         disabled
+                                         className="bg-stone-100 text-stone-400 font-bold px-2 py-1.5 rounded-lg text-xs flex items-center gap-1 border border-stone-200 cursor-not-allowed"
+                                         title="Item currently out of stock"
+                                       >
+                                         <Ban className="w-3 h-3 text-rose-500" />
+                                         <span>{lang === 'am' ? 'አልቋል' : 'Sold Out'}</span>
+                                       </button>
+                                     ) : (
+                                       <div className="flex items-center gap-1.5">
+                                         <button
+                                           type="button"
+                                           onClick={(e) => handleOpenFoodReservation(item, e)}
+                                           className="bg-[#1B4D3E] hover:bg-[#153D31] text-white font-bold px-2 py-1.5 rounded-lg text-xs flex items-center gap-1 shadow-2xs border border-[#13382D] cursor-pointer active:scale-95"
+                                           title="Reserve dish and table"
+                                         >
+                                           <Utensils className="w-3 h-3 text-[#C5A059]" />
+                                           <span className="hidden sm:inline">{lang === 'am' ? 'ቦታ ያዝ' : 'Reserve'}</span>
+                                         </button>
+
+                                         <button
+                                           type="button"
+                                           onClick={(e) => handleAddToOrder(item, e)}
+                                           className="bg-[#C5A059] hover:bg-[#B08B42] text-[#1A1C19] font-bold px-2.5 py-1.5 rounded-lg text-xs flex items-center gap-1 shadow-2xs border border-[#C5A059] cursor-pointer active:scale-95"
+                                           title="Add to dining order"
+                                         >
+                                           <Plus className="w-3.5 h-3.5 text-[#1A1C19]" />
+                                           <span>{cartQty > 0 ? `+${cartQty}` : 'Add'}</span>
+                                         </button>
+                                       </div>
+                                     )}
                                   </div>
                                 </div>
                               );
@@ -1080,7 +1118,20 @@ export default function MenuSection({
                     {lightboxItem?.price} <span className="text-xs font-sans uppercase">ETB</span>
                   </div>
 
-                  {/* Order Button inside Lightbox */}
+                  {/* Reserve and Order Buttons inside Lightbox */}
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      const dish = lightboxItem;
+                      closeLightbox(e);
+                      handleOpenFoodReservation(dish, e);
+                    }}
+                    className="bg-[#1B4D3E] hover:bg-[#153D31] text-white font-bold px-3.5 py-2 rounded-xl text-xs flex items-center gap-1.5 shadow-md border border-[#13382D] transition-transform active:scale-95 cursor-pointer"
+                  >
+                    <Utensils className="w-3.5 h-3.5 text-[#C5A059]" />
+                    <span>{lang === 'am' ? 'ቦታ ያዝ' : 'Reserve'}</span>
+                  </button>
+
                   <button
                     type="button"
                     onClick={(e) => {
@@ -1134,6 +1185,19 @@ export default function MenuSection({
         onUpdateQuantity={handleUpdateQuantity}
         onClearOrder={handleClearOrder}
         paymentSettings={paymentSettings}
+        lang={lang}
+      />
+
+      {/* ======================================================== */}
+      {/* FOOD RESERVATION MODAL (Prompt #5)                       */}
+      {/* ======================================================== */}
+      <FoodReservationModal
+        isOpen={isFoodReservationOpen}
+        onClose={() => {
+          setIsFoodReservationOpen(false);
+          setSelectedItemForReservation(null);
+        }}
+        item={selectedItemForReservation}
         lang={lang}
       />
 

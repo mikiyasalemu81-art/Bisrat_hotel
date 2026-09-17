@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { 
   X, 
   Utensils, 
@@ -35,13 +35,24 @@ export default function CustomerPaymentDrawer({
   const frontDeskPhone = paymentSettings?.phoneNumber || '0906320251';
   const cbeAccount = paymentSettings?.cbeAccountNumber || '1000679192934';
   const cbeName = paymentSettings?.cbeAccountName || 'Bisrat Hotel';
-  const enabledMethods = paymentSettings?.paymentMethods || { cbe: true, arrival: true };
+
+  const activeMethodsList = useMemo(() => {
+    if (Array.isArray(paymentSettings?.paymentMethodsList) && paymentSettings.paymentMethodsList.length > 0) {
+      return paymentSettings.paymentMethodsList.filter(m => m.enabled !== false);
+    }
+    return [
+      { id: 'cbe', name: 'Commercial Bank of Ethiopia (CBE Mobile Banking)', type: 'cbe', enabled: true, accountNumber: cbeAccount, accountName: cbeName },
+      { id: 'cash', name: 'Pay on Arrival / Cash at Counter', type: 'arrival', enabled: true, instructions: 'Pay cash directly to your server or reception counter.' }
+    ];
+  }, [paymentSettings?.paymentMethodsList, cbeAccount, cbeName]);
 
   const [selectedTable, setSelectedTable] = useState(defaultTable);
   const [guestName, setGuestName] = useState('');
   const [guestPhone, setGuestPhone] = useState('');
-  const [paymentMethod, setPaymentMethod] = useState('cbe');
-  const [copiedCbe, setCopiedCbe] = useState(false);
+  const [paymentMethod, setPaymentMethod] = useState(() => {
+    return activeMethodsList[0]?.id || activeMethodsList[0]?.name || 'cbe';
+  });
+  const [copiedKey, setCopiedKey] = useState(null);
   const [orderConfirmed, setOrderConfirmed] = useState(null);
 
   useEffect(() => {
@@ -51,12 +62,10 @@ export default function CustomerPaymentDrawer({
   }, [defaultTable]);
 
   useEffect(() => {
-    if (enabledMethods.cbe !== false) {
-      setPaymentMethod('cbe');
-    } else {
-      setPaymentMethod('cash');
+    if (activeMethodsList.length > 0 && !activeMethodsList.some(m => m.id === paymentMethod || m.name === paymentMethod)) {
+      setPaymentMethod(activeMethodsList[0]?.id || activeMethodsList[0]?.name);
     }
-  }, [enabledMethods.cbe, enabledMethods.cash, enabledMethods.arrival]);
+  }, [activeMethodsList, paymentMethod]);
 
   if (!isOpen) return null;
 
@@ -67,10 +76,12 @@ export default function CustomerPaymentDrawer({
 
   const totalItemCount = orderItems.reduce((sum, entry) => sum + (entry.quantity || 1), 0);
 
-  const copyToClipboard = (text) => {
-    navigator.clipboard.writeText(text);
-    setCopiedCbe(true);
-    setTimeout(() => setCopiedCbe(false), 2500);
+  const copyToClipboard = (text, key = 'default') => {
+    try {
+      navigator.clipboard.writeText(text);
+    } catch (e) {}
+    setCopiedKey(key);
+    setTimeout(() => setCopiedKey(null), 2500);
   };
 
   const handlePlaceOrder = (e) => {
@@ -257,7 +268,7 @@ export default function CustomerPaymentDrawer({
               </a>
             </div>
 
-            {/* 4. Payment Method Selection (Dynamically Populated from Admin Settings) */}
+            {/* 4. Payment Method Selection (Dynamically Populated from Admin Payment Settings) */}
             <div className="bg-white p-4 rounded-2xl border border-[#E8EFE9] shadow-xs space-y-3">
               <label className="block text-xs font-bold text-[#1A1C19] flex items-center gap-1.5">
                 <CreditCard className="w-4 h-4 text-[#1B4D3E]" />
@@ -265,90 +276,130 @@ export default function CustomerPaymentDrawer({
               </label>
 
               <div className="grid grid-cols-1 gap-2.5">
-                
-                {/* CBE Mobile Banking Option */}
-                {enabledMethods.cbe && (
-                  <div
-                    onClick={() => setPaymentMethod('cbe')}
-                    className={`cursor-pointer p-3 rounded-xl border-2 transition-all ${
-                      paymentMethod === 'cbe' 
-                        ? 'bg-[#1B4D3E]/10 border-[#1B4D3E] shadow-xs' 
-                        : 'bg-[#FDFCF7] border-[#E8EFE9] hover:border-[#1B4D3E]/40'
-                    }`}
-                  >
-                    <div className="flex items-center justify-between mb-1">
-                      <div className="flex items-center gap-2">
-                        <Building2 className="w-4 h-4 text-[#1B4D3E]" />
-                        <span className="font-bold text-xs text-[#1A1C19]">
-                          Commercial Bank of Ethiopia (CBE Mobile Banking)
-                        </span>
-                      </div>
-                      <input
-                        type="radio"
-                        name="paymentMethod"
-                        checked={paymentMethod === 'cbe'}
-                        onChange={() => setPaymentMethod('cbe')}
-                        className="text-[#1B4D3E] focus:ring-[#1B4D3E]"
-                      />
-                    </div>
+                {activeMethodsList.map((m) => {
+                  const isSelected = paymentMethod === m.id || paymentMethod === m.name;
 
-                    {paymentMethod === 'cbe' && (
-                      <div className="mt-2 pt-2 border-t border-[#1B4D3E]/20 text-xs text-[#1A1C19] space-y-1.5 animate-fade-in">
-                        <div className="flex items-center justify-between bg-white px-3 py-1.5 rounded-lg border border-[#E8EFE9] font-mono font-bold">
-                          <span>CBE Acc: {cbeAccount}</span>
-                          <button
-                            type="button"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              copyToClipboard(cbeAccount, 'cbe');
-                            }}
-                            className="text-[11px] text-[#1B4D3E] hover:underline flex items-center gap-1 font-bold"
-                          >
-                            {copiedCbe ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5" />}
-                            <span>{copiedCbe ? 'Copied' : 'Copy'}</span>
-                          </button>
+                  return (
+                    <div
+                      key={m.id}
+                      onClick={() => setPaymentMethod(m.id || m.name)}
+                      className={`cursor-pointer p-3 rounded-xl border-2 transition-all ${
+                        isSelected 
+                          ? 'bg-[#1B4D3E]/10 border-[#1B4D3E] shadow-xs' 
+                          : 'bg-[#FDFCF7] border-[#E8EFE9] hover:border-[#1B4D3E]/40'
+                      }`}
+                    >
+                      <div className="flex items-center justify-between mb-1">
+                        <div className="flex items-center gap-2">
+                          {m.type === 'cbe' ? (
+                            <Building2 className="w-4 h-4 text-[#1B4D3E]" />
+                          ) : m.type === 'telebirr' ? (
+                            <Smartphone className="w-4 h-4 text-[#1B4D3E]" />
+                          ) : (
+                            <CreditCard className="w-4 h-4 text-[#1B4D3E]" />
+                          )}
+                          <span className="font-bold text-xs text-[#1A1C19]">
+                            {m.name}
+                          </span>
                         </div>
-                        <p className="text-[11px] text-stone-600">
-                          Account Name: <strong>{cbeName}</strong>
-                        </p>
+                        <input
+                          type="radio"
+                          name="paymentMethod"
+                          checked={isSelected}
+                          onChange={() => setPaymentMethod(m.id || m.name)}
+                          className="text-[#1B4D3E] focus:ring-[#1B4D3E]"
+                        />
                       </div>
-                    )}
-                  </div>
-                )}
 
-                {/* Pay on Arrival Option */}
-                {(enabledMethods.arrival !== false || enabledMethods.cash !== false) && (
-                  <div
-                    onClick={() => setPaymentMethod('cash')}
-                    className={`cursor-pointer p-3 rounded-xl border-2 transition-all ${
-                      paymentMethod === 'cash' 
-                        ? 'bg-[#1B4D3E]/10 border-[#1B4D3E] shadow-xs' 
-                        : 'bg-[#FDFCF7] border-[#E8EFE9] hover:border-[#1B4D3E]/40'
-                    }`}
-                  >
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2">
-                        <CreditCard className="w-4 h-4 text-[#1B4D3E]" />
-                        <span className="font-bold text-xs text-[#1A1C19]">
-                          Pay on Arrival / Cash at Counter
-                        </span>
-                      </div>
-                      <input
-                        type="radio"
-                        name="paymentMethod"
-                        checked={paymentMethod === 'cash'}
-                        onChange={() => setPaymentMethod('cash')}
-                        className="text-[#1B4D3E] focus:ring-[#1B4D3E]"
-                      />
+                      {/* Detail / Instructions panel when selected */}
+                      {isSelected && (
+                        <div className="mt-2 pt-2 border-t border-[#1B4D3E]/20 text-xs text-[#1A1C19] space-y-1.5 animate-fade-in">
+                          {/* CBE Account */}
+                          {m.type === 'cbe' && (m.accountNumber || cbeAccount) && (
+                            <div className="space-y-1">
+                              <div className="flex items-center justify-between bg-white px-3 py-1.5 rounded-lg border border-[#E8EFE9] font-mono font-bold">
+                                <span>CBE Acc: {m.accountNumber || cbeAccount}</span>
+                                <button
+                                  type="button"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    copyToClipboard(m.accountNumber || cbeAccount, m.id);
+                                  }}
+                                  className="text-[11px] text-[#1B4D3E] hover:underline flex items-center gap-1 font-bold cursor-pointer"
+                                >
+                                  {copiedKey === m.id ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5" />}
+                                  <span>{copiedKey === m.id ? 'Copied' : 'Copy'}</span>
+                                </button>
+                              </div>
+                              <p className="text-[11px] text-stone-600">
+                                Account Name: <strong>{m.accountName || cbeName}</strong>
+                              </p>
+                            </div>
+                          )}
+
+                          {/* Telebirr Details */}
+                          {m.type === 'telebirr' && (
+                            <div className="space-y-1">
+                              {m.merchantId && (
+                                <div className="flex items-center justify-between bg-white px-3 py-1.5 rounded-lg border border-[#E8EFE9] font-mono font-bold">
+                                  <span>Merchant ID: {m.merchantId}</span>
+                                  <button
+                                    type="button"
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      copyToClipboard(m.merchantId, `m-${m.id}`);
+                                    }}
+                                    className="text-[11px] text-[#1B4D3E] hover:underline flex items-center gap-1 font-bold cursor-pointer"
+                                  >
+                                    {copiedKey === `m-${m.id}` ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5" />}
+                                    <span>{copiedKey === `m-${m.id}` ? 'Copied' : 'Copy'}</span>
+                                  </button>
+                                </div>
+                              )}
+                              {m.phoneNumber && (
+                                <p className="text-[11px] text-stone-700">
+                                  Phone: <strong className="font-mono">{m.phoneNumber}</strong>
+                                </p>
+                              )}
+                            </div>
+                          )}
+
+                          {/* Bank Details */}
+                          {m.type === 'bank' && m.accountNumber && (
+                            <div className="space-y-1">
+                              <div className="flex items-center justify-between bg-white px-3 py-1.5 rounded-lg border border-[#E8EFE9] font-mono font-bold">
+                                <span>{m.bankName || 'Bank'}: {m.accountNumber}</span>
+                                <button
+                                  type="button"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    copyToClipboard(m.accountNumber, m.id);
+                                  }}
+                                  className="text-[11px] text-[#1B4D3E] hover:underline flex items-center gap-1 font-bold cursor-pointer"
+                                >
+                                  {copiedKey === m.id ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5" />}
+                                  <span>{copiedKey === m.id ? 'Copied' : 'Copy'}</span>
+                                </button>
+                              </div>
+                              {m.accountName && (
+                                <p className="text-[11px] text-stone-600">
+                                  Account Name: <strong>{m.accountName}</strong>
+                                </p>
+                              )}
+                            </div>
+                          )}
+
+                          {/* Instructions */}
+                          {m.instructions && (
+                            <p className="text-[11px] text-stone-600">
+                              {m.instructions}
+                            </p>
+                          )}
+                        </div>
+                      )}
                     </div>
-                    {paymentMethod === 'cash' && (
-                      <p className="text-[11px] text-[#1B4D3E] mt-1.5 pt-1.5 border-t border-[#1B4D3E]/20">
-                        Pay cash directly to your server or at the main reception counter upon service.
-                      </p>
-                    )}
-                  </div>
-                )}
-
+                  );
+                })}
               </div>
             </div>
 

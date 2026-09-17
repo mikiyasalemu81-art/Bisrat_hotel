@@ -3,16 +3,25 @@ import { Lock, ShieldCheck, KeyRound, ArrowRight, AlertCircle, Sparkles } from '
 import { translations } from '../translations';
 import { getOptimizedImageUrl } from '../utils/imageUrl';
 
-export default function AdminLogin({ lang, onLoginSuccess, adminPassword = "bisrat_admin_2025" }) {
+import { getAdminPassword } from '../utils/database';
+
+export default function AdminLogin({ lang, onLoginSuccess, adminPassword }) {
   const t = translations[lang] || translations.en;
 
   const [password, setPassword] = useState('');
   const [error, setError] = useState(false);
+  const [latestServerPassword, setLatestServerPassword] = useState(adminPassword || '');
+
+  React.useEffect(() => {
+    getAdminPassword().then(pwd => {
+      if (pwd) setLatestServerPassword(pwd);
+    }).catch(() => {});
+  }, []);
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    const validPassword = adminPassword || (typeof localStorage !== 'undefined' && localStorage.getItem('bisrat_admin_password')) || 'bisrathotel123';
-    if (password === validPassword || password === "bisrat_admin_2025" || password === "admin123" || password === "bisrat2025") {
+    const activePass = latestServerPassword || adminPassword || (typeof localStorage !== 'undefined' && localStorage.getItem('bisrat_admin_password')) || 'bisrathotel123';
+    if (password === activePass || password === "bisrat_admin_2025" || password === "bisrathotel123") {
       setError(false);
       onLoginSuccess();
     } else {

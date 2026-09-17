@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { X, Calendar, User, Phone, Mail, CreditCard, CheckCircle, ShieldCheck, Sparkles, Building2 } from 'lucide-react';
 import { translations } from '../translations';
+import { saveRoomReservation } from '../utils/database';
 
 export default function BookingModal({ 
   isOpen, 
@@ -15,7 +16,15 @@ export default function BookingModal({
 
   const t = translations[lang] || translations.en;
 
-  const enabledMethods = paymentSettings?.paymentMethods || { cbe: true, arrival: true };
+  const activeMethodsList = useMemo(() => {
+    if (Array.isArray(paymentSettings?.paymentMethodsList) && paymentSettings.paymentMethodsList.length > 0) {
+      return paymentSettings.paymentMethodsList.filter(m => m.enabled !== false);
+    }
+    return [
+      { id: 'cbe', name: 'Commercial Bank of Ethiopia (CBE)', type: 'cbe', enabled: true, instructions: t.booking.cbeDesc },
+      { id: 'arrival', name: 'Pay on Arrival / Cash', type: 'arrival', enabled: true, instructions: t.booking.arrivalDesc }
+    ];
+  }, [paymentSettings?.paymentMethodsList, t.booking.cbeDesc, t.booking.arrivalDesc]);
 
   const [activeRoomId, setActiveRoomId] = useState(selectedRoom?.id || rooms[0]?.id || '');
   const [fullName, setFullName] = useState('');
@@ -25,8 +34,7 @@ export default function BookingModal({
   const [checkOut, setCheckOut] = useState(new Date(Date.now() + 86400000).toISOString().split('T')[0]);
   const [guests, setGuests] = useState(1);
   const [paymentMethod, setPaymentMethod] = useState(() => {
-    if (enabledMethods.cbe !== false) return 'cbe';
-    return 'arrival';
+    return activeMethodsList[0]?.name || 'Commercial Bank of Ethiopia (CBE)';
   });
   const [confirmedBooking, setConfirmedBooking] = useState(null);
 
@@ -43,7 +51,7 @@ export default function BookingModal({
   const nights = calculateNights();
   const totalPrice = (currentRoom?.price || 2500) * nights;
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (!fullName || !phone) {
       alert("Please fill in your name and phone number.");
@@ -55,19 +63,31 @@ export default function BookingModal({
       id: refNumber,
       roomName: t.rooms[currentRoom.nameKey] || currentRoom.nameKey,
       guestName: fullName,
+      name: fullName,
       phone,
       email,
       checkIn,
+      checkInDate: checkIn,
       checkOut,
+      checkOutDate: checkOut,
       nights,
       guests,
       totalPrice,
       paymentMethod,
       status: 'Confirmed',
+      dateSubmitted: new Date().toISOString(),
       createdAt: new Date().toLocaleDateString()
     };
 
-    onBookingSubmit(newBooking);
+    try {
+      await saveRoomReservation(newBooking);
+    } catch (err) {
+      console.warn('Persistent DB save warning:', err);
+    }
+
+    if (onBookingSubmit) {
+      onBookingSubmit(newBooking);
+    }
     setConfirmedBooking(newBooking);
   };
 
@@ -197,64 +217,55 @@ export default function BookingModal({
                 </div>
               </div>
 
-              {/* Payment Methods Choice */}
+              {/* Payment Methods Choice (Dynamic from Admin Payment Settings) */}
               <div>
                 <label className="block text-xs font-bold text-stone-700 mb-2">
                   {t.booking.paymentTitle}
                 </label>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  
-                  {/* CBE Birr Choice */}
-                  {enabledMethods.cbe !== false && (
-                    <div
-                      onClick={() => setPaymentMethod('cbe')}
-                      className={`cursor-pointer rounded-2xl p-3.5 border-2 transition-all flex flex-col justify-between ${
-                        paymentMethod === 'cbe'
-                          ? 'border-[#1B4D3E] bg-[#1B4D3E]/5 shadow-sm'
-                          : 'border-stone-200 bg-white hover:border-stone-300'
-                      }`}
-                    >
-                      <div className="flex items-center justify-between mb-2">
-                        <span className="font-bold text-xs text-purple-700 bg-purple-100 px-2.5 py-0.5 rounded-lg">
-                          CBE Birr
-                        </span>
-                        <input 
-                          type="radio" 
-                          name="payment" 
-                          checked={paymentMethod === 'cbe'} 
-                          onChange={() => setPaymentMethod('cbe')}
-                        />
-                      </div>
-                      <p className="text-xs font-semibold text-[#1A1C19]">{t.booking.cbe}</p>
-                      <p className="text-[10px] text-stone-500 mt-1">{t.booking.cbeDesc}</p>
-                    </div>
-                  )}
+                  {activeMethodsList.map((m) => {
+                    const isSelected = paymentMethod === m.name || paymentMethod === m.id;
 
-                  {/* Pay on Arrival Choice */}
-                  {enabledMethods.arrival !== false && (
-                    <div
-                      onClick={() => setPaymentMethod('arrival')}
-                      className={`cursor-pointer rounded-2xl p-3.5 border-2 transition-all flex flex-col justify-between ${
-                        paymentMethod === 'arrival'
-                          ? 'border-[#1B4D3E] bg-[#1B4D3E]/5 shadow-sm'
-                          : 'border-stone-200 bg-white hover:border-stone-300'
-                      }`}
-                    >
-                      <div className="flex items-center justify-between mb-2">
-                        <Building2 className="w-4 h-4 text-[#1B4D3E]" />
-                        <input 
-                          type="radio" 
-                          name="payment" 
-                          checked={paymentMethod === 'arrival'} 
-                          onChange={() => setPaymentMethod('arrival')}
-                        />
+                    return (
+                      <div
+                        key={m.id}
+                        onClick={() => setPaymentMethod(m.name)}
+                        className={`cursor-pointer rounded-2xl p-3.5 border-2 transition-all flex flex-col justify-between ${
+                          isSelected
+                            ? 'border-[#1B4D3E] bg-[#1B4D3E]/5 shadow-sm'
+                            : 'border-stone-200 bg-white hover:border-stone-300'
+                        }`}
+                      >
+                        <div className="flex items-center justify-between mb-2">
+                          <span className="font-bold text-xs text-[#1B4D3E] bg-[#1B4D3E]/10 px-2.5 py-0.5 rounded-lg uppercase tracking-wider text-[10px]">
+                            {m.type === 'cbe' ? 'CBE Birr' : m.type === 'telebirr' ? 'Telebirr' : m.type === 'arrival' ? 'Cash on Arrival' : m.type}
+                          </span>
+                          <input 
+                            type="radio" 
+                            name="payment" 
+                            checked={isSelected} 
+                            onChange={() => setPaymentMethod(m.name)}
+                            className="text-[#1B4D3E] focus:ring-[#1B4D3E]"
+                          />
+                        </div>
+                        <p className="text-xs font-semibold text-[#1A1C19]">{m.name}</p>
+                        {m.accountNumber && (
+                          <p className="font-mono text-[11px] text-stone-700 mt-1 font-bold">
+                            Acc: {m.accountNumber}
+                          </p>
+                        )}
+                        {m.merchantId && (
+                          <p className="font-mono text-[11px] text-stone-700 mt-1 font-bold">
+                            Merchant ID: {m.merchantId}
+                          </p>
+                        )}
+                        {m.instructions && (
+                          <p className="text-[10px] text-stone-500 mt-1">{m.instructions}</p>
+                        )}
                       </div>
-                      <p className="text-xs font-semibold text-[#1A1C19]">{t.booking.arrival}</p>
-                      <p className="text-[10px] text-stone-500 mt-1">{t.booking.arrivalDesc}</p>
-                    </div>
-                  )}
-
+                    );
+                  })}
                 </div>
               </div>
 

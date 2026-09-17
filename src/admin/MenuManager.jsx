@@ -30,6 +30,9 @@ import { saveCloudAppState } from '../utils/cloudSync';
 export default function MenuManager({ 
   menuItems = [], 
   setMenuItems, 
+  onToggleStock,
+  onSaveMenuItem,
+  onDeleteMenuItem,
   photos = {},
   setPhotos,
   paymentSettings = {},
@@ -130,8 +133,8 @@ export default function MenuManager({
       const cloudRes = await uploadToCloudStorage(compressed, paymentSettings?.cloudStorage);
       const publicHttpsUrl = cloudRes.secureUrl || cloudRes.url;
 
-      if (!publicHttpsUrl || publicHttpsUrl.startsWith('data:')) {
-        throw new Error("No public Cloudinary URL returned from cloud storage.");
+      if (!publicHttpsUrl || !publicHttpsUrl.startsWith('https://') || publicHttpsUrl.startsWith('data:') || publicHttpsUrl.startsWith('blob:')) {
+        throw new Error("No public Cloudinary HTTPS URL returned from cloud storage.");
       }
 
       setEditImageUrl(publicHttpsUrl);
@@ -148,6 +151,17 @@ export default function MenuManager({
     e.preventDefault();
     if (!editingItem) return;
 
+    if (isEditUploading) {
+      alert("Please wait for photo upload to Cloudinary to complete before saving.");
+      return;
+    }
+
+    const cleanImg = editImageUrl.trim();
+    if (cleanImg && (cleanImg.startsWith('blob:') || cleanImg.startsWith('data:'))) {
+      alert("Cannot save local blob or data URL. Please wait for Cloudinary upload to complete.");
+      return;
+    }
+
     const numericPrice = Number(editPrice);
     if (isNaN(numericPrice) || numericPrice <= 0) {
       alert("Please enter a valid price in ETB.");
@@ -155,7 +169,6 @@ export default function MenuManager({
     }
 
     const now = Date.now();
-    const cleanImg = editImageUrl.trim();
     const finalImageUrl = cleanImg 
       ? getOptimizedImageUrl(cleanImg, now) 
       : getItemImage(editingItem);
@@ -167,6 +180,7 @@ export default function MenuManager({
       category: editCategory || editingItem.category,
       price: numericPrice,
       isAvailable: editIsAvailable,
+      isActive: editIsAvailable,
       description: editDescription.trim(),
       imageUrl: finalImageUrl,
       image_url: finalImageUrl,
@@ -174,12 +188,21 @@ export default function MenuManager({
       updatedAt: now,
     };
 
-    const updatedList = menuItems.map(item => item.id === editingItem.id ? updatedItem : item);
-    setMenuItems(updatedList);
-    try {
-      localStorage.setItem('bisrat_menu', JSON.stringify(updatedList));
-      saveCloudAppState('menuItems', updatedList, paymentSettings?.cloudStorage).catch(() => {});
-    } catch (e) {}
+    if (onSaveMenuItem) {
+      try {
+        await onSaveMenuItem(updatedItem);
+      } catch (err) {
+        console.warn('onSaveMenuItem notice:', err);
+      }
+    } else {
+      const updatedList = menuItems.map(item => item.id === editingItem.id ? updatedItem : item);
+      setMenuItems(updatedList);
+      try {
+        localStorage.setItem('bisrat_menu', JSON.stringify(updatedList));
+        localStorage.setItem('bisrat_menu_ts', String(now));
+        saveCloudAppState('menuItems', updatedList, paymentSettings?.cloudStorage).catch(() => {});
+      } catch (e) {}
+    }
 
     // Update photo cache if placeholderSlot exists
     if (editingItem.placeholderSlot && finalImageUrl) {
@@ -200,7 +223,7 @@ export default function MenuManager({
     try {
       if (typeof window !== 'undefined' && 'BroadcastChannel' in window) {
         const channel = new BroadcastChannel('bisrat_hotel_sync');
-        channel.postMessage({ type: 'MENU_UPDATE', menuItems: updatedList, imgSyncTs: now });
+        channel.postMessage({ type: 'MENU_UPDATE', menuItems: menuItems.map(i => i.id === editingItem.id ? updatedItem : i), imgSyncTs: now, updatedAt: now });
         channel.postMessage({ type: 'IMG_SYNC', timestamp: now });
         if (editingItem.placeholderSlot && finalImageUrl) {
           channel.postMessage({ type: 'PHOTOS_UPDATE', photos: { [editingItem.placeholderSlot]: finalImageUrl } });
@@ -221,22 +244,34 @@ export default function MenuManager({
       e.preventDefault();
       e.stopPropagation();
     }
+
+    if (onToggleStock) {
+      onToggleStock(id).catch(err => {
+        console.error('onToggleStock error:', err);
+      });
+      return;
+    }
+
+    const now = Date.now();
     const updated = menuItems.map(item => {
       if (item.id === id) {
-        return { ...item, isAvailable: !item.isAvailable };
+        const nextVal = item.isAvailable === false ? true : false;
+        return { ...item, isAvailable: nextVal, isActive: nextVal, updatedAt: now };
       }
       return item;
     });
+
     setMenuItems(updated);
     try {
       localStorage.setItem('bisrat_menu', JSON.stringify(updated));
+      localStorage.setItem('bisrat_menu_ts', String(now));
       saveCloudAppState('menuItems', updated, paymentSettings?.cloudStorage).catch(() => {});
     } catch (e) {}
 
     try {
       if (typeof window !== 'undefined' && 'BroadcastChannel' in window) {
         const channel = new BroadcastChannel('bisrat_hotel_sync');
-        channel.postMessage({ type: 'MENU_UPDATE', menuItems: updated });
+        channel.postMessage({ type: 'MENU_UPDATE', menuItems: updated, updatedAt: now });
         channel.close();
       }
     } catch (e) {}
@@ -256,8 +291,8 @@ export default function MenuManager({
       const cloudRes = await uploadToCloudStorage(compressed, paymentSettings?.cloudStorage);
       const publicHttpsUrl = cloudRes.secureUrl || cloudRes.url;
 
-      if (!publicHttpsUrl || publicHttpsUrl.startsWith('data:')) {
-        throw new Error("No public Cloudinary URL returned from cloud storage.");
+      if (!publicHttpsUrl || !publicHttpsUrl.startsWith('https://') || publicHttpsUrl.startsWith('data:') || publicHttpsUrl.startsWith('blob:')) {
+        throw new Error("No public Cloudinary HTTPS URL returned from cloud storage.");
       }
 
       setImageUrl(publicHttpsUrl);
@@ -274,10 +309,20 @@ export default function MenuManager({
     e.preventDefault();
     if (!nameEn || !price) return;
 
+    if (isAddUploading) {
+      alert("Please wait for photo upload to Cloudinary to complete before saving.");
+      return;
+    }
+
+    const cleanImg = imageUrl.trim() || null;
+    if (cleanImg && (cleanImg.startsWith('blob:') || cleanImg.startsWith('data:'))) {
+      alert("Cannot save local blob or data URL. Please wait for Cloudinary upload to complete.");
+      return;
+    }
+
     const numericPrice = Number(price);
     const now = Date.now();
     const slotKey = `menu-custom-${now}.jpg`;
-    const cleanImg = imageUrl.trim() || null;
     const finalUrl = cleanImg ? getOptimizedImageUrl(cleanImg, now) : null;
 
     const newItem = {
@@ -296,12 +341,21 @@ export default function MenuManager({
       description: description.trim() || "Freshly prepared dish at Bisrat Hotel Restaurant & Bar."
     };
 
-    const updatedList = [newItem, ...menuItems];
-    setMenuItems(updatedList);
-    try {
-      localStorage.setItem('bisrat_menu', JSON.stringify(updatedList));
-      saveCloudAppState('menuItems', updatedList, paymentSettings?.cloudStorage).catch(() => {});
-    } catch (e) {}
+    if (onSaveMenuItem) {
+      try {
+        await onSaveMenuItem(newItem);
+      } catch (err) {
+        console.warn('onSaveMenuItem notice:', err);
+      }
+    } else {
+      const updatedList = [newItem, ...menuItems];
+      setMenuItems(updatedList);
+      try {
+        localStorage.setItem('bisrat_menu', JSON.stringify(updatedList));
+        localStorage.setItem('bisrat_menu_ts', String(now));
+        saveCloudAppState('menuItems', updatedList, paymentSettings?.cloudStorage).catch(() => {});
+      } catch (e) {}
+    }
 
     if (finalUrl) {
       try {
@@ -316,7 +370,7 @@ export default function MenuManager({
     try {
       if (typeof window !== 'undefined' && 'BroadcastChannel' in window) {
         const channel = new BroadcastChannel('bisrat_hotel_sync');
-        channel.postMessage({ type: 'MENU_UPDATE', menuItems: updatedList, imgSyncTs: now });
+        channel.postMessage({ type: 'MENU_UPDATE', menuItems: [newItem, ...menuItems], imgSyncTs: now, updatedAt: now });
         channel.postMessage({ type: 'IMG_SYNC', timestamp: now });
         channel.close();
       }
@@ -342,17 +396,27 @@ export default function MenuManager({
       e.stopPropagation();
     }
     if (window.confirm(`Are you sure you want to delete "${name}" from the menu?`)) {
+      if (onDeleteMenuItem) {
+        onDeleteMenuItem(id).catch(err => {
+          console.error('onDeleteMenuItem error:', err);
+        });
+        showSuccess(`Removed "${name}" from the menu.`);
+        return;
+      }
+
+      const now = Date.now();
       const updated = menuItems.filter(item => item.id !== id);
       setMenuItems(updated);
       try {
         localStorage.setItem('bisrat_menu', JSON.stringify(updated));
+        localStorage.setItem('bisrat_menu_ts', String(now));
         saveCloudAppState('menuItems', updated, paymentSettings?.cloudStorage).catch(() => {});
       } catch (e) {}
 
       try {
         if (typeof window !== 'undefined' && 'BroadcastChannel' in window) {
           const channel = new BroadcastChannel('bisrat_hotel_sync');
-          channel.postMessage({ type: 'MENU_UPDATE', menuItems: updated });
+          channel.postMessage({ type: 'MENU_UPDATE', menuItems: updated, updatedAt: now });
           channel.close();
         }
       } catch (e) {}
