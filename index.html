@@ -205,7 +205,7 @@
     const openIcon = document.getElementById('bot-icon-open');
     const closeIcon = document.getElementById('bot-icon-close');
 
-    const WEBHOOK_URL = 'https://mikiyas11.app.n8n.cloud/webhook/bisrat-chat-trigger/chat';
+    const WEBHOOK_URL = 'https://bisrat-bot-api.onrender.com/chat';
     let sessionId = localStorage.getItem('bisrat_chat_session') || 'sess_' + Math.random().toString(36).substring(2, 12);
     localStorage.setItem('bisrat_chat_session', sessionId);
 

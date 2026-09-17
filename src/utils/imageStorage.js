@@ -9,9 +9,9 @@ import {
   triggerGlobalImageRefresh, 
   getImageSyncTimestamp, 
   setImageSyncTimestamp 
-} from './imageUrl';
-import { saveCloudAppState } from './cloudSync';
-import { uploadToCloudinary, getCloudinaryConfig } from './cloudinary';
+} from './imageUrl.js';
+import { saveCloudAppState } from './cloudSync.js';
+import { uploadToCloudinary, getCloudinaryConfig } from './cloudinary.js';
 
 export { 
   getOptimizedImageUrl, 

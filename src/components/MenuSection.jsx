@@ -58,6 +58,7 @@ export default function MenuSection({
   menuItems = [], 
   photos = {}, 
   paymentSettings = {},
+  onFoodReservationSubmit,
   lang = 'en' 
 }) {
   const t = translations[lang] || translations.en;
@@ -101,14 +102,16 @@ export default function MenuSection({
   const [selectedItemForReservation, setSelectedItemForReservation] = useState(null);
   const [isFoodReservationOpen, setIsFoodReservationOpen] = useState(false);
 
-  const handleOpenFoodReservation = useCallback((item, e) => {
+  const handleOpenFoodReservation = useCallback((item, e, defaultQty = null) => {
     if (e) {
       e.preventDefault();
       e.stopPropagation();
     }
-    setSelectedItemForReservation(item);
+    const inCart = orderItems.find(o => o.id === item.id);
+    const qty = defaultQty !== null ? defaultQty : (inCart?.quantity || 1);
+    setSelectedItemForReservation({ ...item, initialQuantity: qty });
     setIsFoodReservationOpen(true);
-  }, []);
+  }, [orderItems]);
 
   useEffect(() => {
     if (!toastNotification) return;
@@ -730,7 +733,7 @@ export default function MenuSection({
                                         <div className="flex items-center gap-1.5 sm:gap-2">
                                           <button
                                             type="button"
-                                            onClick={(e) => handleOpenFoodReservation(item, e)}
+                                            onClick={(e) => handleOpenFoodReservation(item, e, cartQty > 0 ? cartQty : 1)}
                                             className="bg-[#1B4D3E] hover:bg-[#153D31] text-white font-bold px-3 py-2 rounded-xl text-xs flex items-center gap-1 shadow-xs transition-all active:scale-95 cursor-pointer border border-[#13382D]"
                                             title="Reserve this dish and table in advance"
                                           >
@@ -740,9 +743,15 @@ export default function MenuSection({
 
                                           <button
                                             type="button"
-                                            onClick={(e) => handleAddToOrder(item, e)}
+                                            onClick={(e) => {
+                                              if (cartQty > 0) {
+                                                handleOpenFoodReservation(item, e, cartQty);
+                                              } else {
+                                                handleAddToOrder(item, e);
+                                              }
+                                            }}
                                             className="bg-[#C5A059] hover:bg-[#B08B42] text-[#1A1C19] font-bold px-3 py-2 rounded-xl text-xs flex items-center gap-1 shadow-xs border border-[#C5A059] transition-all active:scale-95 hover:shadow-sm cursor-pointer"
-                                            title="Add to dining order"
+                                            title={cartQty > 0 ? `Complete reservation for ${cartQty} items` : "Add to order"}
                                           >
                                             <ShoppingBag className="w-3.5 h-3.5 text-[#1A1C19]" />
                                             <span>{cartQty > 0 ? `(${cartQty})` : (lang === 'am' ? 'እዘዝ' : 'Order')}</span>
@@ -854,7 +863,7 @@ export default function MenuSection({
                                        <div className="flex items-center gap-1.5">
                                          <button
                                            type="button"
-                                           onClick={(e) => handleOpenFoodReservation(item, e)}
+                                           onClick={(e) => handleOpenFoodReservation(item, e, cartQty > 0 ? cartQty : 1)}
                                            className="bg-[#1B4D3E] hover:bg-[#153D31] text-white font-bold px-2 py-1.5 rounded-lg text-xs flex items-center gap-1 shadow-2xs border border-[#13382D] cursor-pointer active:scale-95"
                                            title="Reserve dish and table"
                                          >
@@ -864,9 +873,15 @@ export default function MenuSection({
 
                                          <button
                                            type="button"
-                                           onClick={(e) => handleAddToOrder(item, e)}
+                                           onClick={(e) => {
+                                             if (cartQty > 0) {
+                                               handleOpenFoodReservation(item, e, cartQty);
+                                             } else {
+                                               handleAddToOrder(item, e);
+                                             }
+                                           }}
                                            className="bg-[#C5A059] hover:bg-[#B08B42] text-[#1A1C19] font-bold px-2.5 py-1.5 rounded-lg text-xs flex items-center gap-1 shadow-2xs border border-[#C5A059] cursor-pointer active:scale-95"
-                                           title="Add to dining order"
+                                           title={cartQty > 0 ? `Complete reservation for ${cartQty} items` : "Add to dining order"}
                                          >
                                            <Plus className="w-3.5 h-3.5 text-[#1A1C19]" />
                                            <span>{cartQty > 0 ? `+${cartQty}` : 'Add'}</span>
@@ -1184,6 +1199,7 @@ export default function MenuSection({
         orderItems={orderItems}
         onUpdateQuantity={handleUpdateQuantity}
         onClearOrder={handleClearOrder}
+        onOrderSubmit={onFoodReservationSubmit}
         paymentSettings={paymentSettings}
         lang={lang}
       />
@@ -1198,6 +1214,7 @@ export default function MenuSection({
           setSelectedItemForReservation(null);
         }}
         item={selectedItemForReservation}
+        onReservationSuccess={onFoodReservationSubmit}
         lang={lang}
       />
 

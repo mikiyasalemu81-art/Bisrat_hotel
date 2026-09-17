@@ -9,6 +9,8 @@
  * - adminPassword
  */
 
+import { saveCloudAppState } from './cloudSync.js';
+
 const PRIMARY_CLOUD_BIN = 'https://extendsclass.com/api/json-storage/bin/eceaede';
 const SECONDARY_API_ENDPOINT = '/api/sync';
 
@@ -152,54 +154,31 @@ export async function fetchDatabaseState() {
  * Save partial or whole slice to persistent database
  */
 export async function saveDatabaseSlice(sliceKey, sliceData) {
-  const patchPayload = {
-    [sliceKey]: sliceData,
-    updatedAt: Date.now()
-  };
+  const now = Date.now();
 
-  let saved = false;
-
-  // 1. Save directly to cloud bin
-  try {
-    const res = await fetch(PRIMARY_CLOUD_BIN, {
-      method: 'PATCH',
-      headers: {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json'
-      },
-      body: JSON.stringify(patchPayload)
-    });
-    if (res.ok) saved = true;
-  } catch (err) {
-    console.warn('[Database] Direct bin patch error:', err);
-  }
-
-  // 2. Also notify API sync
-  try {
-    const apiRes = await fetch(SECONDARY_API_ENDPOINT, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(patchPayload)
-    });
-    if (apiRes.ok) saved = true;
-  } catch (e) {}
-
-  // 3. Update localStorage cache for instant offline responsiveness
+  // 1. Update localStorage cache for instant offline responsiveness
   try {
     localStorage.setItem(`bisrat_${sliceKey}`, JSON.stringify(sliceData));
-    localStorage.setItem('bisrat_last_sync', String(patchPayload.updatedAt));
+    localStorage.setItem('bisrat_last_sync', String(now));
   } catch (e) {}
 
-  // 4. Broadcast to other open tabs on this browser
+  // 2. Broadcast to other open tabs on this browser
   try {
     if (typeof window !== 'undefined' && 'BroadcastChannel' in window) {
       const channel = new BroadcastChannel('bisrat_hotel_sync');
-      channel.postMessage({ type: 'SLICE_UPDATE', sliceKey, data: sliceData, timestamp: patchPayload.updatedAt });
+      channel.postMessage({ type: 'SLICE_UPDATE', sliceKey, data: sliceData, timestamp: now });
       channel.close();
     }
   } catch (e) {}
 
-  return { success: saved, updatedAt: patchPayload.updatedAt };
+  // 3. Centralized safe read-merge-write cloud persistence
+  try {
+    const cloudRes = await saveCloudAppState(sliceKey, sliceData);
+    return { success: cloudRes.success || cloudRes.cloudSaved, updatedAt: now };
+  } catch (err) {
+    console.warn('[Database] Cloud sync error in saveDatabaseSlice:', err);
+    return { success: false, error: err.message, updatedAt: now };
+  }
 }
 
 /* ========================================================================= */

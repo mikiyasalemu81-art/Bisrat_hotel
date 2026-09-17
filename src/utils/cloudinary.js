@@ -9,7 +9,7 @@
  * NEVER hardcodes credentials in source code.
  */
 
-import { compressImage } from './imageStorage';
+import { compressImage } from './imageStorage.js';
 
 /**
  * Retrieve current Cloudinary cloud name and upload preset from environment variables

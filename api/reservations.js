@@ -37,15 +37,17 @@ export default async function handler(req, res) {
     return {};
   };
 
-  // Helper to patch db
+  // Helper to safely persist to cloud db with read-merge-write PUT
   const patchDb = async (patch) => {
+    const current = await getDb();
+    const merged = { ...current, ...patch, updatedAt: Date.now() };
     return await fetch(CLOUD_BIN_URL, {
-      method: 'PATCH',
+      method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
         'Accept': 'application/json'
       },
-      body: JSON.stringify({ ...patch, updatedAt: Date.now() })
+      body: JSON.stringify(merged)
     });
   };
 

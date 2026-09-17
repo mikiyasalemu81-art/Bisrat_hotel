@@ -515,6 +515,10 @@ export default function App() {
     setRoomReservations(prev => [newBooking, ...prev.filter(r => r.id !== newBooking.id)]);
   };
 
+  const handleFoodReservationSubmit = (newReservation) => {
+    setFoodReservations(prev => [newReservation, ...prev.filter(f => f.id !== newReservation.id)]);
+  };
+
   const handleAddReview = (newReview) => {
     const updated = [newReview, ...reviews];
     setReviews(updated);
@@ -586,6 +590,7 @@ export default function App() {
               photos={photos}
               lang={lang}
               paymentSettings={paymentSettings}
+              onFoodReservationSubmit={handleFoodReservationSubmit}
             />
           </div>
         )}

@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { createPortal } from 'react-dom';
 import { 
   X, 
   Utensils, 
@@ -30,7 +31,7 @@ export default function FoodReservationModal({
   const displayName = lang === 'am' ? item.nameAm : lang === 'or' ? item.nameOr : item.nameEn;
   const secondaryName = lang !== 'en' ? item.nameEn : item.nameAm;
 
-  const [quantity, setQuantity] = useState(1);
+  const [quantity, setQuantity] = useState(() => Math.max(1, Number(item?.initialQuantity) || 1));
   const [fullName, setFullName] = useState('');
   const [phone, setPhone] = useState('');
   const [diningTime, setDiningTime] = useState('');
@@ -40,14 +41,22 @@ export default function FoodReservationModal({
   const [errorMsg, setErrorMsg] = useState('');
   const [confirmedReservation, setConfirmedReservation] = useState(null);
 
+  React.useEffect(() => {
+    if (item) {
+      setQuantity(Math.max(1, Number(item.initialQuantity) || 1));
+      setErrorMsg('');
+      setConfirmedReservation(null);
+    }
+  }, [item?.id, item?.initialQuantity]);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!fullName.trim()) {
-      setErrorMsg('Please enter your full name.');
+      setErrorMsg(lang === 'am' ? 'እባክዎ ሙሉ ስምዎን ያስገቡ።' : 'Please enter your full name.');
       return;
     }
     if (!phone.trim()) {
-      setErrorMsg('Please enter your phone number so we can confirm your reservation.');
+      setErrorMsg(lang === 'am' ? 'እባክዎ ስልክ ቁጥርዎን ያስገቡ።' : 'Please enter your phone number so we can confirm your reservation.');
       return;
     }
 
@@ -105,8 +114,8 @@ export default function FoodReservationModal({
     onClose();
   };
 
-  return (
-    <div className="fixed inset-0 z-50 overflow-y-auto bg-stone-900/70 backdrop-blur-sm flex items-center justify-center p-2 sm:p-4 animate-fade-in">
+  return createPortal(
+    <div className="fixed inset-0 z-[9999] overflow-y-auto bg-stone-900/75 backdrop-blur-sm flex items-center justify-center p-2 sm:p-4 animate-fade-in" style={{ zIndex: 9999 }}>
       
       <div className="bg-[#FDFCF7] w-full max-w-2xl rounded-3xl shadow-2xl border border-[#E8EFE9] overflow-hidden flex flex-col max-h-[92vh]">
         
@@ -187,21 +196,41 @@ export default function FoodReservationModal({
                     )}
                   </div>
                 </div>
+              </div>
 
-                {/* Quantity Selector */}
-                <div className="flex flex-col items-center gap-1 bg-[#FDFCF7] border border-stone-200 rounded-xl p-1 shrink-0">
+              {/* Quantity Selection Section ("Ask how many they want") */}
+              <div className="bg-white p-4 rounded-2xl border border-[#E8EFE9] shadow-2xs flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+                <div>
+                  <label className="block text-xs font-bold text-stone-800">
+                    {lang === 'am' ? 'ምን ያህል ይፈልጋሉ? (ብዛት)' : lang === 'or' ? 'Meeqa barbaaddu? (Baay\'ina)' : 'How many would you like? (Quantity)'}
+                  </label>
+                  <p className="text-[11px] text-stone-500 mt-0.5">
+                    {quantity} × {item.price} ETB = <span className="font-mono font-bold text-[#1B4D3E]">{item.price * quantity} ETB</span>
+                  </p>
+                </div>
+
+                <div className="flex items-center gap-2 bg-[#FDFCF7] border border-stone-300 rounded-xl p-1 shrink-0">
                   <button
                     type="button"
                     onClick={() => setQuantity(q => Math.max(1, q - 1))}
-                    className="w-7 h-7 rounded-lg bg-white border border-stone-200 text-stone-700 font-bold hover:bg-stone-100 flex items-center justify-center text-sm"
+                    className="w-9 h-9 rounded-lg bg-white border border-stone-200 text-stone-700 font-bold hover:bg-stone-100 flex items-center justify-center text-base active:scale-95 shadow-2xs"
+                    title="Decrease quantity"
                   >
                     -
                   </button>
-                  <span className="font-bold text-xs text-stone-800">{quantity}</span>
+                  <input
+                    type="number"
+                    min="1"
+                    max="99"
+                    value={quantity}
+                    onChange={(e) => setQuantity(Math.max(1, parseInt(e.target.value) || 1))}
+                    className="w-12 text-center font-bold text-sm sm:text-base text-stone-900 bg-transparent focus:outline-none"
+                  />
                   <button
                     type="button"
                     onClick={() => setQuantity(q => q + 1)}
-                    className="w-7 h-7 rounded-lg bg-white border border-stone-200 text-stone-700 font-bold hover:bg-stone-100 flex items-center justify-center text-sm"
+                    className="w-9 h-9 rounded-lg bg-[#1B4D3E] text-white font-bold hover:bg-[#153D31] flex items-center justify-center text-base active:scale-95 shadow-2xs"
+                    title="Increase quantity"
                   >
                     +
                   </button>
@@ -397,6 +426,7 @@ export default function FoodReservationModal({
 
       </div>
 
-    </div>
+    </div>,
+    document.body
   );
 }

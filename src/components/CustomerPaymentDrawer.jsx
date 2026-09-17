@@ -17,6 +17,7 @@ import {
   PhoneCall, 
   ShieldCheck 
 } from 'lucide-react';
+import { saveFoodReservation } from '../utils/database';
 
 export default function CustomerPaymentDrawer({
   isOpen,
@@ -24,6 +25,7 @@ export default function CustomerPaymentDrawer({
   orderItems = [],
   onUpdateQuantity,
   onClearOrder,
+  onOrderSubmit,
   paymentSettings = {},
   lang = 'en'
 }) {
@@ -102,6 +104,32 @@ export default function CustomerPaymentDrawer({
       paymentMethod,
       timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
     };
+
+    // Save as food reservation record for Admin Dashboard
+    const reservationRecord = {
+      id: orderRef,
+      name: guestName.trim() || 'Dining Guest',
+      phone: guestPhone.trim() || frontDeskPhone,
+      dateSubmitted: new Date().toISOString(),
+      menuItems: orderItems.map(o => ({
+        id: o.id || o.item?.id,
+        name: o.item?.nameEn || o.nameEn || 'Dish',
+        price: o.item?.price || o.price || 0,
+        quantity: o.quantity || 1
+      })),
+      menuItemNames: orderItems.map(o => `${o.item?.nameEn || o.nameEn || 'Item'} (x${o.quantity || 1})`).join(', '),
+      tableNumber: selectedTable || 'Unassigned',
+      notes: `Order Total: ${totalAmount} ETB • Payment: ${paymentMethod}`,
+      status: 'Pending'
+    };
+
+    saveFoodReservation(reservationRecord).catch(err => {
+      console.warn('Failed to persist cart order to database:', err);
+    });
+
+    if (onOrderSubmit) {
+      onOrderSubmit(reservationRecord);
+    }
 
     setOrderConfirmed(confirmed);
     if (onClearOrder) onClearOrder();

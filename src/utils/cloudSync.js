@@ -6,10 +6,11 @@
  * and customer devices across the internet without requiring manual user configuration.
  */
 
-import { triggerGlobalImageRefresh } from './imageUrl';
-import { getCloudinaryConfig } from './cloudinary';
+import { triggerGlobalImageRefresh } from './imageUrl.js';
+import { getCloudinaryConfig } from './cloudinary.js';
 
-// Dedicated Global Public Cloud State Bin (Proxied via local Vite middleware to avoid CORS)
+// Dedicated Global Public Cloud State Bin
+const DIRECT_BIN_URL = 'https://extendsclass.com/api/json-storage/bin/eceaede';
 const PRIMARY_CLOUD_BIN = '/api/sync';
 const SECONDARY_API_ENDPOINT = '/api/sync';
 const LEGACY_API_ENDPOINT = '/api/menu';
@@ -33,17 +34,18 @@ export function getCloudConfig(customConfig = {}) {
   };
 
   try {
-    const saved = localStorage.getItem('bisrat_payment_settings');
-    if (saved) {
-      const parsed = JSON.parse(saved);
-      if (parsed.cloudStorage) {
-        config = { 
-          ...config, 
-          ...parsed.cloudStorage, 
-          cloudName: parsed.cloudStorage.cloudName || config.cloudName,
-          uploadPreset: parsed.cloudStorage.uploadPreset || config.uploadPreset,
-          ...customConfig 
-        };
+    if (typeof localStorage !== 'undefined') {
+      const saved = localStorage.getItem('bisrat_payment_settings');
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (parsed.cloudStorage) {
+          config = { 
+            ...config, 
+            ...parsed.cloudStorage,
+            cloudName: parsed.cloudStorage.cloudName || config.cloudName,
+            uploadPreset: parsed.cloudStorage.uploadPreset || config.uploadPreset
+          };
+        }
       }
     }
   } catch (e) {
@@ -68,36 +70,37 @@ export async function fetchCloudAppState(customConfig = {}) {
   const config = getCloudConfig(customConfig);
   const now = Date.now();
 
-  // 1. Try Primary Cloud Bin directly (accessible from any device globally)
+  // 1. Try Vercel Serverless / Local Vite proxy `/api/sync`
   try {
-    const binRes = await fetch(`${PRIMARY_CLOUD_BIN}?t=${now}`, {
-      cache: 'no-store'
-    });
-
-    if (binRes.ok) {
-      const binData = await binRes.json();
-      if (binData && typeof binData === 'object' && (binData.menuItems || binData.paymentSettings || binData.reviews || binData.photos)) {
-        return { success: true, data: binData, source: 'cloud-storage-bin' };
-      }
-    }
-  } catch (binErr) {
-    console.warn('[CloudSync] Primary cloud bin fetch notice:', binErr);
-  }
-
-  // 2. Try Vercel Serverless Function API `/api/sync`
-  try {
-    const apiRes = await fetch(`${SECONDARY_API_ENDPOINT}?t=${now}`, {
+    const apiRes = await fetch(`${PRIMARY_CLOUD_BIN}?t=${now}`, {
       cache: 'no-store',
       headers: { 'Accept': 'application/json' }
     });
     if (apiRes.ok) {
       const apiData = await apiRes.json();
       const stateObj = apiData?.data || apiData;
-      if (stateObj && typeof stateObj === 'object' && (stateObj.menuItems || stateObj.paymentSettings || stateObj.reviews)) {
-        return { success: true, data: stateObj, source: 'vercel-api-sync' };
+      if (stateObj && typeof stateObj === 'object' && (stateObj.menuItems || stateObj.paymentSettings || stateObj.reviews || stateObj.food_reservations)) {
+        return { success: true, data: stateObj, source: 'api-sync' };
       }
     }
   } catch (apiErr) {}
+
+  // 2. Direct fetch from ExtendsClass bin (accessible from any device globally)
+  try {
+    const binRes = await fetch(`${DIRECT_BIN_URL}?t=${now}`, {
+      cache: 'no-store',
+      headers: { 'Accept': 'application/json' }
+    });
+
+    if (binRes.ok) {
+      const binData = await binRes.json();
+      if (binData && typeof binData === 'object' && (binData.menuItems || binData.paymentSettings || binData.reviews || binData.photos || binData.food_reservations)) {
+        return { success: true, data: binData, source: 'cloud-storage-bin' };
+      }
+    }
+  } catch (binErr) {
+    console.warn('[CloudSync] Direct cloud bin fetch notice:', binErr);
+  }
 
   // 3. Try Legacy API `/api/menu`
   try {
@@ -250,8 +253,11 @@ export async function saveCloudAppState(sliceKey, sliceData, customConfig = {}) 
       console.warn('[CloudSync] /api/sync returned status:', apiRes.status);
     }
   } catch (binErr) {
-    console.warn('[CloudSync] /api/sync save error, trying direct bin fallback:', binErr);
-    // Direct cloud bin fallback with read-merge-write
+    console.warn('[CloudSync] /api/sync save error:', binErr);
+  }
+
+  // 3. Fallback: Direct cloud bin with safe read-merge-write PUT if /api/sync didn't succeed
+  if (!cloudSaved) {
     try {
       const DIRECT_BIN = 'https://extendsclass.com/api/json-storage/bin/eceaede';
       const readRes = await fetch(`${DIRECT_BIN}?t=${Date.now()}`);
@@ -263,7 +269,10 @@ export async function saveCloudAppState(sliceKey, sliceData, customConfig = {}) 
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(mergedDirect)
       });
-      if (putRes.ok) cloudSaved = true;
+      if (putRes.ok) {
+        cloudSaved = true;
+        console.log('[CloudSync] Successfully saved via direct bin fallback');
+      }
     } catch (directErr) {
       console.warn('[CloudSync] Direct bin fallback error:', directErr);
     }
