@@ -743,15 +743,9 @@ export default function MenuSection({
 
                                           <button
                                             type="button"
-                                            onClick={(e) => {
-                                              if (cartQty > 0) {
-                                                handleOpenFoodReservation(item, e, cartQty);
-                                              } else {
-                                                handleAddToOrder(item, e);
-                                              }
-                                            }}
+                                            onClick={(e) => handleOpenFoodReservation(item, e, cartQty > 0 ? cartQty : 1)}
                                             className="bg-[#C5A059] hover:bg-[#B08B42] text-[#1A1C19] font-bold px-3 py-2 rounded-xl text-xs flex items-center gap-1 shadow-xs border border-[#C5A059] transition-all active:scale-95 hover:shadow-sm cursor-pointer"
-                                            title={cartQty > 0 ? `Complete reservation for ${cartQty} items` : "Add to order"}
+                                            title="Order / Reserve this dish"
                                           >
                                             <ShoppingBag className="w-3.5 h-3.5 text-[#1A1C19]" />
                                             <span>{cartQty > 0 ? `(${cartQty})` : (lang === 'am' ? 'እዘዝ' : 'Order')}</span>
@@ -873,18 +867,12 @@ export default function MenuSection({
 
                                          <button
                                            type="button"
-                                           onClick={(e) => {
-                                             if (cartQty > 0) {
-                                               handleOpenFoodReservation(item, e, cartQty);
-                                             } else {
-                                               handleAddToOrder(item, e);
-                                             }
-                                           }}
+                                           onClick={(e) => handleOpenFoodReservation(item, e, cartQty > 0 ? cartQty : 1)}
                                            className="bg-[#C5A059] hover:bg-[#B08B42] text-[#1A1C19] font-bold px-2.5 py-1.5 rounded-lg text-xs flex items-center gap-1 shadow-2xs border border-[#C5A059] cursor-pointer active:scale-95"
-                                           title={cartQty > 0 ? `Complete reservation for ${cartQty} items` : "Add to dining order"}
+                                           title="Order / Reserve this dish"
                                          >
                                            <Plus className="w-3.5 h-3.5 text-[#1A1C19]" />
-                                           <span>{cartQty > 0 ? `+${cartQty}` : 'Add'}</span>
+                                           <span>{cartQty > 0 ? `+${cartQty}` : (lang === 'am' ? 'እዘዝ' : 'Order')}</span>
                                          </button>
                                        </div>
                                      )}
@@ -1150,14 +1138,14 @@ export default function MenuSection({
                   <button
                     type="button"
                     onClick={(e) => {
-                      handleAddToOrder(lightboxItem, e);
+                      const dish = lightboxItem;
                       closeLightbox(e);
-                      setIsDrawerOpen(true);
+                      handleOpenFoodReservation(dish, e, 1);
                     }}
                     className="bg-[#C5A059] hover:bg-[#B08B42] text-[#1A1C19] font-bold px-4 py-2 rounded-xl text-xs flex items-center gap-1.5 shadow-md border border-[#C5A059] transition-transform active:scale-95 cursor-pointer"
                   >
                     <ShoppingBag className="w-4 h-4 text-[#1A1C19]" />
-                    <span>Order Now</span>
+                    <span>{lang === 'am' ? 'አሁን እዘዝ' : 'Order Now'}</span>
                   </button>
                 </div>
               </div>

@@ -247,7 +247,6 @@
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            action: 'sendMessage',
             chatInput: text,
             sessionId: sessionId
           })
@@ -255,12 +254,26 @@
 
         const data = await response.json();
         typingDiv.remove();
-        
-        // n8n returns string directly or inside an output property
-        const botReply = typeof data === 'string' ? data : (data.output || data.text || 'Thank you for reaching out to Bisrat Hotel.');
+
+        // Safely extract reply across all formats
+        let botReply = '';
+        if (typeof data === 'string') {
+          botReply = data;
+        } else if (data.output) {
+          botReply = data.output;
+        } else if (data.text) {
+          botReply = data.text;
+        } else if (data.reply) {
+          botReply = data.reply;
+        } else if (Array.isArray(data) && data[0]?.output) {
+          botReply = data[0].output;
+        } else {
+          botReply = 'Please call reception at 022 211 2555 or 0906 320 251.';
+        }
+
         appendMessage(botReply, 'bot');
       } catch (err) {
-        typingDiv.textContent = 'Unable to connect to concierge right now. Please call reception directly.';
+        typingDiv.textContent = 'Please call reception directly at 022 211 2555 or 0906 320 251.';
       }
     });
   })();
